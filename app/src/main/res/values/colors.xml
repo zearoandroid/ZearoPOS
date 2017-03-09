@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2980b9</color>
+    <color name="colorPrimaryDark">#3498db</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="text_color_default">#00000C</color>
+    <color name="text_color_inverse">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="list_row_default_bg">#ffffff</color>
+    <color name="list_row_pressed_bg">#008cef</color>
+    <color name="list_row_selected_bg">#86d3f6</color>
+
+    <color name="edit_button_pressed">#6dc79a</color>
+    <color name="edit_button_default">#e0e0e0</color>
+    <color name="dark_grey_blue">#2c3e50</color>
+    <color name="pale_grey_blue">#ecf0f1</color>
+    <color name="dark_sky_blue">#3498db</color>
+    <color name="dark_grey">#979797</color>
+    <color name="dark_orange">#ff8000</color>
+
+    <color name="NiceButtonStartColor">#4AA02C</color>
+    <color name="NiceButtonEndColor">#348017</color>
+    <color name="NiceButtonDisabledStartColor">#565051</color>
+    <color name="NiceButtonDisabledEndColor">#736F6E</color>
+    <color name="NiceButtonBorderColor">#254117</color>
+
+    <color name="card1_bg">#f78507</color>
+    <color name="card2_bg">#244637</color>
+    <color name="card3_bg">#c056d9</color>
+    <color name="card4_bg">#967754</color>
+    <color name="card5_bg">#ef075c</color>
+    <color name="card6_bg">#22adf5</color>
+    <color name="card7_bg">#5cee36</color>
+    <color name="cardstack_bg">#ebeff0</color>
+
+    <color name="pale_grey">#ecf0f1</color>
+    <color name="splash_text_shadow">#2c3e50</color>
+    <color name="pos_terminal_background">#ebeff0</color>
+    <color name="tomato">#e74c3c</color>
+    <color name="greyDark">#979797</color>
+    <color name="black">#000000</color>
+    <color name="blackGrey">#555555</color>
+
+    <color name="firstRunBackground">#ff620b38</color>
+    <color name="purple">#ff460928</color>
+    <color name="red">#ffff0000</color>
+    <color name="transparent">#00000000</color>
+    <color name="transGray">#80aaaaaa</color>
+    <color name="transPurble">#80460928</color>
+    <color name="purplelight">#ff7f2251</color>
+    <color name="gray">#ff333333</color>
+    <color name="infoColor">#003636</color>
+    <color name="mapColor">#048a8a</color>
+    <color name="feedbackColor">#005757</color>
+    <color name="transWhite">#80ffffff</color>
+</resources>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix"
+    android:id="@+id/totalAmountLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/dark_grey_blue"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtTotalQtyItems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="center|center_horizontal"
+        android:alpha="0.5"
+        android:paddingLeft="24dp"
+        android:paddingTop="16dp"
+        android:text="0 items"
+        fontPath="fonts/GothamRounded-Book.otf"
+        android:textColor="@color/white"
+        android:textSize="@dimen/orderHeaderLblSize"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnDiscountView"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/txtTotalQtyItems"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/discount_selection_button_transparent"
+        android:text="%"
+        fontPath="fonts/GothamRounded-Bold.otf"
+        android:textColor="@color/dark_orange"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/txtOrderNameView"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_toRightOf="@+id/btnDiscountView"
+        android:layout_below="@+id/txtTotalQtyItems"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="10dp"
+        android:text=""
+        fontPath="fonts/GothamRounded-Bold.otf"
+        android:textColor="@color/dark_orange"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/layTotalSection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="24dp"
+            android:paddingTop="16dp"
+            android:text="Total"
+            android:textColor="@color/white"
+            fontPath="fonts/GothamRounded-Medium.otf"
+            android:textSize="@dimen/orderHeaderLblSize"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtTotalOld"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="24dp"
+            android:paddingTop="16dp"
+            android:text="QR 0.00"
+            fontPath="fonts/GothamRounded-Medium.otf"
+            android:textColor="@color/white"
+            android:textSize="@dimen/orderHeaderLblSize"
+            android:textStyle="normal"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/txtTotalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/layTotalSection"
+        android:paddingBottom="16dp"
+        android:paddingRight="24dp"
+        android:paddingTop="5dp"
+        android:text="QR 0.00"
+        fontPath="fonts/GothamRounded-Light.otf"
+        android:textColor="@color/white"
+        android:textSize="@dimen/orderHeaderAmtSize"
+        android:textStyle="bold" />
+
+</RelativeLayout>

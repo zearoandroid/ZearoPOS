@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layPayment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_dialog"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".presentation.view.activity.PaymentActivity"
+    tools:ignore="MissingPrefix">
+
+    <RelativeLayout
+        android:id="@+id/layPayTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary">
+        <TextView
+            android:id="@+id/txtPaymentTitle"
+            fontPath="fonts/GothamRounded-Bold.otf"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_gravity="center|center_vertical"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:text="Payment"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/imgClosePayment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
+            android:src="@android:drawable/ic_delete"/>
+    </RelativeLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layPayTitle">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/rgPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                android:padding="15dp">
+
+                <RadioButton
+                    android:id="@+id/rbCredit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingRight="10dp"
+                    android:text="On Credit" />
+
+                <RadioButton
+                    android:id="@+id/rbCash"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingRight="10dp"
+                    android:text="On Cash" />
+
+            </RadioGroup>
+
+            <TableLayout
+                android:id="@+id/layPaymentTypes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:id="@+id/txtCustomerNameTitle"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Customer:"
+                        android:textSize="@dimen/payLabelSize" />
+
+                    <TextView
+                        android:id="@+id/textCustomer"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Cash Customer"
+                        android:textSize="@dimen/payLabelSize" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:id="@+id/txtOldTotalAmountTitle"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Total Amount:"
+                        android:textSize="@dimen/payLabelSize" />
+
+                    <TextView
+                        android:id="@+id/txtOldTotalAmount"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:textSize="@dimen/payLabelSize" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:id="@+id/txtDiscountTitle"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Discount:"
+                        android:textSize="@dimen/payLabelSize" />
+
+                    <TextView
+                        android:id="@+id/txtDiscountAmount"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:textSize="@dimen/payLabelSize" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:id="@+id/txtPayAmountTitle"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Payable Amount:"
+                        android:textSize="@dimen/payLabelSize" />
+
+                    <TextView
+                        android:id="@+id/txtTotalAmount"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/payLabelTotalSize" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:id="@+id/txtReturnTitle"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Balance Amount:"
+                        android:textSize="@dimen/payLabelSize" />
+
+                    <TextView
+                        android:id="@+id/txtReturnAmount"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:textSize="@dimen/payLabelSize" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/txtPaidByTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Paid by:"
+                        android:textSize="@dimen/activity_login_text_size" />
+
+                    <Spinner
+                        android:id="@+id/spnPaymentMode"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPaidCash"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:src="@drawable/cash"
+                        android:text="Paid:" />
+
+                    <EditText
+                        android:id="@+id/edtPaidAmount"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:maxLines="1"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPaidAmex"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:src="@drawable/amex"
+                        android:text="Paid:" />
+
+                    <EditText
+                        android:id="@+id/edtPaidAmex"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:maxLines="1"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPaidGiftcard"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:src="@drawable/giftcard"
+                        android:text="Paid:" />
+
+                    <EditText
+                        android:id="@+id/edtPaidGiftcard"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:maxLines="1"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPaidMastercard"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:src="@drawable/mastercard"
+                        android:text="Paid:" />
+
+                    <EditText
+                        android:id="@+id/edtPaidMastercard"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:maxLines="1"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPaidVisa"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:src="@drawable/visa"
+                        android:text="Paid:" />
+
+                    <EditText
+                        android:id="@+id/edtPaidVisa"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:maxLines="1"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPaidOther"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:src="@drawable/other"
+                        android:text="Paid:" />
+
+                    <EditText
+                        android:id="@+id/edtPaidOther"
+                        fontPath="fonts/GothamRounded-Book.otf"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:maxLines="1"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/txtEmailTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Email:"
+                        android:textSize="@dimen/activity_login_text_size" />
+
+                    <EditText
+                        android:id="@+id/edtEmail"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_marginTop="2dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/txtPhoneTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Phone Number:"
+                        android:textSize="@dimen/activity_login_text_size" />
+
+                    <EditText
+                        android:id="@+id/edtMobileNumber"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/payTableRowHeigh"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight="1"
+                        android:background="@drawable/border_dialog"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="4dp"
+                        android:textSize="@dimen/activity_login_text_size" />
+                </TableRow>
+
+            </TableLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/edtReason"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/border_dialog"
+                    android:hint="Please enter reason..."
+                    android:maxLines="5"
+                    android:padding="5dp" />
+
+                <Button
+                    android:id="@+id/btnComplete"
+                    fontPath="fonts/GothamRounded-Medium.otf"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/payTableRowHeigh"
+                    android:layout_gravity="center|center_horizontal"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/nice_button"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="1"
+                    android:text="Complete"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/activity_login_text_size" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- NOTE No need to develop a system service for keyboard, there is a standard View for that (well, not completely standard, its in a funny package 'android.inputmethodservice'. -->
+    <!-- NOTE The graphical layout does not know the package ('java.lang.NoClassDefFoundError: Could not initialize class android.inputmethodservice.KeyboardView') so the keyboard is not shown. -->
+    <!--<android.inputmethodservice.KeyboardView
+        android:id="@+id/keyboardview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:visibility="gone" />-->
+
+</RelativeLayout>

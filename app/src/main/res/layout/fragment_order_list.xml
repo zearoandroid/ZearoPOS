@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:expandable="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="false"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/txtTotalQty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="center|center_horizontal"
+            android:layout_weight="1"
+            android:paddingLeft="5dp"
+            android:text="0 items"
+            android:textSize="@dimen/orderLblTxtSize"
+            android:textColor="@color/greyDark"
+            fontPath="fonts/GothamRounded-Medium.otf"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgUserView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="left|center_horizontal"
+                android:paddingLeft="5dp"
+                android:src="@drawable/customer_icon"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/imgMergeView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_horizontal"
+                android:paddingLeft="10dp"
+                android:src="@drawable/merge_arrow"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/imgSplitView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_horizontal"
+                android:paddingLeft="10dp"
+                android:src="@drawable/split_arrow1"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.AppCompatAutoCompleteTextView
+            android:id="@+id/autoUserView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="left|center_horizontal"
+            android:layout_weight="1"
+            android:paddingLeft="5dp"
+            android:text="Typer user name"
+            android:textColor="@color/greyDark"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgOrdStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:src="@drawable/ic_lock_open"/>
+
+            <TextView
+                android:id="@+id/txtBusinessPartnerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:text="Cashier"
+                android:textSize="18sp"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:textColor="@android:color/holo_blue_dark"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/txtPOSNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right|center_horizontal"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:paddingLeft="5dp"
+            android:text="ORDER# 0000"
+            android:textSize="@dimen/orderLblTxtSize"
+            fontPath="fonts/GothamRounded-Bold.otf"
+            android:visibility="gone"
+            android:textColor="@color/greyDark"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtTempTotalAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right|center_horizontal"
+            android:layout_weight="1"
+            android:visibility="visible"
+            android:gravity="right"
+            android:paddingLeft="5dp"
+            android:text="Total QR 0.00"
+            android:textSize="@dimen/orderLblTxtSize"
+            fontPath="fonts/GothamRounded-Bold.otf"
+            android:textColor="@color/tomato"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <com.zearoconsulting.zearopos.presentation.view.component.ExpandableTotalAmountLayout
+        android:id="@+id/totalAmountLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/headerLayout"
+        android:visibility="visible"
+        expandable:el_contentLayout="@layout/view_total_content"
+        expandable:el_headerLayout="@layout/view_total_header" />
+
+    <com.zearoconsulting.zearopos.presentation.view.component.ExpandableTotalAmountLayout
+        android:id="@+id/editQtyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/headerLayout"
+        android:visibility="invisible"
+        expandable:el_contentLayout="@layout/view_total_content"
+        expandable:el_headerLayout="@layout/view_item_header" />
+
+    <FrameLayout
+        android:id="@+id/displayItemEditor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/editQtyLayout"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/emptyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/emptyImgView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center|center_horizontal"
+            android:paddingLeft="5dp"
+            android:src="@drawable/bag_icon"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/txtEmptyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/emptyImgView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:textSize="16sp"
+            fontPath="fonts/GothamRounded-Book.otf"
+            android:text="@string/emptyMessage"
+            android:textColor="@color/dark_grey_blue"
+            android:textStyle="normal" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/listItemLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/totalAmountLayout"
+        android:layout_above="@+id/layBottomBar"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/listViewItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5dp"
+            android:fadeScrollbars="false"></ListView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/cardList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5dp"
+            android:visibility="gone"></android.support.v7.widget.RecyclerView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/tableList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="100dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5dp"
+            android:visibility="gone"></android.support.v7.widget.RecyclerView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/splitItemList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="100dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5dp"
+            android:visibility="gone"></android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <FrameLayout
+            android:id="@+id/layCancel"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/tomato"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/btnCancel"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:src="@drawable/ic_cancel_white"
+                android:text="@string/cancel"
+                android:visibility="visible" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layKOT"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="#2c3e50"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/imgPrintKOTView"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:src="@drawable/generate_white"
+                android:text="@string/cancel"
+                android:visibility="visible" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layListCount"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/dark_grey_blue"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txtTotalOrder"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:text="3 lists"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/orderLblTxtSize" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layPrint"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="#359bdb">
+
+            <ImageView
+                android:id="@+id/imgPrintView"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:src="@drawable/ic_print"
+                android:text="@string/payment"
+                android:visibility="visible" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layHold"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="#2c3e50">
+
+            <Button
+                android:id="@+id/txtOrderCount"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:text="0"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/orderCountIndicatorSize"
+                android:textStyle="bold" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layPayment"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/dark_sky_blue">
+
+            <ImageView
+                android:id="@+id/btnPayment"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:src="@drawable/complete_white"
+                android:text="@string/payment"
+                android:visibility="visible" />
+
+            <!--
+                <Button
+                    android:id="@+id/btnPayment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:visibility="visible"
+                    android:background="@null"
+                    android:drawableRight="@drawable/ic_arrow_right"
+                    android:gravity="center"
+                    android:inputType="none"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="@string/payment"
+                    fontPath="fonts/GothamRounded-Bold.otf"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/orderBtnTxtSize" />
+            -->
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layBackFromCart"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/dark_grey_blue"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnBackFromCart"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:drawableLeft="@drawable/ic_arrow_back"
+                android:gravity="center"
+                android:inputType="none"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:text="@string/back"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/orderBtnTxtSize" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layBottomMergeBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:id="@+id/laySplit"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/tomato"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnSplit"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:text="@string/split"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layMerge"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/dark_sky_blue">
+
+            <Button
+                android:id="@+id/btnMergeTable"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:inputType="none"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:text="@string/merge"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/orderBtnTxtSize"
+                android:visibility="visible" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layBackFromMerge"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="2"
+            android:background="@color/dark_grey_blue"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/btnBackMergeFromCart"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:drawableLeft="@drawable/ic_arrow_back"
+                android:gravity="center"
+                android:inputType="none"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:text="@string/back"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/orderBtnTxtSize" />
+        </FrameLayout>
+    </LinearLayout>
+
+</RelativeLayout>

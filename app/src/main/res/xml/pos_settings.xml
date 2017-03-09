@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:title="About">
+        <PreferenceScreen
+            android:title="Developer"
+            android:key="developer"
+            android:summary="Zearo Apps">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="Version"
+            android:key="version"
+            android:summary="1.0">
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_print_options" >
+
+
+        <!--<ListPreference
+            android:key="prefPrintOptions"
+            android:entries="@array/printOptions"
+            android:entryValues="@array/printOptionsValues"
+            android:title="@string/pref_print_options" />-->
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="prefUsbPrinter"
+            android:summary="@string/pref_usb_summary"
+            android:title="@string/pref_usb" >
+        </CheckBoxPreference>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefBluetoothPrinter"
+            android:summary="@string/pref_blt_summary"
+            android:title="@string/pref_blt" >
+        </CheckBoxPreference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

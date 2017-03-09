@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/txtCalculatedAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="QR 10.00"
+        fontPath="fonts/GothamRounded-Book.otf"
+        android:textColor="@color/dark_sky_blue"
+        android:textSize="@dimen/multiEdtHeaderLblSize" />
+
+    <TextView
+        android:id="@+id/txtOriginalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtCalculatedAmount"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="QR 11.00"
+        fontPath="fonts/GothamRounded-Book.otf"
+        android:textColor="@color/dark_grey"
+        android:textSize="@dimen/multiEdtLblSize" />
+
+    <TextView
+        android:id="@+id/txtDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtOriginalAmount"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/multiEdtDescMarginTop"
+        android:text="@string/hint_total_amount"
+        fontPath="fonts/GothamRounded-Light.otf"
+        android:textColor="@color/dark_grey_blue"
+        android:textSize="@dimen/multiEdtLblSize" />
+
+    <TextView
+        android:id="@+id/txtTempDiscountView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtOriginalAmount"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="@string/hint_total_amount"
+        android:textColor="@color/dark_grey_blue"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/layKeybad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtDescription"
+        android:layout_margin="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiEdtBtnHeight"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnOne"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                android:text="1"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/multiEdtBtnSize" />
+
+            <Button
+                android:id="@+id/btnTwo"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                android:text="2"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+            <Button
+                android:id="@+id/btnThree"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                android:text="3"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiEdtBtnHeight"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnFour"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:text="4"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+            <Button
+                android:id="@+id/btnFive"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:text="5"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+            <Button
+                android:id="@+id/btnSix"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:text="6"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiEdtBtnHeight"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnSeven"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                android:text="7"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+            <Button
+                android:id="@+id/btnEight"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                android:text="8"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+            <Button
+                android:id="@+id/btnNine"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/border_keyboard"
+                android:text="9"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiEdtBtnHeight"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnClear"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_weight="1"
+                android:background="#ecf0f1"
+                android:src="@drawable/backspace" />
+
+            <Button
+                android:id="@+id/btnZero"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:background="@drawable/border_keyboard"
+                android:text="0"
+                android:textSize="@dimen/multiEdtBtnSize"  />
+
+            <ImageButton
+                android:id="@+id/btnDone"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/multiEdtBtnHeight"
+                android:layout_weight="1"
+                android:background="#ecf0f1"
+                android:src="@drawable/ic_done_black" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/laySelection"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/multiEdtBtnHeight"
+        android:layout_below="@+id/layKeybad"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnQtyDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/quantity_button_default"
+            android:text="Quantity"
+            android:textAllCaps="false"
+            fontPath="fonts/GothamRounded-Bold.otf"
+            android:textColor="@color/dark_sky_blue"
+            android:textSize="@dimen/multiEdtLblSize"
+            android:visibility="visible" />
+
+        <RelativeLayout
+            android:id="@+id/laySwitchCompat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/discount_selection_button_pressed"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:text="Discount by amount"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:textColor="@color/white"
+                android:textSize="@dimen/multiEdtLblSize"
+                android:textStyle="bold" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/discount_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
+                android:textOff="%"
+                android:textOn="-" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/layBackToList"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/multiEdtBtnHeight"
+        android:layout_below="@+id/laySelection"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/backArrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_back" />
+
+            <TextView
+                android:id="@+id/btnBackToList"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_toRightOf="@+id/backArrow"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:text="Back to list"
+                fontPath="fonts/GothamRounded-Medium.otf"
+                android:textAllCaps="false"
+                android:textColor="#2980b9"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorPrimary"
+        android:layout_below="@+id/layBackToList"/>
+
+
+</RelativeLayout>

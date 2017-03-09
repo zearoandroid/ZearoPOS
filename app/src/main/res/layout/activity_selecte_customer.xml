@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="5dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp"
+    android:id="@+id/laySelectCustomer"
+    tools:context="com.zearoconsulting.zearopos.presentation.view.activity.SelecteCustomer">
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/edtSearchCustomer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:hint="Search customer..."/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/activity_customer_swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtSearchCustomer">
+        <view
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            class="android.support.v7.widget.RecyclerView"
+            android:id="@+id/customer_recycler_view"
+            android:divider="#b5b5b5"
+            android:dividerHeight="1dp"
+            android:listSelector="@drawable/list_selector"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</RelativeLayout>

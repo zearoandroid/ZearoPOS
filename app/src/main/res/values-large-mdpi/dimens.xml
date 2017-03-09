@@ -1,0 +1,73 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="popup_width">300dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="login_form_width">240dp</dimen>
+    <dimen name="edittext_height">50dp</dimen>
+    <dimen name="button_height">64dp</dimen>
+
+    <!-- SPLASH SCREEN -->
+    <dimen name="appname_size">32sp</dimen>
+
+    <!-- LOGIN SCREEN -->
+    <dimen name="login_form_margin">260dp</dimen>
+    <dimen name="login_form_edittext_height">50dp</dimen>
+    <dimen name="login_button_height">64dp</dimen>
+    <dimen name="activity_login_label_size">15sp</dimen>
+    <dimen name="activity_login_text_size">16sp</dimen>
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="card_gap">100dp</dimen>
+    <dimen name="card_gap_bottom">5dp</dimen>
+    <dimen name="dp30">30dp</dimen>
+    <dimen name="dp8">8dp</dimen>
+    <dimen name="dp10">10dp</dimen>
+    <dimen name="dp80">80dp</dimen>
+    <dimen name="card_radius">5dp</dimen>
+    <dimen name="dp16">16dp</dimen>
+
+    <!-- PAYMENT WINDOW SIZES -->
+    <dimen name="payLabelSize">12sp</dimen>
+    <dimen name="payTableRowHeigh">50dp</dimen>
+    <dimen name="payButtonHeight">30dp</dimen>
+    <dimen name="payEditTextSize">12sp</dimen>
+    <dimen name="payLabelTotalSize">22sp</dimen>
+
+    <!-- ORDER LIST WINDOW SIZES -->
+    <dimen name="orderBtnTxtSize">12sp</dimen>
+    <dimen name="orderLblTxtSize">12sp</dimen>
+    <dimen name="orderBPLblTxtSize">14sp</dimen>
+    <dimen name="orderBtnHeight">40dp</dimen>
+    <dimen name="orderCountIndicatorSize">24sp</dimen>
+
+    <!-- ORDER TOTAL HEADER SIZES -->
+    <dimen name="orderHeaderLblSize">14sp</dimen>
+    <dimen name="orderHeaderAmtSize">20sp</dimen>
+
+    <!-- ORDER LIST ITEM SIZES -->
+    <dimen name="orderListLblSize">10sp</dimen>
+    <dimen name="orderListProdSize">16sp</dimen>
+
+    <!-- MULTIEDITOR SIZES -->
+    <dimen name="multiEdtBtnSize">20sp</dimen>
+    <dimen name="multiEdtLblSize">14sp</dimen>
+    <dimen name="multiEdtBtnHeight">40dp</dimen>
+    <dimen name="multiEdtHeaderLblSize">20sp</dimen>
+    <dimen name="multiEdtDescMarginTop">5dp</dimen>
+
+    <!-- CART BUTTON SIZES -->
+    <dimen name="cartBtnHeight">50dp</dimen>
+    <dimen name="cartBtnImageHeight">30dp</dimen>
+    <dimen name="totalPaddings">10dp</dimen>
+    <dimen name="discountBtnWidthHeight">35dp</dimen>
+
+    <!-- CATEGORY SIZES -->
+    <dimen name="categoryWidthHeight">50dp</dimen>
+
+</resources>

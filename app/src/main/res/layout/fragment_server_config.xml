@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#cfcfcf"
+    android:minHeight="250dp"
+    android:minWidth="600dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10.0dip"
+                android:text="Server Cofiguration"
+                android:textColor="@color/white"
+                android:textSize="20.0dip"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:background="@color/colorPrimary" />
+
+        <LinearLayout
+            android:id="@+id/serverForm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/editTextServer"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_form_edittext_height"
+                android:background="@drawable/rounded_border_edittext"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingLeft="4dp"
+                android:gravity="center_vertical|center"
+                android:hint="@string/hint_server_address"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textSize="@dimen/activity_login_text_size" />
+
+            <EditText
+                android:id="@+id/editTextPort"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_form_edittext_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/editTextUser"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/rounded_border_edittext"
+                android:ems="10"
+                android:gravity="center_vertical|center"
+                android:hint="@string/hint_port"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:inputType="number"
+                android:maxLines="1"
+                android:paddingLeft="4dp"
+                android:textSize="@dimen/activity_login_text_size" />
+
+            <Button
+                android:id="@+id/btnConnet"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_button_height"
+                android:layout_below="@+id/spinnerWarhouse"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_border_button"
+                android:text="@string/btnConnect"
+                fontPath="fonts/GothamRounded-Medium.otf"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/activity_login_text_size" />
+
+            <TextView
+                android:id="@+id/txtConnection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:textColor="@color/white"
+                android:textSize="@dimen/activity_login_label_size" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

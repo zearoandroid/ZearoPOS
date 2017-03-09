@@ -1,0 +1,319 @@
+<resources>
+    <string name="app_name">Dhukan</string>
+    <string name="app_name_dm">Smart menu</string>
+    <string name="product">Product</string>
+    <string name="qty">Qty</string>
+    <string name="uom">UOM</string>
+    <string name="priceString">Price</string>
+    <string name="total_qty">Total Qty</string>
+    <string name="total">Total QR.</string>
+    <string name="cancel">Cancel</string>
+    <string name="kot">KOT</string>
+    <string name="split">Split</string>
+    <string name="hold">Hold</string>
+    <string name="recall">Recall</string>
+    <string name="payment">Complete</string>
+    <string name="merge">Merge</string>
+    <string name="back">Back</string>
+    <string name="barcode_scanner">Barcode Scanner</string>
+    <string name="cash_customer">CASH CUSTOMER</string>
+    <string name="posicons">posicons</string>
+    <string name="action_search">Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="menuitem_refresh">Refresh</string>
+    <string name="dhukan.me">dhukan.me</string>
+    <string name="hint_username">username</string>
+    <string name="hint_password">password</string>
+    <string name="hint_total_amount">Enter amount to discount total bill</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <bool name="isTablet">true</bool>
+
+    <string-array name="tabs">
+        <item>TAB 1</item>
+        <item>TAB 2</item>
+        <item>TAB 3</item>
+        <item>TAB 4</item>
+        <item>TAB 5</item>
+        <item>TAB 6</item>
+    </string-array>
+
+    <string name="title_activity_payment">PaymentActivity</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_multieditor">MultiEditorActivity</string>
+    <string name="title_activity_customer">Select Customer</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to login -->
+    <string name="loginToBegin">Login to begin</string>
+    <string name="btnLogin">Login</string>
+    <string name="rememberMe">Remember me</string>
+    <string name="forgot">Forgot?</string>
+
+    <!-- Strings related to POS terminal -->
+    <string name="chooseItems">Choose or Scan items</string>
+    <string name="emptyMessage">Add something\n   from the left</string>
+    <string name="category">Category</string>
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="pref_title_data_load">Fast / Live</string>
+    <string name="title_activity_posterminal">POSTerminalActivity</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="openDrawer">Open</string>
+    <string name="closeDrawer">Close</string>
+    <string name="main_content">Main Content</string>
+    <string name="connectPrinterTitle">Connect Printer</string>
+
+    <string name="bt_search_btd">Search</string>
+    <string name="bt_stop_search_btd">"Stop"</string>
+    <string name="dev_conn_btn">"Connect"</string>
+    <string name="dev_disconn_btn">"Disconnect"</string>
+
+    <string name="bt_tab">Bluetooth</string>
+    <string name="connecting_msg">"Connecting"</string>
+    <string name="bt_conn_fail_msg">"Bluetooth Connection Failed"</string>
+    <string name="dev_check_msg">"Check the device status or settings."</string>
+    <string name="title_activity_print_test">PrintTestActivity</string>
+    <string name="bt_disconn_msg">"Printer Disconnected"</string>
+    <string name="bt_conn_msg">"Printer Connected"</string>
+    <string name="bt_search_btn">Search Bluetooth Devices</string>
+    <string name="bt_stop_search_btn">"Stop Searching Bluetooth Devices"</string>
+
+    <string name="internet_disconn_msg">"WiFi/Internet disconnected"</string>
+    <string name="internet_conn_msg">"WiFi/Internet disconnected"</string>
+    <string name="title_activity_dm__login">DM_Login</string>
+
+    <string name="please_enter_your_password">Please Enter Your Password</string>
+    <string name="please_enter_your_username">Please Enter Your Username</string>
+    <string name="title_activity_dm__menu">DM_Menu</string>
+    <string name="btnMenu">Menu</string>
+    <string name="title_activity_category_list">CategoryListActivity</string>
+    <string name="cart">Cart</string>
+    <string name="add">ADD</string>
+    <string name="feedback">feedback</string>
+    <string name="title_activity_dm__products">Dm_Products</string>
+    <string name="title_activity_dm__category_items">DM_CategoryItems</string>
+    <string name="title_activity_dm__splash">DM_Splash</string>
+    <string name="title_activity_dm__manual_sync">DM_ManualSync</string>
+
+    <string name="riyals">Riyals</string>
+    <string name="qr1">1</string>
+    <string name="qr5">5</string>
+    <string name="qr10">10</string>
+    <string name="qr50">50</string>
+    <string name="qr100">100</string>
+    <string name="qr500">500</string>
+
+    <string name="dirhams">Dirhams</string>
+    <string name="dr1">1</string>
+    <string name="dr25">25</string>
+    <string name="dr50">50</string>
+
+    <string name="sdk_type">all</string>
+    <string-array name="printer_list_all">
+        <item>"TP801"</item>
+        <item>"TP805"</item>
+        <item>"TP806"</item>
+        <item>"HTP80A"</item>
+        <item>"HTP80B"</item>
+        <item>"HTP80C"</item>
+        <item>"PPTII-A"</item>
+        <item>"HTP58A"</item>
+        <item>"PPTII-B"</item>
+        <item>"HTP58B"</item>
+        <item>"PPT2-UR"</item>
+        <item>"PPTD3"</item>
+        <item>"MPT-II"</item>
+        <item>"MPT-III"</item>
+        <item>"HMP80A"</item>
+        <item>"MPS3"</item>
+        <item>"MPD2"</item>
+        <item>"MPT-E2"</item>
+        <item>"MLP2"</item>
+        <item>"MPT8"</item>
+        <item>"LPQ58"</item>
+        <item>"LPQ80"</item>
+        <item>"LP106A"</item>
+        <item>"LP106B"</item>
+        <item>"PT541"</item>
+        <item>"PT562"</item>
+        <item>"PT721"</item>
+        <item>"POS80A"</item>
+        <item>"POS80B"</item>
+        <item>"POS80C"</item>
+        <item>"POS58A"</item>
+        <item>"POS58B"</item>
+        <item>"M-1"</item>
+        <item>"M-2"</item>
+        <item>"M-3"</item>
+        <item>"M-4"</item>
+        <item>"M-5"</item>
+        <item>"M-6"</item>
+        <item>"M-8"</item>
+        <item>"L-2"</item>
+        <item>"L-3"</item>
+        <item>"DT-210"</item>
+        <item>"DT-230"</item>
+        <item>"SMP-R381"</item>
+        <item>"SMP-R385"</item>
+        <item>"SMP-R386"</item>
+        <item>"SM-L200"</item>
+        <item>"MPRINT LP58"</item>
+        <item>"MPRINT LP80"</item>
+        <item>"MPRINT G58"</item>
+        <item>"MPRINT G80"</item>
+        <item>"TM-58"</item>
+        <item>"TM-80"</item>
+        <item>"TM-90"</item>
+        <item>"DP-24"</item>
+        <item>"DP-34"</item>
+        <item>"SGPR-300"</item>
+    </string-array>
+    <string-array name="printer_list_hprt">
+        <item>"TP801"</item>
+        <item>"TP805"</item>
+        <item>"TP806"</item>
+        <item>"HTP80A"</item>
+        <item>"HTP80B"</item>
+        <item>"HTP80C"</item>
+        <item>"PPTII-A"</item>
+        <item>"HTP58A"</item>
+        <item>"PPTII-B"</item>
+        <item>"HTP58B"</item>
+        <item>"PPT2-UR"</item>
+        <item>"PPTD3"</item>
+        <item>"MPT-II"</item>
+        <item>"MPT-III"</item>
+        <item>"HMP80A"</item>
+        <item>"MPS3"</item>
+        <item>"MPD2"</item>
+        <item>"MPT-E2"</item>
+        <item>"MLP2"</item>
+        <item>"MPT8"</item>
+        <item>"LPQ58"</item>
+        <item>"LPQ80"</item>
+        <item>"LP106A"</item>
+        <item>"LP106B"</item>
+        <item>"PT541"</item>
+        <item>"PT562"</item>
+        <item>"PT721"</item>
+    </string-array>
+    <string-array name="printer_list_mkt">
+        <item>"POS80A"</item>
+        <item>"POS80B"</item>
+        <item>"POS80C"</item>
+        <item>"POS58A"</item>
+        <item>"POS58B"</item>
+        <item>"M-1"</item>
+        <item>"M-2"</item>
+        <item>"M-3"</item>
+        <item>"M-4"</item>
+        <item>"M-5"</item>
+        <item>"M-6"</item>
+        <item>"M-8"</item>
+        <item>"L-2"</item>
+        <item>"L-3"</item>
+    </string-array>
+    <string-array name="printer_list_mprint">
+        <item>"MPRINT LP58"</item>
+        <item>"MPRINT LP80"</item>
+        <item>"MPRINT G58"</item>
+        <item>"MPRINT G80"</item>
+    </string-array>
+    <string-array name="printer_list_sycrown">
+        <item>"SMP-R381"</item>
+        <item>"SMP-R385"</item>
+        <item>"SMP-R386"</item>
+        <item>"SM-L200"</item>
+    </string-array>
+    <string-array name="printer_list_mgpos">
+        <item>"TM-58"</item>
+        <item>"TM-80"</item>
+        <item>"TM-90"</item>
+    </string-array>
+    <string-array name="printer_list_ds">
+        <item>"DT-210"</item>
+        <item>"DT-230"</item>
+    </string-array>
+    <string-array name="printer_list_cst">
+        <item>"DP-24"</item>
+        <item>"DP-34"</item>
+    </string-array>
+    <string-array name="printer_list_other">
+        <item>"SGPR-300"</item>
+    </string-array>
+
+    <string-array name="feeds_list">
+        <item>"10mm"</item>
+        <item>"15mm"</item>
+        <item>"20mm"</item>
+        <item>"25mm"</item>
+        <item>"30mm"</item>
+    </string-array>
+
+</resources>

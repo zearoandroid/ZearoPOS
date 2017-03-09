@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dhukan</string>
+    <string name="app_name_dm">Smart menu</string>
+    <string name="product">Product</string>
+    <string name="qty">Qty</string>
+    <string name="uom">UOM</string>
+    <string name="priceString">Price</string>
+    <string name="total_qty">Total Qty</string>
+    <string name="total">Total QR.</string>
+    <string name="cancel">Cancel</string>
+    <string name="hold">HOLD</string>
+    <string name="recall">RECALL</string>
+    <string name="payment">Complete</string>
+    <string name="barcode_scanner">Barcode Scanner</string>
+    <string name="cash_customer">CASH CUSTOMER</string>
+    <string name="posicons">posicons</string>
+    <bool name="isTablet">true</bool>
+</resources>

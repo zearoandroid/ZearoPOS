@@ -1,0 +1,94 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    tools:ignore="MissingPrefix"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_dialog"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:id="@+id/layConnectPrinter"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".presentation.view.activity.ConnectPrinterActivity">
+
+
+    <TextView
+        android:id="@+id/txtConPrinterTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center|center_vertical"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:paddingLeft="5dp"
+        android:text="@string/connectPrinterTitle"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/edtBltAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        fontPath="fonts/GothamRounded-Book.otf"
+        android:visibility="visible"/>
+
+    <ListView
+        android:id="@+id/lstPairedDevices"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@+id/txtConPrinterTitle">
+
+    </ListView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnBltSearch"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:drawableLeft="@drawable/ic_blt_search"
+                android:gravity="center"
+                android:padding="10dp"
+                fontPath="fonts/GothamRounded-Medium.otf"
+                android:text="@string/bt_search_btn"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnBltConnect"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:background="#2ab060"
+                fontPath="fonts/GothamRounded-Medium.otf"
+                android:drawableRight="@drawable/ic_blt_connect"
+                android:padding="10dp"
+                android:text="@string/dev_conn_btn"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

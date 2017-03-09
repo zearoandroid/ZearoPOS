@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix"
+    android:id="@+id/category_view"
+    android:layout_width="108dp"
+    android:layout_height="108dp"
+    card_view:cardCornerRadius="25dp"
+    android:background="@color/white"
+    card_view:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imgCategory"
+            android:layout_width="108dp"
+            android:layout_height="108dp"
+            android:layout_centerInParent="true"
+            android:scaleType="fitCenter"
+            android:layout_margin="6dp"
+            android:src="@drawable/no_product"
+            android:contentDescription=""></ImageView>
+
+        <TextView
+            android:id="@+id/txtCategoryName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_margin="2dp"
+            android:gravity="center"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:background="#FFFFFFFF"
+            android:maxLines="2"
+            android:text="@string/category"
+            fontPath="fonts/GothamRounded-Medium.otf"
+            android:textStyle="bold"
+            android:textColor="@color/dark_grey_blue"
+            android:textSize="12sp" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

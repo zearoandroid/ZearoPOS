@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pos_terminal_background"
+    android:baselineAligned="false">
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoPanelHeight="71dp"
+        sothree:umanoShadowHeight="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#f0f0f0">
+
+            <FrameLayout
+                android:id="@+id/displayProductList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/layPOSType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnCounterSale"
+                        android:layout_width="fill_parent"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_selector"
+                        android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Counter Sale"
+                        android:textAllCaps="false"
+                        android:textSize="18sp" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/tab_separator"
+                        android:gravity="center_vertical" />
+
+                    <Button
+                        android:id="@+id/btnTableService"
+                        android:layout_width="fill_parent"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_selector"
+                        android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Table Service"
+                        android:textAllCaps="false"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/table_selection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_margin="10dp">
+                </android.support.v7.widget.RecyclerView>
+
+                <include layout="@layout/content_product" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/displayOrderList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+
+</RelativeLayout>
