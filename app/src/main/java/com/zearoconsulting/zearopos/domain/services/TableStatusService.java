@@ -218,29 +218,31 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
 
                     Log.i("IP Address", ipAddress);
 
-                    if (Common.isIpAddress(ipAddress)) {
+                    if (terminals.getIsPrinter().equalsIgnoreCase("Y")) {
 
-                        //get kotLine data from kotLineItems
-                        List<KOTLineItems> kotLineItem = mDBHelper.getKOTLineItem(kotPrintList.get(i).getKotNumber());
+                        if(Common.isIpAddress(ipAddress)) {
 
-                        //call Wi-Fi print
-                        if (hprtPrinter != null) {
-                            HPRTPrinterHelper.PortClose();
-                        } else {
-                        }
+                            //get kotLine data from kotLineItems
+                            List<KOTLineItems> kotLineItem = mDBHelper.getKOTLineItem(kotPrintList.get(i).getKotNumber());
 
-                        hprtPrinter = new HPRTPrinterHelper(thisCon, printerName);
-                        if (HPRTPrinterHelper.PortOpen("WiFi," + ipAddress + "," + strPort) != 0) {
-                            //Printer Not connected
-                            Log.e("POSActivity-LAN PRINTER", "PRINTER NOT CONNECTED");
-                        } else {
-                            try {
-                                Log.i("POSActivity-LAN PRINTER", "PRINTER CONNECTED");
+                            //call Wi-Fi print
+                            if (hprtPrinter != null) {
+                                HPRTPrinterHelper.PortClose();
+                            } else {
+                            }
 
-                                pAct.LanguageEncode();
-                                //pAct.BeforePrintAction();
+                            hprtPrinter = new HPRTPrinterHelper(thisCon, printerName);
+                            if (HPRTPrinterHelper.PortOpen("WiFi," + ipAddress + "," + strPort) != 0) {
+                                //Printer Not connected
+                                Log.e("POSActivity-LAN PRINTER", "PRINTER NOT CONNECTED");
+                            } else {
+                                try {
+                                    Log.i("POSActivity-LAN PRINTER", "PRINTER CONNECTED");
 
-                                //for (int k = 0; k < 2; k++) {
+                                    pAct.LanguageEncode();
+                                    //pAct.BeforePrintAction();
+
+                                    //for (int k = 0; k < 2; k++) {
 
                                     HPRTPrinterHelper.PrintText(alignUtils.alignFormat(terminals.getTerminalName()) + "\n", 0, 16, 0);
 
@@ -282,12 +284,17 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                                     HPRTPrinterHelper.CutPaper(HPRTPrinterHelper.HPRT_PARTIAL_CUT_FEED, 240);
 
                                     //update local status to printed
-                                    mDBHelper.updateKOTStatusPrinted(kotPrintList.get(i).getKotNumber(),invoiceNumber);
-                                //}
-                            } catch (Exception e) {
-                                Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
+                                    mDBHelper.updateKOTStatusPrinted(kotPrintList.get(i).getKotNumber(), invoiceNumber);
+                                    //}
+
+                                } catch (Exception e) {
+                                    Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
+                                }
                             }
                         }
+                    }else{
+                        //update local status to printed
+                        mDBHelper.updateKOTStatusPrinted(kotPrintList.get(i).getKotNumber(),invoiceNumber);
                     }
                 }
 

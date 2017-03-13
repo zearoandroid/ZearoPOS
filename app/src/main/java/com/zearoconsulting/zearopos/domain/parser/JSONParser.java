@@ -759,6 +759,11 @@ public class JSONParser {
                     else
                         terminals.setTerminalIP("");
 
+                    if(obj.has("isPrinter"))
+                        terminals.setIsPrinter(obj.getString("isPrinter"));
+                    else
+                        terminals.setIsPrinter("N");
+
                     mDBHelper.addTerminals(terminals);
 
                     terminalsList.add(terminals);
@@ -1596,8 +1601,10 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else {
                 if (json.length() != 0 && json.getInt("responseCode") == 200) {
+                    long posId = 0;
                     b.putInt("Type", AppConstants.POS_ORDER_DRAFT_SUCCESS);
-                    b.putString("OUTPUT", "");
+                    posId = json.getLong("posId");
+                    b.putString("OUTPUT", String.valueOf(posId));
                 }else if (json.getInt("responseCode") == 401) {
                     mAppManager.setSessionId(0);
                     b.putInt("Type", AppConstants.SESSION_EXPIRED);

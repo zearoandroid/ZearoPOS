@@ -180,6 +180,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_KOT_TERMINAL_ID = "kotTerminalId";
     private static final String KEY_KOT_TERMINAL_NAME = "kotTerminalName";
     private static final String KEY_KOT_TERMINAL_IP = "kotTerminalIP";
+    private static final String KEY_KOT_IS_PRINTER = "kotIsPrinter";
 
     private static final String KEY_KOT_NUMBER = "kotNumber";
     private static final String KEY_INVOICE_NUMBER = "invoiceNumber";
@@ -271,7 +272,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //create query for KOT_TERMINALS
     private static final String KOT_TERMINALS_CREATE_QUERY = "CREATE TABLE "
             + TABLE_KOT_TERMINALS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_KOT_TERMINAL_NAME + " TEXT, "
-            + KEY_KOT_TERMINAL_IP + " TEXT );";
+            + KEY_KOT_TERMINAL_IP + " TEXT, " + KEY_KOT_IS_PRINTER + " TEXT);";
 
     //create query for KOT_HEADER
     private static final String KOT_HEADER_CREATE_QUERY = "CREATE TABLE "

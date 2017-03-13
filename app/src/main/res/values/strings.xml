@@ -334,12 +334,12 @@
 
     <string-array name="printOptions">
         <item name="1">USB</item>
-        <item name="2">Wi-Fi</item>
+        <item name="2">Bluetooth</item>
     </string-array>
 
     <string-array name="printOptionsValues">
         <item name="1">USB</item>
-        <item name="2">WiFi</item>
+        <item name="2">Bluetooth</item>
     </string-array>
 
 </resources>

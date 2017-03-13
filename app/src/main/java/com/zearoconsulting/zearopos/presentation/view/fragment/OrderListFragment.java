@@ -246,7 +246,7 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
                     break;
                 case AppConstants.POS_ORDER_DRAFT_SUCCESS:
                     mProDlg.dismiss();
-                    sendPrint();
+                    sendPrint(Long.parseLong(jsonStr));
                     break;
                 case AppConstants.POS_ORDER_DRAFT_FAILURE:
                     //INFORM USER POSTING FAILURE
@@ -472,7 +472,7 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
             case R.id.imgMergeView:
                 if (AppConstants.isTableService) {
                     kotHeaderList = mDBHelper.getKOTTables(true);
-                    if (kotHeaderList.size() != 0)
+                    if (kotHeaderList.size() != 0 && kotHeaderList.size()>1)
                         showMergeView();
                 }
                 break;
@@ -507,7 +507,7 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
 
     private void onSplit() {
         if (lineItem != null) {
-            if (lineItem.size() != 0) {
+            if (lineItem.size() != 0 && lineItem.size()>1) {
                 showSplitView();
             }
         }
@@ -924,10 +924,12 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
         }
     }
 
-    public void sendPrint() {
-        for(int i=0;i<orderNumberList.size();i++) {
-            ((POSActivity) getActivity()).printBill(orderNumberList.get(i), lineItem, oldTotal, mTotalBill, 0, 0);
-        }
+    public void sendPrint(long posNumber) {
+        //for(int i=0;i<orderNumberList.size();i++) {
+            List<POSLineItem> lineItems = mDBHelper.getPOSLineItems(posNumber, 0);
+            double total = mDBHelper.sumOfProductsTotalPrice(posNumber);
+            ((POSActivity) getActivity()).printBill(posNumber, lineItems, total, total, 0, 0);
+        //}
     }
 
     public void generateKOT() {

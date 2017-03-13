@@ -128,8 +128,12 @@ public class SessionFragment extends AbstractDialogFragment {
     public void onViewCreated(View paramView, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(paramView, savedInstanceState);
 
-        this.mSessionType = getArguments().getString("sessionType", "");
-        this.mSessionDesc = getArguments().getString("sessionDesc", "");
+        Bundle bundle = getArguments();
+        if(bundle!=null){
+            this.mSessionType = bundle.getString("sessionType", "");
+            this.mSessionDesc = bundle.getString("sessionDesc", "");
+        }
+
 
         getDialog().getWindow().setSoftInputMode(3);
         getDialog().getWindow().requestFeature(1);

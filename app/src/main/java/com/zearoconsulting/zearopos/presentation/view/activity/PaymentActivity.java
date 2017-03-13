@@ -178,13 +178,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             // Get the instance of SharedPreferences object
             mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-            //ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
-            boolean printType = mSharedPreferences.getBoolean("prefUsbPrinter",false);
-            if(printType){
-                ConnectType = "USB";
-            }else{
-                ConnectType = "Bluetooth";
-            }
+            ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
 
             mTblPayTypes = (TableLayout) findViewById(R.id.layPaymentTypes);
             onCredit = (RadioButton) findViewById(R.id.rbCredit);

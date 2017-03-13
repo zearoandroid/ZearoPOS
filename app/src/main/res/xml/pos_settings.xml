@@ -20,13 +20,13 @@
     <PreferenceCategory android:title="@string/pref_print_options" >
 
 
-        <!--<ListPreference
+        <ListPreference
             android:key="prefPrintOptions"
             android:entries="@array/printOptions"
             android:entryValues="@array/printOptionsValues"
-            android:title="@string/pref_print_options" />-->
+            android:title="@string/pref_print_options" />
 
-        <CheckBoxPreference
+        <!--<CheckBoxPreference
             android:defaultValue="true"
             android:key="prefUsbPrinter"
             android:summary="@string/pref_usb_summary"
@@ -38,7 +38,7 @@
             android:key="prefBluetoothPrinter"
             android:summary="@string/pref_blt_summary"
             android:title="@string/pref_blt" >
-        </CheckBoxPreference>
+        </CheckBoxPreference>-->
 
     </PreferenceCategory>
 

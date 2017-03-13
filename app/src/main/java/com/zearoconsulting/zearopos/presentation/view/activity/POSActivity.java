@@ -205,6 +205,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     boolean printType;
     private ClipboardManager myClipboard;
     private ClipData myClip;
+    SessionFragment sessionDialog = new SessionFragment();
 
     final Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -384,14 +385,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
             // Get the instance of SharedPreferences object
             mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-            boolean autoSetPrinter = mSharedPreferences.getBoolean("prefUsbPrinter", true);
-
-            printType = mSharedPreferences.getBoolean("prefUsbPrinter",false);
-            if(printType){
-                ConnectType = "USB";
-            }else{
-                ConnectType = "Bluetooth";
-            }
+            ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
 
             mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(ACTION_USB_PERMISSION), 0);
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
@@ -761,7 +755,20 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         if (String.valueOf(mAppManager.getSessionId()).equalsIgnoreCase("0")) {
             //show create session
             try {
-                SessionFragment.newInstance(POSActivity.this, "CREATE", "New").show(fragmentManager, "SESSION");
+
+                if(sessionDialog!=null &&  sessionDialog.getDialog()!=null
+                        && sessionDialog.getDialog().isShowing()) {
+                    //dialog is showing so do something
+                    Log.i("SESSION", "It's Showing");
+                } else {
+                    //dialog is not showing
+                    Bundle bundle = new Bundle();
+                    bundle.putString("sessionType", "CREATE");
+                    bundle.putString("sessionDesc", "New");
+                    sessionDialog.setArguments(bundle);
+                    sessionDialog.show(fragmentManager, "SESSION");
+                }
+                //SessionFragment.newInstance(POSActivity.this, "CREATE", "New").show(fragmentManager, "SESSION");
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -769,20 +776,37 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         } else if (!mAppManager.getSessionStatus()) {
             //show resume session with close session
             try {
-                SessionFragment.newInstance(POSActivity.this, "RESUME", "Resume").show(fragmentManager, "SESSION");
+                if(sessionDialog!=null &&  sessionDialog.getDialog()!=null
+                        && sessionDialog.getDialog().isShowing()) {
+                    //dialog is showing so do something
+                    Log.i("SESSION", "It's Showing");
+                } else {
+                    //dialog is not showing
+                    Bundle bundle = new Bundle();
+                    bundle.putString("sessionType", "RESUME");
+                    bundle.putString("sessionDesc", "Resume");
+                    sessionDialog.setArguments(bundle);
+                    sessionDialog.show(fragmentManager, "SESSION");
+                }
+                //SessionFragment.newInstance(POSActivity.this, "RESUME", "Resume").show(fragmentManager, "SESSION");
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
+            if (!ConnectType.equalsIgnoreCase("USB")) {
+                //check bluetoothport is null
+                if (mBluetoothAdapter != null) {
+                    if (mBluetoothAdapter.isEnabled() && bluetoothPort == null) {
+                        displayConnectPrinter();
+                        return;
+                    }
+                }
+            }
         }
 
-        //check bluetoothport is null
-       /* if (mBluetoothAdapter != null) {
-            if (mBluetoothAdapter.isEnabled() && bluetoothPort == null) {
-                displayConnectPrinter();
-                return;
-            }
-        }*/
+
 
         try {
             mPOSNumberHandler.postDelayed(mPOSNumberRunnable, 5000);
@@ -1454,12 +1478,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         try {
 
-            printType = mSharedPreferences.getBoolean("prefUsbPrinter",false);
-            if(printType){
-                ConnectType = "USB";
-            }else{
-                ConnectType = "Bluetooth";
-            }
+            ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
 
             if (totalAmt != 0 && ConnectType.equalsIgnoreCase("USB")) {
                 printPreInvoice(orderNum, lineItem, totalAmt, finalAmt, paidAmt, returnAmt);
@@ -1476,8 +1495,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     try {
                         if (mBluetoothAdapter.isEnabled()) {
                             Organization orgDetail = mDBHelper.getOrganizationDetail(mAppManager.getOrgID());
-                            lineItem = mDBHelper.getPOSLineItems(AppConstants.posID, 0);
-                            InvoiceBill bill = new InvoiceBill(mContext, AppConstants.posID, lineItem, totalAmt, finalAmt, paidAmt, returnAmt);
+                            lineItem = mDBHelper.getPOSLineItems(orderNum, 0);
+                            InvoiceBill bill = new InvoiceBill(mContext, orderNum, lineItem, totalAmt, finalAmt, paidAmt, returnAmt);
                             bill.setOrgDetails(orgDetail);
                             bltResult = bill.billGenerateAndPrint();
                         } else {
@@ -1526,12 +1545,12 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         paidAmt = mPaidAmt;
         returnAmt = mReturnAmt;
 
-        printType = mSharedPreferences.getBoolean("prefUsbPrinter",false);
+        /*printType = mSharedPreferences.getBoolean("prefUsbPrinter",false);
         if(printType){
             ConnectType = "USB";
         }else{
             ConnectType = "Bluetooth";
-        }
+        }*/
 
         if(ConnectType.equalsIgnoreCase("USB")){
 

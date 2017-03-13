@@ -3,10 +3,7 @@ package com.zearoconsulting.zearopos.presentation.print;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Environment;
-
 import com.sewoo.jpos.command.ESCPOS;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.jpos.printer.ESCPOSPrinter;
@@ -14,14 +11,12 @@ import com.sewoo.jpos.printer.LKPrint;
 import com.zearoconsulting.zearopos.AndroidApplication;
 import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.data.AppDataManager;
-import com.zearoconsulting.zearopos.data.DBHelper;
 import com.zearoconsulting.zearopos.data.POSDataSource;
 import com.zearoconsulting.zearopos.presentation.model.KOTHeader;
 import com.zearoconsulting.zearopos.presentation.model.Organization;
 import com.zearoconsulting.zearopos.presentation.model.POSLineItem;
 import com.zearoconsulting.zearopos.presentation.model.POSPayment;
 import com.zearoconsulting.zearopos.presentation.model.Tables;
-import com.zearoconsulting.zearopos.utils.AppConstants;
 import com.zearoconsulting.zearopos.utils.Common;
 
 import java.io.File;
@@ -165,7 +160,7 @@ public class InvoiceBill {
 
             //String orgArabicName = "شوكولا كافيه لاونج";
 
-            List<Long> kotTableList = mDBHelper.getKOTTableList(AppConstants.posID);
+            List<Long> kotTableList = mDBHelper.getKOTTableList(posId);
             String tableName;
             int covers = 0;
 

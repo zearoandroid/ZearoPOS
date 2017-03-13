@@ -178,6 +178,7 @@ public class POSDataSource {
     private static final String KEY_KOT_TERMINAL_ID = "kotTerminalId";
     private static final String KEY_KOT_TERMINAL_NAME = "kotTerminalName";
     private static final String KEY_KOT_TERMINAL_IP = "kotTerminalIP";
+    private static final String KEY_KOT_IS_PRINTER = "kotIsPrinter";
 
     private static final String KEY_KOT_NUMBER = "kotNumber";
     private static final String KEY_INVOICE_NUMBER = "invoiceNumber";
@@ -398,6 +399,7 @@ public class POSDataSource {
             values.put(KEY_KOT_TERMINAL_ID, terminals.getTerminalId());
             values.put(KEY_KOT_TERMINAL_NAME, terminals.getTerminalName());
             values.put(KEY_KOT_TERMINAL_IP, terminals.getTerminalIP());
+            values.put(KEY_KOT_IS_PRINTER, terminals.getIsPrinter());
 
             // Inserting Row
             db.insert(TABLE_KOT_TERMINALS, null, values);
@@ -1022,13 +1024,14 @@ public class POSDataSource {
         Terminals terminals = null;
 
         try {
-            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP from kotTerminals where clientId = '" + clientId + "' and orgId = '" + orgId + "' and kotTerminalId = '" + terminalId + "' ", null);
+            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP, kotIsPrinter from kotTerminals where clientId = '" + clientId + "' and orgId = '" + orgId + "' and kotTerminalId = '" + terminalId + "' ", null);
 
             while (cursor.moveToNext()) {
                 terminals = new Terminals();
                 terminals.setTerminalId(cursor.getLong(0));
                 terminals.setTerminalName(cursor.getString(1));
                 terminals.setTerminalIP(cursor.getString(2));
+                terminals.setIsPrinter(cursor.getString(3));
             }
             cursor.close();
         } catch (Exception e) {
