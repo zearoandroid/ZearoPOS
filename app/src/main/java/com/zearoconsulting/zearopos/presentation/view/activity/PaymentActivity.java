@@ -212,6 +212,8 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             mTotalAmount = mDBHelper.sumOfProductsWithoutDiscount(AppConstants.posID);
             mFinalAmount = mDBHelper.sumOfProductsTotalPrice(AppConstants.posID);
 
+            mFinalAmount = Double.parseDouble(Common.valueFormatter(mFinalAmount));
+
             mTxtPaymentTitle.setText("Payment ("+AppConstants.posID+")");
             mOldTotalAmountView.setText(Common.valueFormatter(mTotalAmount));
             mDiscountAmountView.setText(Common.valueFormatter(mTotalAmount - mFinalAmount));
