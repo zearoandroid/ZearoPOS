@@ -175,50 +175,62 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
 
     public void updateItemAtPosition(int position, boolean addOrRemove) {
         if(mProductList.size()>=position) {
-            Product product = mProductList.get(position);
+            try {
+                Product product = mProductList.get(position);
 
-            int val = product.getDefaultQty();
+                int val = product.getDefaultQty();
 
-            if (addOrRemove)
-                val++;
-            else
-                val--;
+                if (addOrRemove)
+                    val++;
+                else
+                    val--;
 
-            product.setDefaultQty(val);
-            mProductList.set(position, product);
+                product.setDefaultQty(val);
+                mProductList.set(position, product);
 
-            lineItems.clear();
-            lineItems = mDBHelper.getPOSLineItems(AppConstants.posID, mCategoryId);
+                lineItems.clear();
+                lineItems = mDBHelper.getPOSLineItems(AppConstants.posID, mCategoryId);
 
-            notifyItemChanged(position);
+                notifyItemChanged(position);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
     public void updateItemAtPosition(int position, int qty) {
         if(mProductList.size()>=position) {
-            Product product = mProductList.get(position);
-            product.setDefaultQty(qty);
-            mProductList.set(position, product);
+            try {
+                Product product = mProductList.get(position);
+                product.setDefaultQty(qty);
+                mProductList.set(position, product);
 
-            lineItems.clear();
-            lineItems = mDBHelper.getPOSLineItems(AppConstants.posID, mCategoryId);
+                lineItems.clear();
+                lineItems = mDBHelper.getPOSLineItems(AppConstants.posID, mCategoryId);
 
-            notifyItemChanged(position);
+                notifyItemChanged(position);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
     public void clearAllItem() {
-        lineItems.clear();
-        lineItems = mDBHelper.getPOSLineItems(AppConstants.posID,mCategoryId);
+        try {
+            lineItems.clear();
+            lineItems = mDBHelper.getPOSLineItems(AppConstants.posID, mCategoryId);
 
-        //if(lineItems.size()==0)
-           // return;
+            //if(lineItems.size()==0)
+            // return;
 
-        for(int i=0; i<mProductList.size(); i++){
-            Product product = mProductList.get(i);
-            product.setDefaultQty(0);
-            mProductList.set(i, product);
-            notifyItemChanged(i);
+            for (int i = 0; i < mProductList.size(); i++) {
+                Product product = mProductList.get(i);
+                product.setDefaultQty(0);
+                mProductList.set(i, product);
+                notifyItemChanged(i);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

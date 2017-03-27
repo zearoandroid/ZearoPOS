@@ -129,65 +129,74 @@ public class AppConstants {
     /** response for kot table line items received key */
     public static final int KOT_FLAGS_RESPONSE_RECEIVED = 37;
 
+    /** call get table kot key */
+    public static final int GET_TABLE_KOT_DETAILS = 38;
+
+    /** response for table kot success key */
+    public static final int TABLE_KOT_DETAILS_RECEIVED_SUCCESS = 39;
+
+    /** response for table kot failure key */
+    public static final int TABLE_KOT_DETAILS_RECEIVED_FAILURE = 40;
+
     /** call draft pos order key */
-    public static final int CALL_DRAFT_POS_ORDER = 38;
+    public static final int CALL_DRAFT_POS_ORDER = 41;
 
     /** response for draft work order success key */
-    public static final int POS_ORDER_DRAFT_SUCCESS = 39;
+    public static final int POS_ORDER_DRAFT_SUCCESS = 42;
 
     /** response for draft work order failure key */
-    public static final int POS_ORDER_DRAFT_FAILURE = 40;
+    public static final int POS_ORDER_DRAFT_FAILURE = 43;
 
     /** call release work order key */
-    public static final int CALL_RELEASE_POS_ORDER = 41;
+    public static final int CALL_RELEASE_POS_ORDER = 44;
 
     /** response for release work order success key */
-    public static final int POS_ORDER_RELEASED_SUCCESS = 42;
+    public static final int POS_ORDER_RELEASED_SUCCESS = 45;
 
     /** response for release work order failure key */
-    public static final int POS_ORDER_RELEASED_FAILURE = 43;
+    public static final int POS_ORDER_RELEASED_FAILURE = 46;
 
     /** call cancel work order key */
-    public static final int CALL_CANCEL_POS_ORDER = 44;
+    public static final int CALL_CANCEL_POS_ORDER = 47;
 
     /** response for cancel work order success key */
-    public static final int POS_ORDER_CANCEL_SUCCESS = 45;
+    public static final int POS_ORDER_CANCEL_SUCCESS = 48;
 
     /** response for cancel work order failure key */
-    public static final int POS_ORDER_CANCEL_FAILURE = 46;
+    public static final int POS_ORDER_CANCEL_FAILURE = 49;
 
     /** response no data received key */
-    public static final int NO_DATA_RECEIVED = 47;
+    public static final int NO_DATA_RECEIVED = 50;
 
     /** response server error key */
-    public static final int SERVER_ERROR = 48;
+    public static final int SERVER_ERROR = 51;
 
     /** response network error key */
-    public static final int NETWORK_ERROR = 49;
+    public static final int NETWORK_ERROR = 52;
 
     /** response device not registered error key */
-    public static final int DEVICE_NOT_REGISTERED = 50;
+    public static final int DEVICE_NOT_REGISTERED = 53;
 
     /** response session expired error key */
-    public static final int SESSION_EXPIRED = 51;
+    public static final int SESSION_EXPIRED = 54;
 
     /** response no bpartner data received key */
-    public static final int BPARTNER_DATA_RECEIVED = 52;
+    public static final int BPARTNER_DATA_RECEIVED = 55;
 
     /** response no bpartner data received key */
-    public static final int NO_BPARTNER_DATA_RECEIVED = 53;
+    public static final int NO_BPARTNER_DATA_RECEIVED = 56;
 
     /** response no table data received key */
-    public static final int NO_TABLE_DATA_RECEIVED = 54;
+    public static final int NO_TABLE_DATA_RECEIVED = 57;
 
     /** response no terminal data received key */
-    public static final int NO_TERMINAL_DATA_RECEIVED = 55;
+    public static final int NO_TERMINAL_DATA_RECEIVED = 58;
 
     /** response no category data received key */
-    public static final int NO_CATEGORY_DATA_RECEIVED = 56;
+    public static final int NO_CATEGORY_DATA_RECEIVED = 59;
 
     /** response no product data received key */
-    public static final int NO_PRODUCT_DATA_RECEIVED = 57;
+    public static final int NO_PRODUCT_DATA_RECEIVED = 60;
 
     /** notify response failure key */
     public static final String NETWORK_FAILURE = "Not connected to Internet";

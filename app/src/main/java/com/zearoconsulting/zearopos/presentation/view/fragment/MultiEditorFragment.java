@@ -76,18 +76,24 @@ public class MultiEditorFragment extends AbstractFragment implements View.OnClic
 
         // IF mIsTotal == FALSE product will be edit
         if(!mIsTotal){
-            mRowId = bundle.getLong("rowId");
-            mPosId = bundle.getLong("posId");
-            posLineItem = mDBHelper.getPOSLineItem(mPosId, mRowId);
-            mKotLineId = posLineItem.getKotLineId();
-            mProdId = posLineItem.getProductId();
-            mProdQty = posLineItem.getPosQty();
-            mProdPrice = posLineItem.getStdPrice();
-            mDiscType = posLineItem.getDiscType();
-            mDiscValue = (int)posLineItem.getDiscValue();
-            discValue= String.valueOf(mDiscValue);
-            mTotalAmt = mProdQty*mProdPrice;
-            mRealAmt = mTotalAmt;
+            try {
+                mRowId = bundle.getLong("rowId");
+                mPosId = bundle.getLong("posId");
+                posLineItem = mDBHelper.getPOSLineItem(mPosId, mRowId);
+                if (posLineItem != null) {
+                    mKotLineId = posLineItem.getKotLineId();
+                    mProdId = posLineItem.getProductId();
+                    mProdQty = posLineItem.getPosQty();
+                    mProdPrice = posLineItem.getStdPrice();
+                    mDiscType = posLineItem.getDiscType();
+                    mDiscValue = (int) posLineItem.getDiscValue();
+                    discValue = String.valueOf(mDiscValue);
+                    mTotalAmt = mProdQty * mProdPrice;
+                    mRealAmt = mTotalAmt;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }else {
             mPosId = bundle.getLong("posId");
             mTotalAmt = bundle.getDouble("TotalAmount", 0);

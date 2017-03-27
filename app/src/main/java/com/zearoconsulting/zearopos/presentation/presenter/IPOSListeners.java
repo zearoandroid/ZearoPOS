@@ -16,4 +16,5 @@ public interface IPOSListeners {
     void onSelectedCategory(Category category);
     void orderCancelSuccess();
     void orderCancelFailure();
+    void onReprintOrder(POSOrders order);
 }

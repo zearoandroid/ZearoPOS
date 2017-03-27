@@ -29,8 +29,8 @@ android {
         targetSdkVersion globalConfiguration.getAt("androidTargetSdkVersion")
 
         applicationId globalConfiguration.getAt("androidApplicationId")
-        versionCode globalConfiguration.getAt("androidVersionCode")
-        versionName globalConfiguration.getAt("androidVersionName")
+        versionCode 1
+        versionName "1.0.8"
     }
 
     compileOptions {
@@ -90,4 +90,5 @@ dependencies {
     compile 'com.pnikosis:materialish-progress:1.7'
     compile 'net.danlew:android.joda:2.9.2'
     compile 'de.hdodenhof:circleimageview:1.2.1'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
 }

@@ -329,17 +329,22 @@
     <string name="pref_usb">USB</string>
     <string name="pref_usb_summary">Printer connection should be usb</string>
 
+    <string name="pref_network">Wi-Fi</string>
+    <string name="pref_network_summary">Printer connection should be Wi-Fi</string>
+
     <string name="pref_blt">Bluetooth</string>
     <string name="pref_blt_summary">Printer connection should be Bluetooth</string>
 
     <string-array name="printOptions">
         <item name="1">USB</item>
         <item name="2">Bluetooth</item>
+        <item name="3">WiFi</item>
     </string-array>
 
     <string-array name="printOptionsValues">
         <item name="1">USB</item>
         <item name="2">Bluetooth</item>
+        <item name="3">WiFi</item>
     </string-array>
 
 </resources>

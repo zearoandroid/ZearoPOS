@@ -21,6 +21,7 @@ import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.zearopos.presentation.model.Customer;
 import com.zearoconsulting.zearopos.presentation.model.POSLineItem;
 import com.zearoconsulting.zearopos.presentation.presenter.IPOSListeners;
+import com.zearoconsulting.zearopos.presentation.view.activity.POSActivity;
 import com.zearoconsulting.zearopos.presentation.view.component.ReboundListener;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.utils.AppConstants;
@@ -67,6 +68,10 @@ public class OrderCancelFragment extends AbstractDialogFragment {
                         mListener.orderCancelFailure();
                     }
                     dismiss();
+                    break;
+                case AppConstants.SESSION_EXPIRED:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showCreateSession();
                     break;
                 case AppConstants.NO_DATA_RECEIVED:
                     //INFORM USER NO DATA

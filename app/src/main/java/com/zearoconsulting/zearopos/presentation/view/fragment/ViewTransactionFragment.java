@@ -31,10 +31,10 @@ public class ViewTransactionFragment extends AbstractDialogFragment {
 
     ReprintListener rePrintListener = new ReprintListener() {
         @Override
-        public void OnRePrintListener(POSOrders orders) {
+        public void OnRePrintListener(POSOrders order) {
             try {
                 //update the cart count number
-                //((IPOSListeners) getActivity()).onReprintOrder(orders);
+                ((IPOSListeners) getActivity()).onReprintOrder(order);
                 dismiss();
             } catch (ClassCastException e) {
                 e.printStackTrace();

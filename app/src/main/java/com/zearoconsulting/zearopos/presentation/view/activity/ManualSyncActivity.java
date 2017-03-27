@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -35,6 +36,8 @@ import java.util.List;
 public class ManualSyncActivity extends BaseActivity implements ConnectivityReceiver.ConnectivityReceiverListener, ILoginListeners {
 
     private Button mBtnSync;
+    // variable to track event time
+    private long mLastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,13 @@ public class ManualSyncActivity extends BaseActivity implements ConnectivityRece
         mBtnSync = (Button) findViewById(R.id.btnManualSync);
         mBtnSync.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                // Preventing multiple clicks, using threshold of 1 second
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 mDBHelper.deletePOSRelatedTables();
                 showLoading();
             }
@@ -123,9 +132,17 @@ public class ManualSyncActivity extends BaseActivity implements ConnectivityRece
 
     @Override
     public void onBackPressed() {
-       /*Intent intent = new Intent(ManualSyncActivity.this, POSActivity.class);
-        startActivity(intent);
-        finish();*/
+
+        if (mProDlg != null) {
+            if (mProDlg.isShowing()) {
+                return;
+            } else {
+                Intent intent = new Intent(ManualSyncActivity.this, POSActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
+
     }
 
     @Override

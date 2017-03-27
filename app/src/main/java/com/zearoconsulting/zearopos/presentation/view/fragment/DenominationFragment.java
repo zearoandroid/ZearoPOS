@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
+import com.zearoconsulting.zearopos.presentation.view.activity.POSActivity;
 import com.zearoconsulting.zearopos.presentation.view.component.ReboundListener;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.utils.AppConstants;
@@ -103,6 +104,10 @@ public class DenominationFragment extends AbstractDialogFragment {
                     mAppManager.setLoggedIn(false);
                     dismiss();
                     getActivity().finish();
+                    break;
+                case AppConstants.SESSION_EXPIRED:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showCreateSession();
                     break;
                 case AppConstants.SERVER_ERROR:
                     mProDlg.dismiss();

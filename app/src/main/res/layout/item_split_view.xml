@@ -16,6 +16,8 @@
             android:id="@+id/layItemView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/tvTotal"
+            android:layout_alignParentLeft="true"
             android:orientation="vertical">
 
             <TextView

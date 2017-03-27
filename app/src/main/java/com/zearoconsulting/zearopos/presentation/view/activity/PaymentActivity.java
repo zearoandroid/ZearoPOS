@@ -25,7 +25,12 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.zearoconsulting.zearopos.AndroidApplication;
@@ -123,10 +128,10 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                     //printInvoice();
                     TSnackbar.make(findViewById(R.id.layPayment), "ORDER POSTED", TSnackbar.LENGTH_LONG)
                             .show();
-                    if (ConnectType.equalsIgnoreCase("USB")) {
-                        printInvoice();
-                    }else{
+                    if (ConnectType.equalsIgnoreCase("Bluetooth")) {
                         printBill();
+                    }else{
+                        printInvoice();
                     }
                     break;
                 case AppConstants.POS_ORDER_RELEASED_FAILURE:
@@ -492,7 +497,75 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
 
                 if (bluetoothPort.isConnected()) {*/
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
+
             try {
+
+                mProDlg.setMessage("Posting data...");
+                mProDlg.show();
+                double mPaidTotalCardAmount = mPaidAmexAmount + mPaidGiftAmount + mPaidMasterAmount + mPaidVisaAmount + mPaidOtherAmount;
+
+                // Create a hash map
+                HashMap hm = new HashMap();
+                // Put elements to the map
+                hm.put("CASH", mPaidCashAmount);
+                hm.put("AMEX", mPaidAmexAmount);
+                hm.put("VISA", mPaidVisaAmount);
+                hm.put("MASTER", mPaidMasterAmount);
+                hm.put("GIFT", mPaidGiftAmount);
+                hm.put("OTHER", mPaidOtherAmount);
+
+                JSONObject mJsonObj = mParser.getParams(AppConstants.CALL_RELEASE_POS_ORDER);
+                JSONObject mHeaderObj = mParser.getHeaderObj(AppConstants.posID, mCustomer, mTotalLines, mFinalAmount, mPaidTotalAmount, mReturnAmount, mPaidCashAmount, mPaidTotalCardAmount);
+                mHeaderObj.put("isCredit", "N");
+                int selectedId = mRGPayType.getCheckedRadioButtonId();
+                // find which radioButton is checked by id
+                if(selectedId == onCredit.getId()) {
+                    mHeaderObj.put("isCredit", "Y");
+                } else if(selectedId == onCash.getId()) {
+                    mHeaderObj.put("isCredit", "N");
+                }
+
+                mJsonObj.put("OrderHeaders", mHeaderObj);
+                JSONArray mPaymentObj = mParser.getPaymentObj(hm);
+                mJsonObj.put("PaymentDetails", mPaymentObj);
+
+                mPOSLineItemList = mDBHelper.getPOSLineItems(AppConstants.posID, 0);
+                JSONArray mOrddersObj = mParser.getOrderItems(mPOSLineItemList);
+                mJsonObj.put("OrderDetails", mOrddersObj);
+                mJsonObj.put("reason", mEdtReason.getText().toString());
+
+                if (mDBHelper.isKOTAvailable(AppConstants.posID)) {
+                    List<Long> kotHeaderList = mDBHelper.getKOTNumberList(AppConstants.posID);
+                    JSONArray mKOTObj = mParser.getPrintedKOT(kotHeaderList);
+                    mJsonObj.put("KOTNumbers", mKOTObj);
+                }
+
+                Log.i("POST ORDER", mJsonObj.toString());
+
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, AppConstants.URL, mJsonObj,
+                        new Response.Listener<JSONObject>(){
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                mParser.parseReleaseOrderJson(response.toString(), mHandler);
+                            }
+                        }, new Response.ErrorListener(){
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(mContext, "Server connection error... Contact Administrator", Toast.LENGTH_SHORT).show();
+                        mProDlg.dismiss();
+                        mBtnComplete.setClickable(true);
+                    }
+                }
+                );
+
+                // Adding request to request queue
+                AndroidApplication.getInstance().addToRequestQueue(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            /*try {
                 mProDlg.setMessage("Posting data...");
                 mProDlg.show();
                 double mPaidTotalCardAmount = mPaidAmexAmount + mPaidGiftAmount + mPaidMasterAmount + mPaidVisaAmount + mPaidOtherAmount;
@@ -539,7 +612,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 //mProDlg.dismiss();
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
+            }*/
         } else {
             mBtnComplete.setClickable(true);
             //show network failure dialog or toast

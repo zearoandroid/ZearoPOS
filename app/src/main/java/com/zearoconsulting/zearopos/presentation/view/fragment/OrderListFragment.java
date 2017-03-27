@@ -252,6 +252,10 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
                     //INFORM USER POSTING FAILURE
                     mProDlg.dismiss();
                     break;
+                case AppConstants.SESSION_EXPIRED:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showCreateSession();
+                    break;
                 case AppConstants.NETWORK_ERROR:
                     //INFORM USER NO DATA
                     Toast.makeText(getActivity(), "NETWORK ERROR...", Toast.LENGTH_SHORT).show();
@@ -1131,6 +1135,7 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
                         StringBuilder sb = new StringBuilder("");
                         for (int j = 0; j < kotTableList.size(); j++) {
                             Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), kotTableList.get(j));
+                            if(table!=null)
                             sb.append(table.getTableName() + " ");
                         }
                         mOrders.get(i).setOrderType(sb.toString());

@@ -163,6 +163,9 @@ public class JSONParser {
                 case AppConstants.CHECK_CREDIT_LIMIT:
                     mJsonObj.put("operation", "CheckCreditLimit");
                     break;
+                case AppConstants.GET_TABLE_KOT_DETAILS:
+                    mJsonObj.put("operation", "getTableKot");
+                    break;
                 default:
                     break;
             }
@@ -534,6 +537,11 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
                 b.putString("OUTPUT", "");
@@ -571,6 +579,11 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.LOGIN_FAILURE);
@@ -626,6 +639,11 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
                 b.putString("OUTPUT", "");
@@ -658,6 +676,11 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
@@ -711,6 +734,11 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             }else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            }else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
             }
         } catch (Exception e) {
@@ -774,7 +802,12 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
-            }else if (json.getInt("responseCode") == 700) {
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
             }
@@ -813,6 +846,11 @@ public class JSONParser {
                 }
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
             } else {
                 if (json.length() != 0 && json.getInt("responseCode") == 200) {
@@ -900,6 +938,16 @@ public class JSONParser {
 
             }else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 101) {
                 b.putInt("Type", AppConstants.NO_BPARTNER_DATA_RECEIVED);
@@ -1437,6 +1485,11 @@ public class JSONParser {
                     b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
                     b.putString("OUTPUT", "");
                 }
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
             } else {
                 if (json.length() != 0 && json.getInt("responseCode") == 200) {
                     long activeTableId = json.getLong("activeTableId");
@@ -1557,6 +1610,11 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
             } else {
                 if (json.length() != 0 && json.getInt("responseCode") == 200) {
                     b.putInt("Type", AppConstants.POS_ORDER_CANCEL_SUCCESS);
@@ -1598,6 +1656,11 @@ public class JSONParser {
                 }
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
             } else {
                 if (json.length() != 0 && json.getInt("responseCode") == 200) {
@@ -1710,6 +1773,11 @@ public class JSONParser {
                 mAppManager.setSessionId(json.getLong("sessionId"));
                 b.putInt("Type", AppConstants.CLOSE_SESSION_RESPONSE);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
@@ -1745,6 +1813,11 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
@@ -1760,6 +1833,162 @@ public class JSONParser {
 
         msg.setData(b);
         mHandler.sendMessage(msg);
+    }
+
+    public void parseTableKOTDataResponse(String jsonStr, Handler mHandler) {
+        Log.i("RESPONSE", jsonStr);
+        Message msg = new Message();
+        JSONObject json;
+        JSONArray jsonTokenArray, jsonProductArray;
+        List<String> tokenList = null;
+        int length = 0;
+        Product mProduct = null;
+        long kotNumber = 0, invoiceNumber = 0, terminalId = 0, tableId=0;
+        int qty = 0;
+        double totalAmount;
+        String notes, kotType, waiterName, isPrinted="N", orderType = "Running";
+        try {
+
+            json = new JSONObject(jsonStr);
+            if (json.getInt("responseCode") == 200) {
+
+                tokenList = new ArrayList<String>();
+
+                tableId = json.getLong("tableId");
+                jsonTokenArray = json.getJSONArray("tokens");
+
+                length = jsonTokenArray.length();
+                for (int i = 0; i < length; i++) {
+
+                    JSONObject tokenObj = (JSONObject) jsonTokenArray.get(i);
+                    jsonProductArray = tokenObj.getJSONArray("products");
+
+                    kotNumber = tokenObj.getLong("KOTNumber");
+                    invoiceNumber = tokenObj.getLong("invoiceNumber");
+                    isPrinted = tokenObj.getString("isPrinted");
+
+                    terminalId = tokenObj.getLong("terminalId");
+                    totalAmount = tokenObj.getLong("totalAmount");
+                    kotType = tokenObj.getString("kotType");
+                    waiterName = tokenObj.getString("waiterName");
+
+                    if(tokenObj.has("isPrinted"))
+                        isPrinted = tokenObj.getString("isPrinted");
+
+                    if(tokenObj.has("orderType"))
+                        orderType = tokenObj.getString("orderType");
+
+                    KOTHeader kotHeader = new KOTHeader();
+                    kotHeader.setTablesId(tableId);
+                    kotHeader.setKotNumber(kotNumber);
+
+                    /*if(tableId!=0){
+                        long invoiceNum = mDBHelper.getKOTInvoiceNumber(tableId);
+                        if (invoiceNum == 0) {
+                        invoiceNumber = invoiceNum;
+                     }else{
+                          invoiceNumber = invoiceNum;
+                       }
+                   }*/
+
+                    if(tableId==0){
+                        kotHeader.setInvoiceNumber(invoiceNumber);
+                    }
+
+                    kotHeader.setTerminalId(terminalId);
+                    kotHeader.setTotalAmount(totalAmount);
+                    kotHeader.setOrderBy(waiterName);
+                    kotHeader.setKotType(kotType);
+                    kotHeader.setOrderType(orderType);
+                    kotHeader.setIsKOT("Y");
+                    kotHeader.setPrinted(isPrinted);
+                    kotHeader.setPosted("N");
+                    kotHeader.setSelected("N");
+                    if(tokenObj.has("coversCount"))
+                        kotHeader.setCoversCount(tokenObj.getInt("coversCount"));
+
+                    //insert kot header data to db
+                    boolean inserted = mDBHelper.addKOTHeader(kotHeader);
+
+                    if(inserted) {
+                        for (int j = 0; j < jsonProductArray.length(); j++) {
+
+                            JSONObject prodObj = (JSONObject) jsonProductArray.get(j);
+
+                            long kotRefLineId = prodObj.getLong("KotLineID");
+
+                            mProduct = mDBHelper.getProduct(mAppManager.getClientID(), mAppManager.getOrgID(), prodObj.getLong("productId"));
+
+                            Product product = new Product();
+                            product.setCategoryId(mProduct.getCategoryId());
+                            product.setProdId(prodObj.getLong("productId"));
+                            product.setProdName(mProduct.getProdName());
+                            product.setProdArabicName(mProduct.getProdArabicName());
+                            product.setProdValue(mProduct.getProdValue());
+                            product.setUomId(prodObj.getLong("productUOMId"));
+                            product.setUomValue(mProduct.getUomValue());
+                            product.setSalePrice(prodObj.getDouble("sellingPrice"));
+                            product.setCostPrice(mProduct.getCostPrice());
+                            product.setTerminalId(terminalId);
+
+                            qty = prodObj.getInt("qty");
+
+                            long kotLineId = prodObj.getLong("KotLineID");
+                            long invNumber = prodObj.getLong("invoiceNumber");
+
+                            if (invNumber != 0)
+                                mDBHelper.updateKOTLineIdToPOSLineItem(invNumber, kotLineId, prodObj.getLong("productId"));
+
+                            if (tableId != 0) {
+                                List<Long> invNumList = mDBHelper.getKOTInvoiceNumbers(tableId);
+
+                                int size = invNumList.size();
+
+                                if (size > 0)
+                                    invoiceNumber = invNumList.get(size - 1);
+                            }
+
+
+                            KOTLineItems kotLineItems = new KOTLineItems();
+                            kotLineItems.setTableId(tableId);
+                            kotLineItems.setKotLineId(kotLineId);
+                            kotLineItems.setKotNumber(kotNumber);
+                            kotLineItems.setInvoiceNumber(invoiceNumber);
+                            kotLineItems.setNotes(prodObj.getString("description"));
+                            kotLineItems.setRefRowId(0);
+                            kotLineItems.setIsExtraProduct("N");
+
+                            //insert kot line items
+                            mDBHelper.addKOTLineItems(kotLineItems, product, qty);
+
+                            if (prodObj.has("relatedProductsArray"))
+                                parseRelatedProducts(tableId, terminalId, kotNumber, invoiceNumber, kotLineId, prodObj.getJSONArray("relatedProductsArray"));
+
+                        }
+
+                        tokenList.add(String.valueOf(kotNumber));
+
+                    }
+
+
+                }
+            } else if (json.getInt("responseCode") == 301) {
+                b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 101) {
+                b.putInt("Type", AppConstants.TABLE_KOT_DETAILS_RECEIVED_FAILURE);
+                b.putString("OUTPUT", "");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            b.putInt("Type", AppConstants.SERVER_ERROR);
+            b.putString("OUTPUT", "");
+        } finally {
+            b.putInt("Type", AppConstants.TABLE_KOT_DETAILS_RECEIVED_SUCCESS);
+            b.putString("OUTPUT", String.valueOf(tableId));
+            msg.setData(b);
+            mHandler.sendMessage(msg);
+        }
     }
 
     public boolean getParsingState(){

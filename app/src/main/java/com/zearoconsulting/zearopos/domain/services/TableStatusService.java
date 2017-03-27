@@ -214,7 +214,7 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                     Terminals terminals = mDBHelper.getTerminalData(mAppManager.getClientID(), mAppManager.getOrgID(), kotPrintList.get(i).getTerminalId());
 
                     //getting ipAddress
-                    String ipAddress = terminals.getTerminalIP();
+                    String ipAddress = terminals.getTerminalIP().trim();
 
                     Log.i("IP Address", ipAddress);
 

@@ -61,7 +61,7 @@ public class ProductListFragment extends AbstractFragment {
             mProductRecyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
         }else {
             if(inchSize>15){
-                mProductRecyclerView.setLayoutManager(new GridLayoutManager(mContext,4));
+                mProductRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
                 spanCount = 5;
                 spacing = 8;
             }else{
@@ -72,7 +72,7 @@ public class ProductListFragment extends AbstractFragment {
 
             String model = android.os.Build.MODEL;
             if(model.contains("SM-T677")){
-                mProductRecyclerView.setLayoutManager(new GridLayoutManager(mContext,4));
+                mProductRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
                 spanCount = 5;
                 spacing = 8;
             }
@@ -100,29 +100,37 @@ public class ProductListFragment extends AbstractFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mCategoryList = mDBHelper.getCategory(mAppManager.getClientID(), mAppManager.getOrgID());
+        try {
+            mCategoryList = mDBHelper.getCategory(mAppManager.getClientID(), mAppManager.getOrgID());
 
-        if (mCategoryList != null && mCategoryList.size()!=0 && mCategoryId == 0)
-        mCategoryId = mCategoryList.get(0).getCategoryId();
+            if (mCategoryList != null && mCategoryList.size() != 0 && mCategoryId == 0)
+                mCategoryId = mCategoryList.get(0).getCategoryId();
 
-        mProductList = mDBHelper.getProducts(mAppManager.getClientID(), mAppManager.getOrgID(),mCategoryId);
-        mProductIDList = mDBHelper.getProductIDs(mAppManager.getClientID(), mAppManager.getOrgID(),mCategoryId);
+            mProductList = mDBHelper.getProducts(mAppManager.getClientID(), mAppManager.getOrgID(), mCategoryId);
+            mProductIDList = mDBHelper.getProductIDs(mAppManager.getClientID(), mAppManager.getOrgID(), mCategoryId);
 
-        ((POSActivity) mContext).setProductList(mProductList);
+            ((POSActivity) mContext).setProductList(mProductList);
 
-        if (mCategoryList != null && mProductList!=null) {
-            if (mProdAdapter == null && mProductList.size()!=0) {
-                mProdAdapter = new ProductsAdapter(mContext, mDBHelper, mAppManager, mProductList, mCategoryId, mListener);
-                mProductRecyclerView.setAdapter(mProdAdapter);
-                mProdAdapter.notifyDataSetChanged();
-            }else{
-                //mProdAdapter = new ProductsAdapter(mContext, mDBHelper, mProductList, mCategoryId, mListener);
-                if(mProductList!=null){
+            if (mCategoryList != null && mProductList != null) {
+                if (mProdAdapter == null && mProductList.size() != 0) {
+                    mProdAdapter = new ProductsAdapter(mContext, mDBHelper, mAppManager, mProductList, mCategoryId, mListener);
                     mProductRecyclerView.setAdapter(mProdAdapter);
-                    mProdAdapter.refresh(mProductList, mCategoryId);
                     mProdAdapter.notifyDataSetChanged();
+                } else {
+                    //mProdAdapter = new ProductsAdapter(mContext, mDBHelper, mProductList, mCategoryId, mListener);
+                    if (mProductList != null && mProdAdapter != null) {
+                        mProductRecyclerView.setAdapter(mProdAdapter);
+                        mProdAdapter.refresh(mProductList, mCategoryId);
+                        mProdAdapter.notifyDataSetChanged();
+                    } else {
+                        mProdAdapter = new ProductsAdapter(mContext, mDBHelper, mAppManager, mProductList, mCategoryId, mListener);
+                        mProductRecyclerView.setAdapter(mProdAdapter);
+                        mProdAdapter.notifyDataSetChanged();
+                    }
                 }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }

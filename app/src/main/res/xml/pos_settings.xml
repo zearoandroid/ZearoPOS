@@ -42,4 +42,13 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:summary="Network IP Address information"
+        android:title="Network information" >
+        <EditTextPreference
+            android:key="ipaddress"
+            android:summary="Please enter printer ip address"
+            android:title="IP Address" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

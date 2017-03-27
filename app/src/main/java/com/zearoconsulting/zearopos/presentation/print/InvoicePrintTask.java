@@ -43,7 +43,7 @@ public class InvoicePrintTask extends AsyncTask<WiFiPrintTaskParams, String, Str
     private String ConnectType = "";
     private String printerName = "";
     private String strPort = "9100";
-    private Context thisCon = AndroidApplication.getAppContext();;
+    private Context thisCon = AndroidApplication.getAppContext();
     private ArrayAdapter arrPrinterList;
     private PublicFunction pFun = null;
     private PublicAction pAct = null;
