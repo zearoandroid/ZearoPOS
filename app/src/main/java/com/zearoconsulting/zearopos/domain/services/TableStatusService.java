@@ -13,6 +13,7 @@ import com.zearoconsulting.zearopos.data.AppDataManager;
 import com.zearoconsulting.zearopos.data.DBHelper;
 import com.zearoconsulting.zearopos.data.POSDataSource;
 import com.zearoconsulting.zearopos.domain.parser.JSONParser;
+import com.zearoconsulting.zearopos.presentation.exception.AppLog;
 import com.zearoconsulting.zearopos.presentation.model.KOTHeader;
 import com.zearoconsulting.zearopos.presentation.model.KOTLineItems;
 import com.zearoconsulting.zearopos.presentation.model.Tables;
@@ -34,9 +35,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -104,7 +108,7 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
 
 
-                            if (!AppConstants.isKOTParsing) {
+                            //if (!AppConstants.isKOTParsing) {
 
                                 String results = getResponse();
 
@@ -118,13 +122,13 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                                 };
 
                                 updateHandler.postDelayed(runnable, 5000);*/
-                            }
+                            //}
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-            }, 100, 5000);
+            }, 100, 8000);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -182,8 +186,12 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
 
     @Override
     public void onParsingSuccess() {
-        Runnable myThread = new PrintThread();
-        new Thread(myThread).start();
+        //if (AppConstants.isKOTParsing) {
+            Runnable myThread = new PrintThread();
+            new Thread(myThread).start();
+        //}else if(!AppConstants.isKOTParsing){
+        //    OrderStatusListener.getInstance().kotPrinted();
+        //}
     }
 
     public class PrintThread implements Runnable {
@@ -221,76 +229,98 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                     if (terminals.getIsPrinter().equalsIgnoreCase("Y")) {
 
                         if(Common.isIpAddress(ipAddress)) {
-
                             //get kotLine data from kotLineItems
-                            List<KOTLineItems> kotLineItem = mDBHelper.getKOTLineItem(kotPrintList.get(i).getKotNumber());
+                            try {
+                                List<KOTLineItems> kotLineItem = mDBHelper.getKOTLineItem(kotPrintList.get(i).getKotNumber());
 
-                            //call Wi-Fi print
-                            if (hprtPrinter != null) {
-                                HPRTPrinterHelper.PortClose();
-                            } else {
-                            }
+                                if (kotLineItem.size() != 0) {
 
-                            hprtPrinter = new HPRTPrinterHelper(thisCon, printerName);
-                            if (HPRTPrinterHelper.PortOpen("WiFi," + ipAddress + "," + strPort) != 0) {
-                                //Printer Not connected
-                                Log.e("POSActivity-LAN PRINTER", "PRINTER NOT CONNECTED");
-                            } else {
-                                try {
-                                    Log.i("POSActivity-LAN PRINTER", "PRINTER CONNECTED");
+                                    AppLog.e("KOT SERVICE", "PRINTING SERVICE STARTED");
 
-                                    pAct.LanguageEncode();
-                                    //pAct.BeforePrintAction();
+                                    List<String> kotLines = new ArrayList<String>();
 
-                                    //for (int k = 0; k < 2; k++) {
-
-                                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat(terminals.getTerminalName()) + "\n", 0, 16, 0);
+                                    kotLines.add(printTextString(alignUtils.alignFormat(terminals.getTerminalName()) + "\n"));
 
                                     String tableHeader = "Table# " + tableName + " | KOT# " + String.valueOf(kotPrintList.get(i).getKotNumber());
-                                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat(tableHeader) + "\n", 0, 16, 0);
+                                    kotLines.add(printTextString(alignUtils.alignFormat(tableHeader) + "\n"));
 
                                     if (invoiceNumber != 0) {
-                                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Inv No: " + invoiceNumber) + "\n", 0, 16, 0);
+                                        kotLines.add(printTextString(alignUtils.alignFormat("Inv No: " + invoiceNumber) + "\n"));
                                     }
 
-                                    /**FOR MR. FOOD*/
-                                    /*HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText("Order By: " + kotPrintList.get(i).getOrderBy() + "\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText(Common.getDate() + "                            " + Common.getTime() + "\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);*/
-                                    //HPRTPrinterHelper.PrintText(String.valueOf(kotPrintList.get(i).getTablesId())+"\n",0,2,0);
-
                                     /**FOR BRIYANI HOUSE*/
-                                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText("Order By: " + kotPrintList.get(i).getOrderBy() + "\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText(Common.getDate() + "                      " + Common.getTime() + "\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
+                                    kotLines.add(printTextString("------------------------------------------\n"));
+                                    kotLines.add(printTextString("Order By: " + kotPrintList.get(i).getOrderBy() + "\n"));
+                                    kotLines.add(printTextString(Common.getDate() + "                      " + Common.getTime() + "\n"));
+                                    kotLines.add(printTextString("------------------------------------------\n"));
 
                                     for (int j = 0; j < kotLineItem.size(); j++) {
-                                        HPRTPrinterHelper.PrintText(kotLineItem.get(j).getQty() + "   " + kotLineItem.get(j).getProduct().getProdName() + "\n", 0, 0, 0);
-
+                                        kotLines.add(printTextString(kotLineItem.get(j).getQty() + "   " + kotLineItem.get(j).getProduct().getProdName() + "\n"));
                                         if (kotLineItem.get(j).getNotes().trim().length() != 0)
-                                            HPRTPrinterHelper.PrintText("     " + kotLineItem.get(j).getNotes() + "\n", 0, 0, 0);
+                                            kotLines.add(printTextString("     " + kotLineItem.get(j).getNotes() + "\n"));
                                     }
-                                    /**FOR MR. FOOD*/
-                                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
 
-                                    /**FOR BRIYANI HOUSE*/
-                                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat("*** " + kotPrintList.get(i).getOrderType() + " ***") + "\n", 0, 16, 0);
+                                    kotLines.add(printTextString("------------------------------------------\n"));
+                                    kotLines.add(printTextString(alignUtils.alignFormat("*** " + kotPrintList.get(i).getOrderType() + " ***") + "\n"));
 
-                                    pAct.AfterPrintAction();
+                                    if(kotLines.size()!=0){
+                                        //call Wi-Fi print
+                                        if (hprtPrinter != null) {
+                                            HPRTPrinterHelper.PortClose();
+                                        }
 
-                                    HPRTPrinterHelper.CutPaper(HPRTPrinterHelper.HPRT_PARTIAL_CUT_FEED, 240);
+                                        hprtPrinter = new HPRTPrinterHelper(thisCon, printerName);
+                                        if (HPRTPrinterHelper.PortOpen("WiFi," + ipAddress + "," + strPort) != 0) {
+                                            //Printer Not connected
+                                            AppLog.e("KOT SERVICE", "PRINTER NOT CONNECTED");
+                                            Log.e("POSActivity-LAN PRINTER", "PRINTER NOT CONNECTED");
+                                        } else {
+                                            try {
+                                                Log.i("POSActivity-LAN PRINTER", "PRINTER CONNECTED");
 
-                                    //update local status to printed
-                                    mDBHelper.updateKOTStatusPrinted(kotPrintList.get(i).getKotNumber(), invoiceNumber);
-                                    //}
+                                                AppLog.e("KOT SERVICE", "PRINTER CONNECTED");
 
-                                } catch (Exception e) {
-                                    Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
+                                                pAct.LanguageEncode();
+                                                pAct.BeforePrintAction();
+
+                                                for(int j=0;j<kotLines.size();j++) {
+                                                    System.out.println(kotLines.get(j));
+                                                    HPRTPrinterHelper.PrintText(kotLines.get(j));
+                                                }
+
+                                                HPRTPrinterHelper.CutPaper(HPRTPrinterHelper.HPRT_PARTIAL_CUT_FEED, 240);
+
+                                                pAct.AfterPrintAction();
+
+                                                //update local status to printed
+                                                mDBHelper.updateKOTStatusPrinted(kotPrintList.get(i).getKotNumber(), invoiceNumber);
+
+                                            } catch (Exception e) {
+
+                                                StringWriter sw = new StringWriter();
+                                                e.printStackTrace(new PrintWriter(sw));
+                                                String stacktrace = sw.toString();
+
+                                                AppLog.e("KOT SERVICE", stacktrace);
+
+                                                Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
+                                            }
+                                        }
+                                    }
+
+                                } else {
+                                    AppLog.e("KOT SERVICE", "KOT LINE ITEM IS EMPTY");
                                 }
+                            }catch (Exception e){
+                                StringWriter sw = new StringWriter();
+                                e.printStackTrace(new PrintWriter(sw));
+                                String stacktrace = sw.toString();
+
+                                AppLog.e("KOT SERVICE", stacktrace);
                             }
+                        }
+                        else{
+                            AppLog.e("KOT SERVICE", "PRINTER IP ADDRESS NOT VALID");
                         }
                     }else{
                         //update local status to printed
@@ -317,9 +347,15 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                AppConstants.isKOTParsing = false;
                 OrderStatusListener.getInstance().kotPrinted();
             }
         }
+    }
+
+    private String printTextString(String printText){
+        String s = printText;
+        return s;
     }
 
     private String postPrintedKOT() {

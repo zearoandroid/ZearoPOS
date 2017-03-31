@@ -83,6 +83,35 @@
             android:layout_height="5dp"
             android:background="@color/colorPrimary" />
 
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="5dp"
+            android:id="@+id/radGroupMode" >
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/radDenomination"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:checked="true"
+                android:textColor="@color/black"
+                android:text="Denomination" />
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:id="@+id/radOnlyTotal"
+                android:text="OnlyTotal" />
+
+        </RadioGroup>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -93,6 +122,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:id="@+id/layTotalSection"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="3dp"
@@ -118,6 +148,12 @@
                         android:textCursorDrawable="@null" />
 
                 </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layDenomination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -450,6 +486,8 @@
                     android:layout_marginTop="10dp"
                     android:gravity="right"
                     android:text="@string/total" />
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/layBottomSession"

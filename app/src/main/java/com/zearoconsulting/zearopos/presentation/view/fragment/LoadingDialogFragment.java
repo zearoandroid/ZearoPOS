@@ -64,7 +64,7 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                         progressWheel.stopSpinning();
                         if (mListener != null)
                             mListener.onOrganizeDataReceived();
-                        dismiss();
+                        dismissAllowingStateLoss();
                     }
                     break;
                 case AppConstants.LOGIN_SUCCESS:
@@ -144,17 +144,17 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                     break;
                 case AppConstants.NO_DATA_RECEIVED:
                     progressWheel.stopSpinning();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.SERVER_ERROR:
                     progressWheel.stopSpinning();
                     Toast.makeText(context, "Server data error", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.DEVICE_NOT_REGISTERED:
                     progressWheel.stopSpinning();
                     Toast.makeText(context, "Device not registered to server!", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.NETWORK_ERROR:
                     //INFORM USER NO DATA
@@ -245,7 +245,7 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
 
     private void gotoPOS() {
         progressWheel.stopSpinning();
-        dismiss();
+        dismissAllowingStateLoss();
         mIntent = new Intent(context, POSActivity.class);
         startActivity(mIntent);
         getActivity().finish();

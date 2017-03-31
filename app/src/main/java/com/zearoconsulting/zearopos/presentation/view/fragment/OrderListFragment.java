@@ -490,7 +490,7 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
                 sendDraftOrder();
                 break;
             case R.id.imgPrintKOTView:
-                if (!AppConstants.isKOTParsing)
+                //if (!AppConstants.isKOTParsing)
                     generateKOT();
                 break;
             case R.id.btnDiscountView:

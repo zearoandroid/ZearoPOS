@@ -13,6 +13,7 @@ import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.data.AppDataManager;
 import com.zearoconsulting.zearopos.data.DBHelper;
 import com.zearoconsulting.zearopos.data.POSDataSource;
+import com.zearoconsulting.zearopos.presentation.exception.AppLog;
 import com.zearoconsulting.zearopos.presentation.model.BPartner;
 import com.zearoconsulting.zearopos.presentation.model.Category;
 import com.zearoconsulting.zearopos.presentation.model.Customer;
@@ -128,9 +129,11 @@ public class JSONParser {
                     mJsonObj.put("operation", "GetKotDetails");
                     break;
                 case AppConstants.POST_KOT_FLAGS:
+                    mJsonObj.put("businessPartnerId", mAppManager.getCustomerBPId());
                     mJsonObj.put("operation", "UpdateKOTFlags");
                     break;
                 case AppConstants.CALL_RELEASE_POS_ORDER:
+                    mJsonObj.put("businessPartnerId", mAppManager.getCustomerBPId());
                     mJsonObj.put("operation", "POSReleaseOrder");
                     break;
                 case AppConstants.GET_BPARTNERS:
@@ -141,6 +144,7 @@ public class JSONParser {
                     mJsonObj.put("currencyId", mAppManager.getCurrencyID());
                     mJsonObj.put("paymentTermId", mAppManager.getPaymentTermID());
                     mJsonObj.put("pricelistId", mAppManager.getPriceListID());
+                    mJsonObj.put("businessPartnerId", mAppManager.getCustomerBPId());
                     break;
                 case AppConstants.CREATE_SESSION_REQUEST:
                     mJsonObj.put("operation", "createSession");
@@ -153,12 +157,15 @@ public class JSONParser {
                     break;
                 case AppConstants.CALL_CANCEL_POS_ORDER:
                     mJsonObj.put("operation", "POSCancelOrder");
+                    mJsonObj.put("businessPartnerId", mAppManager.getCustomerBPId());
                     break;
                 case AppConstants.CALL_DRAFT_POS_ORDER:
                     mJsonObj.put("operation","POSDraftOrder");
+                    mJsonObj.put("businessPartnerId", mAppManager.getCustomerBPId());
                     break;
                 case AppConstants.POST_TABLE_CHANGE:
                     mJsonObj.put("operation", "ChangeActiveTable");
+                    mJsonObj.put("businessPartnerId", mAppManager.getCustomerBPId());
                     break;
                 case AppConstants.CHECK_CREDIT_LIMIT:
                     mJsonObj.put("operation", "CheckCreditLimit");
@@ -747,12 +754,16 @@ public class JSONParser {
             b.putString("OUTPUT", "");
         } finally {
 
-            if (length == tableList.size()) {
-                b.putInt("Type", AppConstants.TABLES_RECEIVED);
-                b.putString("OUTPUT", "");
+            if(tableList!=null) {
+                if (length == tableList.size()) {
+                    b.putInt("Type", AppConstants.TABLES_RECEIVED);
+                    b.putString("OUTPUT", "");
 
-                msg.setData(b);
-                mHandler.sendMessage(msg);
+                    msg.setData(b);
+                    mHandler.sendMessage(msg);
+                }
+            }else{
+                AppLog.e("PARSE TABLE","NO TABLE DATA RECEIVED");
             }
         }
     }
@@ -816,15 +827,19 @@ public class JSONParser {
             b.putInt("Type", AppConstants.SERVER_ERROR);
             b.putString("OUTPUT", "");
         } finally {
+            if (terminalsList != null) {
+                if (length == terminalsList.size()) {
+                    b.putInt("Type", AppConstants.TERMINALS_RECEIVED);
+                    b.putString("OUTPUT", "");
 
-            if (length == terminalsList.size()) {
-                b.putInt("Type", AppConstants.TERMINALS_RECEIVED);
-                b.putString("OUTPUT", "");
-
-                msg.setData(b);
-                mHandler.sendMessage(msg);
+                    msg.setData(b);
+                    mHandler.sendMessage(msg);
+                }
+            } else {
+                AppLog.e("PARSE TERMINAL", "NO TERMINAL DATA RECEIVED");
             }
         }
+
     }
 
     /**
@@ -1182,10 +1197,12 @@ public class JSONParser {
      * @param jsonStr
      * @param mHandler
      */
-    public void parseKOTData(String jsonStr, Handler mHandler){
-        AppConstants.isKOTParsing = true;
-        Runnable myThread = new ParseKOTDataThread(jsonStr, mHandler);
-        new Thread(myThread).start();
+    public void parseKOTData(String jsonStr, Handler mHandler) {
+
+        //if (!AppConstants.isKOTParsing) {
+            Runnable myThread = new ParseKOTDataThread(jsonStr, mHandler);
+            new Thread(myThread).start();
+        //}
     }
 
     public class ParseKOTDataThread implements Runnable {
@@ -1213,6 +1230,8 @@ public class JSONParser {
             try {
                 json = new JSONObject(mJsonStr);
                 if (json.getInt("responseCode") == 200) {
+
+                    AppConstants.isKOTParsing = true;
 
                     if(json.has("tables")){
                         jsonTableArray = json.getJSONArray("tables");
@@ -1356,18 +1375,24 @@ public class JSONParser {
                             JSONObject tableObj = (JSONObject) jsonDraftedTableArray.get(i);
                             mDBHelper.updateOrderAvailableTable(tableObj.getLong("tableId"));
                         }
+
+                        AppConstants.isKOTParsing = false;
                     }
 
                 } else if (json.getInt("responseCode") == 301) {
+                    AppConstants.isKOTParsing = false;
                     b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                     b.putString("OUTPUT", "");
                 } else if (json.getInt("responseCode") == 101) {
+                    AppConstants.isKOTParsing = false;
                     mDBHelper.updateAllTableStatus();
                 }else if (json.getInt("responseCode") == 700) {
+                    AppConstants.isKOTParsing = false;
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
                     b.putString("OUTPUT", "");
                 }
             } catch (Exception e) {
+                AppConstants.isKOTParsing = false;
                 e.printStackTrace();
                 b.putInt("Type", AppConstants.SERVER_ERROR);
                 b.putString("OUTPUT", "");

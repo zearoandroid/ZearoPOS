@@ -52,14 +52,16 @@ public class SessionFragment extends AbstractDialogFragment {
                     break;
                 case AppConstants.CREATE_SESSION_RESPONSE:
                     mProDlg.dismiss();
-                    dismiss();
+                    ((POSActivity) getActivity()).checkPrinterConnection();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.RESUME_SESSION_REQUEST:
                     mParser.parseResumeSessionResponse(jsonStr, mHandler);
                     break;
                 case AppConstants.RESUME_SESSION_RESPONSE:
                     mProDlg.dismiss();
-                    dismiss();
+                    ((POSActivity) getActivity()).checkPrinterConnection();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.SESSION_EXPIRED:
                     mProDlg.dismiss();
@@ -69,9 +71,10 @@ public class SessionFragment extends AbstractDialogFragment {
                     mProDlg.dismiss();
                     //show the server error dialog
                     Toast.makeText(getActivity(), "Server data error", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.NETWORK_ERROR:
+                    mProDlg.dismiss();
                     //INFORM USER NO DATA
                     Toast.makeText(getActivity(), "NETWORK ERROR...", Toast.LENGTH_SHORT).show();
                     break;

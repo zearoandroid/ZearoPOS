@@ -39,6 +39,7 @@ import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.zearopos.domain.receivers.ConnectivityReceiver;
 import com.zearoconsulting.zearopos.presentation.model.BPartner;
 import com.zearoconsulting.zearopos.presentation.model.Customer;
+import com.zearoconsulting.zearopos.presentation.model.KOTHeader;
 import com.zearoconsulting.zearopos.presentation.model.KOTLineItems;
 import com.zearoconsulting.zearopos.presentation.model.Organization;
 import com.zearoconsulting.zearopos.presentation.model.POSLineItem;
@@ -90,7 +91,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
     private String mCardType;
     private Customer mCustomer;
     private List<POSLineItem> mPOSLineItemList;
-    private double mTotalAmount=0;
+    private double mTotalAmount = 0;
     private double mPaidCashAmount = 0;
     private double mPaidAmexAmount = 0;
     private double mPaidGiftAmount = 0;
@@ -111,7 +112,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
 
     private ImageView mImgClosePayment;
     private SharedPreferences mSharedPreferences;
-    private String ConnectType="USB";
+    private String ConnectType = "USB";
 
     final Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -130,7 +131,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                             .show();
                     if (ConnectType.equalsIgnoreCase("Bluetooth")) {
                         printBill();
-                    }else{
+                    } else {
                         printInvoice();
                     }
                     break;
@@ -181,9 +182,10 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             mContext = this;
 
             // Get the instance of SharedPreferences object
-            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            //mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-            ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
+            //ConnectType = mSharedPreferences.getString("prefPrintOptions","USB");
+            ConnectType = mAppManager.getPrinterMode();
 
             mTblPayTypes = (TableLayout) findViewById(R.id.layPaymentTypes);
             onCredit = (RadioButton) findViewById(R.id.rbCredit);
@@ -202,12 +204,12 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             mEdtPaidVisa = (EditText) findViewById(R.id.edtPaidVisa);
             mEdtReason = (EditText) findViewById(R.id.edtReason);
             mBtnComplete = (Button) findViewById(R.id.btnComplete);
-            mRGPayType = (RadioGroup) findViewById(R.id.rgPayment) ;
+            mRGPayType = (RadioGroup) findViewById(R.id.rgPayment);
             mImgClosePayment = (ImageView) findViewById(R.id.imgClosePayment);
 
             mReboundListener = new ReboundListener();
 
-            AppConstants.isKOTParsing = true;
+            //AppConstants.isKOTParsing = true;
 
             mCustomer = mDBHelper.getPOSCustomer(AppConstants.posID);
             mPOSLineItemList = mDBHelper.getPOSLineItems(AppConstants.posID, 0);
@@ -219,15 +221,15 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
 
             mFinalAmount = Double.parseDouble(Common.valueFormatter(mFinalAmount));
 
-            mTxtPaymentTitle.setText("Payment ("+AppConstants.posID+")");
+            mTxtPaymentTitle.setText("Payment (" + AppConstants.posID + ")");
             mOldTotalAmountView.setText(Common.valueFormatter(mTotalAmount));
             mDiscountAmountView.setText(Common.valueFormatter(mTotalAmount - mFinalAmount));
             mTotalAmountView.setText(Common.valueFormatter(mFinalAmount));
 
             order = mDBHelper.getPosHeader(AppConstants.posID);
-            bPartner = mDBHelper.getBPartner(mAppManager.getClientID(),mAppManager.getOrgID(),order.getBpId());
+            bPartner = mDBHelper.getBPartner(mAppManager.getClientID(), mAppManager.getOrgID(), order.getBpId());
 
-            AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
+            AppConstants.URL = AppConstants.kURLHttp + mAppManager.getServerAddress() + ":" + mAppManager.getServerPort() + AppConstants.kURLServiceName + AppConstants.kURLMethodApi;
 
             //mEdtPaidAmount.setText(String.valueOf(mFinalAmount));
             mProDlg = new ProgressDialog(this);
@@ -236,11 +238,11 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
 
             mRGPayType.setVisibility(View.GONE);
 
-            if(bPartner.getIsCredit().equalsIgnoreCase("Y")){
+            if (bPartner.getIsCredit().equalsIgnoreCase("Y")) {
                 mRGPayType.setVisibility(View.VISIBLE);
                 mRGPayType.check(R.id.rbCredit);
                 mTblPayTypes.setVisibility(View.GONE);
-            }else{
+            } else {
 
             }
 
@@ -286,9 +288,9 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // find which radio button is selected
-                    if(checkedId == R.id.rbCredit) {
+                    if (checkedId == R.id.rbCredit) {
                         mTblPayTypes.setVisibility(View.GONE);
-                    } else if(checkedId == R.id.rbCash) {
+                    } else if (checkedId == R.id.rbCash) {
                         mTblPayTypes.setVisibility(View.VISIBLE);
                     }
                 }
@@ -299,7 +301,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 @Override
                 public void onClick(View v) {
 
-                    AppConstants.isKOTParsing = false;
+                    //AppConstants.isKOTParsing = false;
                     finish();
                 }
             });
@@ -320,20 +322,20 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                         finish();
                     }*/
 
-                        if(bPartner.getIsCredit().equalsIgnoreCase("Y")){
-                            if(bPartner.getCreditLimit()<mFinalAmount)
+                        if (bPartner.getIsCredit().equalsIgnoreCase("Y")) {
+                            if (bPartner.getCreditLimit() < mFinalAmount)
                                 TSnackbar.make(findViewById(R.id.layPayment), "Please check the credit limit", TSnackbar.LENGTH_LONG).show();
-                            else{
+                            else {
                                 mBtnComplete.setClickable(false);
                                 savePaymentDetail();
                                 postPOSOrder();
                             }
-                        }else{
+                        } else {
                             mReturnAmount = validateReturnAmount();
                             if (mReturnAmount <= 0) {
-                            mBtnComplete.setClickable(false);
-                            savePaymentDetail();
-                            postPOSOrder();
+                                mBtnComplete.setClickable(false);
+                                savePaymentDetail();
+                                postPOSOrder();
                             } else {
                                 TSnackbar.make(findViewById(R.id.layPayment), "Please verify the amount", TSnackbar.LENGTH_LONG)
                                         .show();
@@ -463,7 +465,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
 
             mPaidTotalAmount = (mPaidCashAmount + mPaidCardAmount);
             mReturnAmount = mFinalAmount - mPaidTotalAmount;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             mReturnAmount = 0;
         }
@@ -519,9 +521,9 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 mHeaderObj.put("isCredit", "N");
                 int selectedId = mRGPayType.getCheckedRadioButtonId();
                 // find which radioButton is checked by id
-                if(selectedId == onCredit.getId()) {
+                if (selectedId == onCredit.getId()) {
                     mHeaderObj.put("isCredit", "Y");
-                } else if(selectedId == onCash.getId()) {
+                } else if (selectedId == onCash.getId()) {
                     mHeaderObj.put("isCredit", "N");
                 }
 
@@ -543,16 +545,16 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 Log.i("POST ORDER", mJsonObj.toString());
 
                 JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, AppConstants.URL, mJsonObj,
-                        new Response.Listener<JSONObject>(){
+                        new Response.Listener<JSONObject>() {
 
                             @Override
                             public void onResponse(JSONObject response) {
                                 mParser.parseReleaseOrderJson(response.toString(), mHandler);
                             }
-                        }, new Response.ErrorListener(){
+                        }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(mContext, "Server connection error... Contact Administrator", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Server connection error! Try Again...", Toast.LENGTH_SHORT).show();
                         mProDlg.dismiss();
                         mBtnComplete.setClickable(true);
                     }
@@ -759,12 +761,25 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
 
                 List<Long> kotTableList = mDBHelper.getKOTTableList(AppConstants.posID);
 
+                //deleting the KOT LineItems
                 mDBHelper.deleteKOTItems(AppConstants.posID);
 
                 for (int i = 0; i < kotTableList.size(); i++) {
-                    List<KOTLineItems> kotLineItemList = mDBHelper.getKOTLineItems(kotTableList.get(i));
-                    if (kotLineItemList.size() == 0)
-                        mDBHelper.deleteKOTDetails(kotTableList.get(i));
+
+                    if (kotTableList.get(i) == 0) {
+                        //get the KOTNumbers of Order
+                        List<KOTHeader> kotNumberList = mDBHelper.getKOTNumbersFromKOTHeader(kotTableList.get(i), AppConstants.posID);
+                        for (int j = 0; j < kotNumberList.size(); j++) {
+                            List<KOTLineItems> kotLineItemList = mDBHelper.getKOTLineItemFromKOTNumber(kotNumberList.get(j).getKotNumber());
+                            if (kotLineItemList.size() == 0)
+                                mDBHelper.deleteKOTHeaders(kotNumberList.get(j).getKotNumber());
+                        }
+
+                    } else {
+                        List<KOTLineItems> kotLineItemList = mDBHelper.getKOTLineItems(kotTableList.get(i));
+                        if (kotLineItemList.size() == 0)
+                            mDBHelper.deleteKOTDetails(kotTableList.get(i));
+                    }
                 }
             }
         }

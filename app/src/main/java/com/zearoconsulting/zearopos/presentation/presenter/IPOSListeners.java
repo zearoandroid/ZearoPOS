@@ -17,4 +17,5 @@ public interface IPOSListeners {
     void orderCancelSuccess();
     void orderCancelFailure();
     void onReprintOrder(POSOrders order);
+    void onPrinterConnection(String mode, String ipAddress);
 }

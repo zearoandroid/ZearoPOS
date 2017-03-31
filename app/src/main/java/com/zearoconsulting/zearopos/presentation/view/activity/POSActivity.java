@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
@@ -24,7 +23,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -53,7 +51,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -84,19 +81,19 @@ import com.zearoconsulting.zearopos.presentation.presenter.ITokenListeners;
 import com.zearoconsulting.zearopos.presentation.presenter.OrderStatusListener;
 import com.zearoconsulting.zearopos.presentation.presenter.TableSelectListener;
 import com.zearoconsulting.zearopos.presentation.print.InvoiceBill;
-import com.zearoconsulting.zearopos.presentation.print.InvoicePrintTask;
 import com.zearoconsulting.zearopos.presentation.print.PublicAction;
-import com.zearoconsulting.zearopos.presentation.print.WiFiPrintTaskParams;
 import com.zearoconsulting.zearopos.presentation.view.adapter.TableAdapter;
 import com.zearoconsulting.zearopos.presentation.view.adapter.TableTouchHelper;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.AlertView;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.presentation.view.fragment.AboutUs;
+import com.zearoconsulting.zearopos.presentation.view.fragment.AlertFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.CategoryListFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.LogoutConfirmationFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.ManualSyncConfirmation;
 import com.zearoconsulting.zearopos.presentation.view.fragment.MultiEditorFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.OrderListFragment;
+import com.zearoconsulting.zearopos.presentation.view.fragment.PrinterSettingsFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.ProductListFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.SessionFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.ShowInvoiceListFragment;
@@ -105,11 +102,11 @@ import com.zearoconsulting.zearopos.utils.AppConstants;
 import com.zearoconsulting.zearopos.utils.Common;
 import com.zearoconsulting.zearopos.utils.NetworkUtil;
 import com.zearoconsulting.zearopos.utils.StringAlignUtils;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -117,7 +114,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import HPRTAndroidSDK.HPRTPrinterHelper;
 import HPRTAndroidSDK.IPort;
 import HPRTAndroidSDK.PublicFunction;
@@ -139,6 +135,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private final long DELAY = 200; // milliseconds
     boolean printType;
     SessionFragment sessionDialog = new SessionFragment();
+    PrinterSettingsFragment printerSettingFragment = null;
+    String strMode, strIPAddress;
     /**
      * View declaration varaiables
      */
@@ -169,6 +167,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private Runnable mTableUpdateRunnable;
     private TableAdapter mTableAdapter;
     private List<Tables> mKOTTableList;
+    private List<KOTHeader> kotHeaderList;
     final Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             int type = msg.getData().getInt("Type");
@@ -191,9 +190,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     }
                     break;
                 case AppConstants.GET_KOT_HEADER_AND_lINES:
-                    if (!AppConstants.isKOTParsing) {
-                        mParser.parseKOTData(jsonStr, mHandler);
-                    }
+                    //if (!AppConstants.isKOTParsing) {
+                    mParser.parseKOTData(jsonStr, mHandler);
+                    //}
                     break;
                 case AppConstants.POST_KOT_FLAGS:
                     mParser.parseKOTStatus(jsonStr, mHandler);
@@ -246,7 +245,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             }
         }
     };
-    private List<KOTHeader> kotHeaderList;
     private long selecteTableId = 0;
     /**
      * @TableSelectListener is used for user can select and generate the invoice of table.
@@ -318,8 +316,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private PublicAction PAct = null;
     private String strPort = "9100";
     private Context thisCon = AndroidApplication.getAppContext();
-    ;
-    private SharedPreferences mSharedPreferences;
     private ClipboardManager myClipboard;
     private ClipData myClip;
     /**
@@ -342,7 +338,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                         break;
                     case BluetoothAdapter.STATE_ON:
                         System.out.println("STATE_ON");
-                        displayConnectPrinter();
+                        displayBluetoothPrinter();
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         System.out.println("STATE_TURNING_ON");
@@ -387,20 +383,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     };
 
-    // Set up Bluetooth.
-    private void bluetoothSetup() {
-        // Initialize
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-            return;
-        }
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -410,10 +392,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         try {
 
-            // Get the instance of SharedPreferences object
-            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-            ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
-
             mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(ACTION_USB_PERMISSION), 0);
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
             mContext.registerReceiver(mUsbReceiver, filter);
@@ -421,12 +399,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             PFun = new PublicFunction(mContext);
             PAct = new PublicAction(mContext);
             InitCombox();
-
-            //connect usb printer
-            connectPrinter();
-
-            //Bluetooth Setup
-            bluetoothSetup();
 
             //Register Bluetooth broadcast receiver
             registerReceiver(mBltStateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
@@ -532,7 +504,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     mPOSNumberHandler.postDelayed(this, 5 * 1000);
                 }
             };
-            mPOSNumberHandler.postDelayed(mPOSNumberRunnable, 5000);
 
             //Thread for checking table status in every 5 seconds
             /*mTableUpdateRunnable = new Runnable() {
@@ -542,7 +513,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     mTableUpdateHandler.postDelayed(this, 5 * 1000);
                 }
             };
-            mTableUpdateHandler.postDelayed(mTableUpdateRunnable, 5000);*/
+            */
 
             if (savedInstanceState == null) {
                 if (findViewById(R.id.displayOrderList) != null) {
@@ -604,9 +575,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 this.mTablesView.setVisibility(View.VISIBLE);
                 Intent i = new Intent(this, TableStatusService.class);
                 //i.putExtra("handler", new Messenger(this.handler));
-                this.startService(i);
+                //this.startService(i);
 
-                AppConstants.isTableService = true;
+                //AppConstants.isTableService = true;
             }
 
             //check the app for isTableService and update the views
@@ -718,26 +689,18 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 readMSRData();
                 return true;
             case R.id.action_settings:
-                showPOSSettings();
+                displayPrinterSettings();
                 return true;
             default:
                 return false;
         }
     }
 
-    private void showPOSSettings() {
-        try {
-            displaySettings();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void displaySettings() {
+    private void displayPrinterSettings() {
         try {
-            Intent actLog = new Intent(mContext,
-                    POSSettingsActivity.class);
-            startActivity(actLog);
+            printerSettingFragment = new PrinterSettingsFragment();
+            printerSettingFragment.show(fragmentManager, "OrderCancelFragment");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -777,6 +740,13 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         //Get the authorized id's for giving permission to order delete, cancel and edit
         mAuthrizeIds = mDBHelper.getAuthorizeId(mAppManager.getOrgID());
+
+        try {
+            mPOSNumberHandler.postDelayed(mPOSNumberRunnable, 5000);
+            mTableUpdateHandler.postDelayed(mTableUpdateRunnable, 5000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (String.valueOf(mAppManager.getSessionId()).equalsIgnoreCase("0")) {
             //show create session
@@ -820,24 +790,16 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 e.printStackTrace();
             }
         } else {
-            ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
+            ConnectType = mAppManager.getPrinterMode();
             if (ConnectType.equalsIgnoreCase("Bluetooth")) {
                 //check bluetoothport is null
                 if (mBluetoothAdapter != null) {
                     if (mBluetoothAdapter.isEnabled() && bluetoothPort == null) {
-                        displayConnectPrinter();
+                        displayBluetoothPrinter();
                         return;
                     }
                 }
             }
-        }
-
-
-        try {
-            mPOSNumberHandler.postDelayed(mPOSNumberRunnable, 5000);
-            mTableUpdateHandler.postDelayed(mTableUpdateRunnable, 5000);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }
@@ -1029,12 +991,44 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         double mFinalAmount = mDBHelper.sumOfProductsTotalPrice(orders.getPosId());
 
         POSPayment payment = mDBHelper.getPaymentDetails(orders.getPosId());
-        if(payment!=null) {
-            printFromPayment(orders.getPosId(), mTotalAmount, mFinalAmount, mFinalAmount, 0, payment.getCash(), payment.getAmex(), payment.getGift(),  payment.getMaster(), payment.getVisa(), payment.getOther(), 0);
-        }else{
-            printFromPayment(orders.getPosId(), mTotalAmount, mFinalAmount, mFinalAmount, 0, 0, 0, 0,  0, 0, 0, 0);
+        if (payment != null) {
+            printFromPayment(orders.getPosId(), mTotalAmount, mFinalAmount, mFinalAmount, 0, payment.getCash(), payment.getAmex(), payment.getGift(), payment.getMaster(), payment.getVisa(), payment.getOther(), 0);
+        } else {
+            printFromPayment(orders.getPosId(), mTotalAmount, mFinalAmount, mFinalAmount, 0, 0, 0, 0, 0, 0, 0, 0);
         }
 
+    }
+
+    @Override
+    public void onPrinterConnection(String mode, String ipAddress) {
+
+        if (mode.equalsIgnoreCase("USB")) {
+            mAppManager.savePrinterData(mode, ipAddress);
+            connectPrinter();
+
+            if (printerSettingFragment != null)
+                printerSettingFragment.dismissAllowingStateLoss();
+
+            AppLog.e("PRINTER CONNECTION MODE ", mode);
+
+        } else if (mode.equalsIgnoreCase("WiFi")) {
+
+            strMode = mode;
+            strIPAddress = ipAddress;
+
+            new WiFiPrinteConnectionTask().execute();
+
+            AppLog.e("PRINTER CONNECTION MODE ", mode);
+
+        } else if (mode.equalsIgnoreCase("Bluetooth")) {
+            mAppManager.savePrinterData(mode, ipAddress);
+            if (printerSettingFragment != null)
+                printerSettingFragment.dismissAllowingStateLoss();
+
+            AppLog.e("PRINTER CONNECTION MODE ", mode);
+
+            connectBluetoothPrinter();
+        }
     }
 
     /**
@@ -1124,7 +1118,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     }
 
-
     /**
      * Generate the invoice for selected table
      * If table already having the invoice number in lines, it will
@@ -1182,7 +1175,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 //mDBHelper.deletePOSTables(AppConstants.posID);
                 updateKOTtoInvoice(AppConstants.posID, tableId);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -1223,14 +1216,14 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         mOrderFrag.updateMode(posId);
     }
 
-    private void getTableKOTData(long tableId){
+    private void getTableKOTData(long tableId) {
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
             try {
 
                 mProDlg.setMessage("Getting tables details...");
                 mProDlg.show();
 
-                AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
+                AppConstants.URL = AppConstants.kURLHttp + mAppManager.getServerAddress() + ":" + mAppManager.getServerPort() + AppConstants.kURLServiceName + AppConstants.kURLMethodApi;
                 JSONObject mJsonObj = mParser.getParams(AppConstants.GET_TABLE_KOT_DETAILS);
                 mJsonObj.put("tableId", tableId);
                 Log.i("KOTJson", mJsonObj.toString());
@@ -1241,13 +1234,13 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 AndroidApplication.getInstance().cancelPendingRequests(this);
 
                 JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, AppConstants.URL, mJsonObj,
-                        new Response.Listener<JSONObject>(){
+                        new Response.Listener<JSONObject>() {
 
                             @Override
                             public void onResponse(JSONObject response) {
-                                mParser.parseTableKOTDataResponse(response.toString(),mHandler);
+                                mParser.parseTableKOTDataResponse(response.toString(), mHandler);
                             }
-                        }, new Response.ErrorListener(){
+                        }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(mContext, "Server Connection error...", Toast.LENGTH_SHORT).show();
@@ -1346,6 +1339,22 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     }
 
+    private void connectBluetoothPrinter() {
+
+        // Initialize
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            return;
+        }
+
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }else{
+            displayBluetoothPrinter();
+        }
+    }
 
     private void connectPrinter() {
 
@@ -1373,7 +1382,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             }
         }
 
-        ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
+        //ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
+        ConnectType = mAppManager.getPrinterMode();
         if (!HavePrinter && ConnectType.equalsIgnoreCase("USB"))
             Toast.makeText(mContext, "Please connect usb printer", Toast.LENGTH_LONG).show();
 
@@ -1537,7 +1547,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         if (menuItem.getItemId() == R.id.navigation_item_3) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
-            displayConnectPrinter();
+            displayBluetoothPrinter();
         }
 
         if (menuItem.getItemId() == R.id.navigation_item_4) {
@@ -1577,7 +1587,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     /**
      * DISPLAY THE BLUETOOTH PRINTER
      */
-    private void displayConnectPrinter() {
+    private void displayBluetoothPrinter() {
         try {
             Intent actLog = new Intent(mContext,
                     ConnectPrinterActivity.class);
@@ -1590,8 +1600,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     public void printBill(long orderNum, List<POSLineItem> lineItem, double totalAmt, double finalAmt, double paidAmt, double returnAmt) {
 
         try {
-            ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
-
+            //ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
+            ConnectType = mAppManager.getPrinterMode();
             if (totalAmt != 0 && !ConnectType.equalsIgnoreCase("Bluetooth")) {
                 printPreInvoice(orderNum, lineItem, totalAmt, finalAmt, paidAmt, returnAmt);
                 //return;
@@ -1612,7 +1622,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                             bill.setOrgDetails(orgDetail);
                             bltResult = bill.billGenerateAndPrint();
                         } else {
-                            bluetoothSetup();
+                            connectBluetoothPrinter();
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -1657,13 +1667,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         paidAmt = mPaidAmt;
         returnAmt = mReturnAmt;
 
-        ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
-
+        //ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
+        ConnectType = mAppManager.getPrinterMode();
         if (ConnectType.equalsIgnoreCase("USB")) {
-
-            /*if (device != null) {
-                HPRTPrinterHelper.PortClose();
-            }*/
 
             Log.i("POSActivity-LAN PRINTER", "PRINTER CONNECTED");
             if (HPRTPrinterHelper.PortOpen(device) != 0) {
@@ -1671,23 +1677,17 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 Toast.makeText(mContext, "Printer connection error!", Toast.LENGTH_LONG).show();
                 updatePrintStatus("QUICK", orderNum);
             } else {
-
                 AppLog.e("PRE-PRINTING", orderNum + " CALLING ");
-
                 USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
-                PrePrintInvoice prePrintTask = new PrePrintInvoice();
+                WiFiPrintInvoice prePrintTask = new WiFiPrintInvoice();
                 prePrintTask.execute(params1);
             }
         } else if (ConnectType.equalsIgnoreCase("WiFi")) {
-            /*WiFiPrintTaskParams params = new WiFiPrintTaskParams(orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
-            InvoicePrintTask myTask = new InvoicePrintTask(mContext);
-            myTask.execute(params);*/
             USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
             WiFiPrintInvoice prePrintTask = new WiFiPrintInvoice();
             prePrintTask.execute(params1);
         }
     }
-
 
     /**
      * UPDATE THE TABLE VIEWS. IF TABLE HAVING ORDER TABLE COLOR SHOULD BE RED, OTHERWISE IT WILL BE GRAY
@@ -1703,7 +1703,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             });
 
         }
-        AppConstants.isKOTParsing = false;
+        //AppConstants.isKOTParsing = false;
     }
 
     @Override
@@ -1763,7 +1763,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                         if (androidMSR.readMSR(mMSRMode) == LKPrint.LK_STS_MSR_READ) {
                             Log.e(TAG, "It's in msr mode ");
                         } else {
-                            AlertView.showError("Fail to change MSR mode.", mContext);
+                            //AlertView.showError("Fail to change MSR mode.", mContext);
+                            FragmentManager localFragmentManager = getSupportFragmentManager();
+                            AlertFragment.newInstance(mContext, "MSR Connection", "Fail to change MSR mode").show(localFragmentManager, "MSR");
                         }
                     } catch (InterruptedException e1) {
                         Log.e(TAG, "msrTestListener " + e1.getMessage());
@@ -1773,7 +1775,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                         Log.e(TAG, "msrTestListener " + e.getMessage());
                     }
                 } else {
-                    AlertView.showAlert("Info", "Connect Printer", mContext);
+                    FragmentManager localFragmentManager = getSupportFragmentManager();
+                    AlertFragment.newInstance(mContext, "Info", "Connect MSR reader").show(localFragmentManager, "MSR");
                 }
             }
         } catch (Exception e) {
@@ -2017,7 +2020,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             mOrderFrag.setCreditLimitDefault();
         }
 
-        AppConstants.isKOTParsing = false;
+        //AppConstants.isKOTParsing = false;
     }
 
     @Override
@@ -2058,8 +2061,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     @Override
     public void printFromPayment(long posNumber, double totalAmount, double finalAmount, double paidAmount, double returnAmount, double paidCash, double paidAmex, double paidGift, double paidMaster, double paidVisa, double paidOther, double amtEntered) {
 
-        ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
-
+        //ConnectType = mSharedPreferences.getString("prefPrintOptions", "USB");
+        ConnectType = mAppManager.getPrinterMode();
         if (ConnectType.equalsIgnoreCase("USB")) {
         /*if (device != null) {
             HPRTPrinterHelper.PortClose();
@@ -2068,54 +2071,19 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             Log.i("POSActivity-LAN PRINTER", "PRINTER CONNECTED");
             if (HPRTPrinterHelper.PortOpen(device) != 0) {
                 HPRTPrinter = null;
-                AppLog.e("PRINTING", posNumber + " CALLING ");
                 Toast.makeText(mContext, "Printer connection error!", Toast.LENGTH_LONG).show();
                 updatePrintStatus("COMPLETE", posNumber);
             } else {
-
                 AppLog.e("PRINTING", posNumber + " CALLING ");
-
                 USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
-                PrintInvoice printTask = new PrintInvoice();
+                WiFiPrintInvoice printTask = new WiFiPrintInvoice();
                 printTask.execute(params1);
             }
         } else if (ConnectType.equalsIgnoreCase("WiFi")) {
-            /*WiFiPrintTaskParams params = new WiFiPrintTaskParams(posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
-            InvoicePrintTask myTask = new InvoicePrintTask(mContext);
-            myTask.execute(params);*/
-
             USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
             WiFiPrintInvoice printTask = new WiFiPrintInvoice();
             printTask.execute(params1);
         }
-    }
-
-    private String addTotalWhiteSpace(String data) {
-        /**FOR MR. FOOD*/
-        //String result = String.format("%-40s", data);
-
-        /**FOR BRIYANI HOUSE*/
-        String result = String.format("%-33s", data);
-        return result;
-    }
-
-    private String addQtyWhiteSpace(String data) {
-        String result = String.format("%-5s", data);
-        return result;
-    }
-
-    private String addItemNameWhiteSpace(String data) {
-        /**FOR MR. FOOD*/
-        //String result = String.format("%-35s", data);
-
-        /**FOR BRIYANI HOUSE*/
-        String result = String.format("%-28s", data);
-        return result;
-    }
-
-    private String addPriceWhiteSpace(String data) {
-        String result = String.format("%8s", data);
-        return result;
     }
 
     private void updatePrintStatus(String printFrom, long posNumber) {
@@ -2137,6 +2105,125 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 bundle.putString("sessionDesc", "Expired");
                 sessionDialog.setArguments(bundle);
                 sessionDialog.show(fragmentManager, "SESSION");
+            }
+        }
+    }
+
+    public void closeActivity() {
+        finish();
+    }
+
+    public void checkPrinterConnection() {
+        if (mAppManager.getPrinterMode().equalsIgnoreCase("")) {
+            FragmentManager localFragmentManager = getSupportFragmentManager();
+            AlertFragment.newInstance(mContext, "Printing Option", "Please select the printer mode from settings").show(localFragmentManager, "PRINTER");
+        }else{
+            onPrinterConnection(mAppManager.getPrinterMode(), mAppManager.getPrinterIP());
+        }
+    }
+
+    private String addTotalWhiteSpace(String data) {
+        String result = "";
+        try {
+            result = String.format("%-33s", data);
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String stacktrace = sw.toString();
+            AppLog.e("AddTotalWhiteSpace", stacktrace);
+        }
+        return result;
+    }
+
+    private String addQtyWhiteSpace(String data) {
+        String result = "";
+        try {
+            result = String.format("%-5s", data);
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String stacktrace = sw.toString();
+            AppLog.e("AddQtyWhiteSpace", stacktrace);
+        }
+        return result;
+    }
+
+    private String addItemNameWhiteSpace(String data) {
+        String result = "";
+        try {
+            result = String.format("%-28s", data);
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String stacktrace = sw.toString();
+            AppLog.e("AddItemNameWhiteSpace", stacktrace);
+        }
+        return result;
+    }
+
+    private String addPriceWhiteSpace(String data) {
+        String result = "";
+        try {
+            result = String.format("%8s", data);
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String stacktrace = sw.toString();
+            AppLog.e("AddPriceWhiteSpace", stacktrace);
+        }
+        return result;
+    }
+
+    private String printTextString(String printText) {
+        String s = printText;
+        return s;
+    }
+
+    private class WiFiPrinteConnectionTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            mProDlg.setMessage("Connecting printer please wait...");
+            mProDlg.setCancelable(false);
+            mProDlg.setCanceledOnTouchOutside(false);
+            mProDlg.show();
+        }
+
+        protected String doInBackground(Void... urls) {
+            String result = "";
+            try {
+
+                if (HPRTPrinter != null) {
+                    HPRTPrinter.PortClose();
+                }
+                HPRTPrinter = new HPRTPrinterHelper(thisCon, printerName);
+
+                if (HPRTPrinter.PortOpen("WiFi," + strIPAddress + "," + strPort) != 0)
+                    result = "error";
+                else {
+                    result = "success";
+                }
+
+            } catch (Exception e) {
+                result = "error";
+            }
+
+            return result;
+        }
+
+        protected void onPostExecute(String result) {
+
+            mProDlg.dismiss();
+
+            if (result.equalsIgnoreCase("success")) {
+                Toast.makeText(thisCon, "WiFi Printer connected successfully", Toast.LENGTH_LONG).show();
+                mAppManager.savePrinterData(strMode, strIPAddress);
+
+                if (printerSettingFragment != null)
+                    printerSettingFragment.dismissAllowingStateLoss();
+            } else {
+                mAppManager.savePrinterData(strMode, strIPAddress);
+                Toast.makeText(thisCon, "WiFi Printer connection error! Try Again...", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -2198,635 +2285,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             } else {
                 // Fail to read MSR.
                 Log.e(TAG, "RawDATA == " + new String(bundle.getByteArray("RawData")));
-                AlertView.showError("Invalid MSR Data.", mContext);
-            }
-        }
-    }
-
-    private class PrePrintInvoice extends AsyncTask<USBPrintTaskParams, String, String> {
-
-        /**
-         * Variables for print product details
-         */
-        String printFrom = "QUICK";
-        String qty;
-        String name;
-        String arabicName;
-        double price;
-        double discPrice = 0;
-        String discount = "";
-        int disc;
-        double discVal;
-        String result = "";
-        long mPosNumber = 0;
-        private ProgressDialog mProgress;
-
-        // Show Progress bar before downloading Music
-        @Override
-        protected void onPreExecute() {
-            mProgress = new ProgressDialog(mContext);
-            mProgress.setMessage("Printing bill please wait...");
-            mProgress.setCancelable(false);
-            mProgress.setCanceledOnTouchOutside(false);
-            mProgress.show();
-        }
-
-        // Download Music File from Internet
-        @Override
-        protected String doInBackground(USBPrintTaskParams... params) {
-
-            try {
-
-                String mCashierName = mAppManager.getUserName();
-
-                printFrom = params[0].printFrom;
-                mPosNumber = params[0].posId;
-                double mTotalAmount = params[0].mTotalAmt;
-                double mFinalAmount = params[0].mFinalAmt;
-                double mPaidAmount = params[0].mPaidAmt;
-                double mReturnAmount = params[0].mReturnAmt;
-
-                double mPaidCashAmt = params[0].mPaidCashAmt;
-                double mPaidAmexAmt = params[0].mPaidAmexAmt;
-                double mPaidGiftAmt = params[0].mPaidGiftAmt;
-                double mPaidMasterAmt = params[0].mPaidMasterAmt;
-                double mPaidVisaAmt = params[0].mPaidVisaAmt;
-                double mOtherAmt = params[0].mPaidOtherAmt;
-                double mAmountEntered = params[0].mAmountEntered;
-
-                mTotalAmount = mDBHelper.sumOfProductsWithoutDiscount(mPosNumber);
-                mFinalAmount = mDBHelper.sumOfProductsTotalPrice(mPosNumber);
-
-                POSPayment payment = mDBHelper.getPaymentDetails(mPosNumber);
-                if (payment != null) {
-                    mPaidCashAmt = payment.getCash();
-                    mPaidAmexAmt = payment.getAmex();
-                    mPaidGiftAmt = payment.getGift();
-                    mPaidMasterAmt = payment.getMaster();
-                    mPaidVisaAmt = payment.getVisa();
-                    mOtherAmt = payment.getOther();
-                    mReturnAmount = payment.getChange();
-                }
-
-                try {
-
-                    PAct.LanguageEncode();
-
-                    AppLog.e("PRE-PRINTING", mPosNumber + " STARTED ");
-
-                    //pAct.BeforePrintAction();
-
-                    Organization orgDetail = mDBHelper.getOrganizationDetail(mAppManager.getOrgID());
-
-                    List<Long> kotTableList = mDBHelper.getKOTTableList(mPosNumber);
-                    String tableName;
-                    int covers = 0;
-
-                    if (kotTableList.size() == 0) {
-                        tableName = "CounterSale";
-                    } else if (kotTableList.size() == 1 && kotTableList.get(0) == 0) {
-                        tableName = "CounterSale";
-                    } else {
-                        StringBuilder sb = new StringBuilder("");
-                        for (int i = 0; i < kotTableList.size(); i++) {
-                            Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), kotTableList.get(i));
-                            if (table != null) {
-                                sb.append(table.getTableName() + " ");
-
-                                List<KOTHeader> kotHeaderList = mDBHelper.getKOTHeaders(kotTableList.get(i), true);
-                                for (int j = 0; j < kotHeaderList.size(); j++) {
-                                    KOTHeader kotHeader = kotHeaderList.get(j);
-                                    covers = covers + kotHeader.getCoversCount();
-                                }
-                            } else {
-                                sb.append("CounterSale");
-                            }
-
-                        }
-                        tableName = sb.toString();
-                    }
-
-                    //if (printFrom.equalsIgnoreCase("QUICK"))
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat("PreBill") + "\n", 0, 16, 0);
-
-                    if (orgDetail != null) {
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgName()) + "\n", 0, 16, 0);
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgAddress()) + "\n", 0, 16, 0);
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Tel: " + orgDetail.getOrgPhone()) + "\n", 0, 16, 0);
-                    }
-                    HPRTPrinterHelper.PrintText(Common.getDate() + "                            " + Common.getTime() + "\n", 0, 0, 0);
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat(String.valueOf(mPosNumber)) + "\n", 0, 16, 0);
-                    HPRTPrinterHelper.PrintText("Cashier: " + mCashierName + "\n", 0, 0, 0);
-                    /**FOR MR. FOOD*/
-                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                    /**FOR BRIYANI HOUSE*/
-                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
-                    if (!tableName.equalsIgnoreCase("CounterSale")) {
-                        String tableHeader = "Table# " + tableName + " | COVERS# " + covers;
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat(tableHeader) + "\n", 0, 16, 0);
-                        /**FOR MR. FOOD*/
-                        //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                        /**FOR BRIYANI HOUSE*/
-                        HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                    }
-
-                    HPRTPrinterHelper.PrintText(addQtyWhiteSpace("Qty") + addItemNameWhiteSpace("Item") + addPriceWhiteSpace("Price") + "\n", 0, 0, 0);
-
-
-                    List<POSLineItem> lineItem = mDBHelper.getPOSLineItems(mPosNumber, 0);
-                    for (int j = 0; j < lineItem.size(); j++) {
-
-                        qty = String.valueOf(lineItem.get(j).getPosQty());
-                        name = lineItem.get(j).getProductName();
-                        arabicName = lineItem.get(j).getProdArabicName();
-                        price = lineItem.get(j).getPosQty() * lineItem.get(j).getStdPrice();
-                        discPrice = 0;
-                        discount = "";
-                        disc = lineItem.get(j).getDiscType();
-                        discVal = lineItem.get(j).getDiscValue();
-
-                        if (disc == 0 && discVal != 0) {
-                            discount = discVal + "% discount";
-                            discPrice = (price * discVal / 100);
-                        } else if (disc == 1 && discVal != 0) {
-                            discount = discVal + " QR discount";
-                            discPrice = discVal;
-                        }
-
-                        //String discount = lineItem.get(i).getDiscValue();
-                        if (name.length() > 35) {
-                            //splitstring and print
-                            int len = name.length();
-                            HPRTPrinterHelper.PrintText(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name.substring(0, 34)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                            HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(name.substring(35, len - 1)) + addPriceWhiteSpace(" ") + "\n", 0, 0, 0);
-                        } else {
-                            HPRTPrinterHelper.PrintText(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                        }
-
-                        if (!discount.equalsIgnoreCase(""))
-                            HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n", 0, 0, 0);
-
-                        //if (lineItem.get(j).getNotes().trim().length() != 0)
-                        //HPRTPrinterHelper.PrintText("     " + lineItem.get(j).getNotes() + "\n", 0, 0, 0);
-
-                        List<POSLineItem> extraProductList = mDBHelper.getPOSExtraLineItems(lineItem.get(j).getKotLineId());
-                        if (extraProductList.size() != 0) {
-                            for (int k = 0; k < extraProductList.size(); k++) {
-
-                                qty = String.valueOf(extraProductList.get(k).getPosQty());
-                                name = extraProductList.get(k).getProductName();
-                                arabicName = extraProductList.get(k).getProdArabicName();
-                                price = extraProductList.get(k).getPosQty() * extraProductList.get(k).getStdPrice();
-                                discPrice = 0;
-                                discount = "";
-                                disc = extraProductList.get(k).getDiscType();
-                                discVal = extraProductList.get(k).getDiscValue();
-
-                                if (disc == 0 && discVal != 0) {
-                                    discount = discVal + "% discount";
-                                    discPrice = (price * discVal / 100);
-                                } else if (disc == 1 && discVal != 0) {
-                                    discount = discVal + " QR discount";
-                                    discPrice = discVal;
-                                }
-
-                                //String discount = lineItem.get(i).getDiscValue();
-                                if (name.length() > 35) {
-                                    //splitstring and print
-                                    int len = name.length();
-                                    HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(0, 34)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                    HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(35, len - 1)) + addPriceWhiteSpace(" ") + "\n", 0, 0, 0);
-                                } else {
-                                    HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                }
-
-                                if (!discount.equalsIgnoreCase(""))
-                                    HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n", 0, 0, 0);
-
-                            }
-                        }
-                    }
-
-                    /**FOR MR. FOOD*/
-                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                    /**FOR BRIYANI HOUSE*/
-                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
-                    if (mTotalAmount != mFinalAmount) {
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n", 0, 0, 0);
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmount - mFinalAmount)) + "\n", 0, 0, 0);
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Net Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mFinalAmount)) + "\n", 0, 0, 0);
-                    } else {
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n", 0, 0, 0);
-                    }
-
-                    /**FOR MR. FOOD*/
-                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                    /**FOR BRIYANI HOUSE*/
-                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
-                    if (mPaidCashAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidAmexAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Amex Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidAmexAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidGiftAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Gift Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidGiftAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidMasterAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Master Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidMasterAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidVisaAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("VISA Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidVisaAmt)) + "\n", 0, 0, 0);
-
-                    if (mOtherAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Other") + "" + addPriceWhiteSpace(Common.valueFormatter(mOtherAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidCashAmt != 0 || mPaidAmexAmt != 0 || mPaidGiftAmt != 0 || mPaidMasterAmt != 0 || mPaidVisaAmt != 0 || mOtherAmt != 0) {
-                        /**FOR MR. FOOD*/
-                        //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                        /**FOR BRIYANI HOUSE*/
-                        HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                    }
-
-                    if (mReturnAmount != 0) {
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Paid Amount") + "" + addPriceWhiteSpace(Common.valueFormatter(mAmountEntered)) + "\n", 0, 0, 0);
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Change") + "" + addPriceWhiteSpace(Common.valueFormatter(mReturnAmount)) + "\n", 0, 0, 0);
-                        /**FOR MR. FOOD*/
-                        //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                        /**FOR BRIYANI HOUSE*/
-                        HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                    }
-
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Thank you for choosing " + orgDetail.getOrgName()) + "\n", 0, 0, 0);
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgWebUrl()) + "\n", 0, 0, 0);
-
-                    PAct.AfterPrintAction();
-
-                    HPRTPrinterHelper.CutPaper(HPRTPrinterHelper.HPRT_PARTIAL_CUT_FEED, 140);
-
-                    AppLog.e("PRE-PRINTING", mPosNumber + " COMPLETED ");
-
-                    result = "success";
-
-
-                } catch (Exception e) {
-                    result = "error";
-                    AppLog.e("PRE-PRINTING", "FIRST ERROR");
-                    Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
-                }
-
-            } catch (Exception e) {
-                AppLog.e("PRE-PRINTING", "SECOND ERROR");
-                result = "error";
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-        // Once Music File is downloaded
-        @Override
-        protected void onPostExecute(String results) {
-            mProgress.dismiss();
-            onPrintTaskComplete(mPosNumber);
-        }
-    }
-
-    // Async Task Class
-    private class PrintInvoice extends AsyncTask<USBPrintTaskParams, String, String> {
-
-        /**
-         * Variables for print product details
-         */
-        String printFrom = "COMPLETE";
-        String qty;
-        String name;
-        String arabicName;
-        double price;
-        double discPrice = 0;
-        String discount = "";
-        int disc;
-        double discVal;
-        String result = "";
-        long mPosNumber = 0;
-        private ProgressDialog mProgress;
-
-        // Show Progress bar before downloading Music
-        @Override
-        protected void onPreExecute() {
-            mProgress = new ProgressDialog(mContext);
-            mProgress.setMessage("Printing bill please wait...");
-            mProgress.setCancelable(false);
-            mProgress.setCanceledOnTouchOutside(false);
-            mProgress.show();
-        }
-
-        // Download Music File from Internet
-        @Override
-        protected String doInBackground(USBPrintTaskParams... params) {
-
-            try {
-
-                String mCashierName = mAppManager.getUserName();
-
-                printFrom = params[0].printFrom;
-                mPosNumber = params[0].posId;
-                double mTotalAmount = params[0].mTotalAmt;
-                double mFinalAmount = params[0].mFinalAmt;
-                double mPaidAmount = params[0].mPaidAmt;
-                double mReturnAmount = params[0].mReturnAmt;
-
-                double mPaidCashAmt = params[0].mPaidCashAmt;
-                double mPaidAmexAmt = params[0].mPaidAmexAmt;
-                double mPaidGiftAmt = params[0].mPaidGiftAmt;
-                double mPaidMasterAmt = params[0].mPaidMasterAmt;
-                double mPaidVisaAmt = params[0].mPaidVisaAmt;
-                double mOtherAmt = params[0].mPaidOtherAmt;
-                double mAmountEntered = params[0].mAmountEntered;
-
-                mTotalAmount = mDBHelper.sumOfProductsWithoutDiscount(mPosNumber);
-                mFinalAmount = mDBHelper.sumOfProductsTotalPrice(mPosNumber);
-
-                POSPayment payment = mDBHelper.getPaymentDetails(mPosNumber);
-                if (payment != null) {
-                    mPaidCashAmt = payment.getCash();
-                    mPaidAmexAmt = payment.getAmex();
-                    mPaidGiftAmt = payment.getGift();
-                    mPaidMasterAmt = payment.getMaster();
-                    mPaidVisaAmt = payment.getVisa();
-                    mOtherAmt = payment.getOther();
-                    mReturnAmount = payment.getChange();
-                }
-
-                try {
-
-                    if (PAct != null) {
-                        AppLog.e("PRINTING", mPosNumber + " STARTED ");
-                        PAct.LanguageEncode();
-                        //pAct.BeforePrintAction();
-                    }
-
-                    Organization orgDetail = mDBHelper.getOrganizationDetail(mAppManager.getOrgID());
-
-                    List<Long> kotTableList = mDBHelper.getKOTTableList(mPosNumber);
-                    String tableName = "CounterSale";
-                    int covers = 0;
-
-                    if (kotTableList.size() == 0) {
-                        tableName = "CounterSale";
-                    } else if (kotTableList.size() == 1 && kotTableList.get(0) == 0) {
-                        tableName = "CounterSale";
-                    } else {
-                        StringBuilder sb = new StringBuilder("");
-                        for (int i = 0; i < kotTableList.size(); i++) {
-                            Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), kotTableList.get(i));
-                            if (table != null) {
-                                sb.append(table.getTableName() + " ");
-
-                                List<KOTHeader> kotHeaderList = mDBHelper.getKOTHeaders(kotTableList.get(i), true);
-                                for (int j = 0; j < kotHeaderList.size(); j++) {
-                                    KOTHeader kotHeader = kotHeaderList.get(j);
-                                    covers = covers + kotHeader.getCoversCount();
-                                }
-                            } else {
-                                sb.append("CounterSale");
-                            }
-
-                        }
-                        tableName = sb.toString();
-                    }
-
-                    //if (printFrom.equalsIgnoreCase("QUICK"))
-                    //HPRTPrinterHelper.PrintText(alignUtils.alignFormat("PreBill") + "\n", 0, 16, 0);
-
-                    if (orgDetail != null) {
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgName()) + "\n", 0, 16, 0);
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgAddress()) + "\n", 0, 16, 0);
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Tel: " + orgDetail.getOrgPhone()) + "\n", 0, 16, 0);
-                    }
-                    HPRTPrinterHelper.PrintText(Common.getDate() + "                            " + Common.getTime() + "\n", 0, 0, 0);
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat(String.valueOf(mPosNumber)) + "\n", 0, 16, 0);
-                    HPRTPrinterHelper.PrintText("Cashier: " + mCashierName + "\n", 0, 0, 0);
-                    /**FOR MR. FOOD*/
-                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                    /**FOR BRIYANI HOUSE*/
-                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
-                    if (!tableName.equalsIgnoreCase("CounterSale")) {
-                        String tableHeader = "Table# " + tableName + " | COVERS# " + covers;
-                        HPRTPrinterHelper.PrintText(alignUtils.alignFormat(tableHeader) + "\n", 0, 16, 0);
-                        /**FOR MR. FOOD*/
-                        //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                        /**FOR BRIYANI HOUSE*/
-                        HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                    }
-
-                    HPRTPrinterHelper.PrintText(addQtyWhiteSpace("Qty") + addItemNameWhiteSpace("Item") + addPriceWhiteSpace("Price") + "\n", 0, 0, 0);
-
-                    List<POSLineItem> lineItem = mDBHelper.getPOSLineItems(mPosNumber, 0);
-
-                    if (lineItem != null) {
-                        for (int j = 0; j < lineItem.size(); j++) {
-
-                            qty = String.valueOf(lineItem.get(j).getPosQty());
-                            name = lineItem.get(j).getProductName();
-                            arabicName = lineItem.get(j).getProdArabicName();
-                            price = lineItem.get(j).getPosQty() * lineItem.get(j).getStdPrice();
-                            discPrice = 0;
-                            discount = "";
-                            disc = lineItem.get(j).getDiscType();
-                            discVal = lineItem.get(j).getDiscValue();
-
-                            if (disc == 0 && discVal != 0) {
-                                discount = discVal + "% discount";
-                                discPrice = (price * discVal / 100);
-                            } else if (disc == 1 && discVal != 0) {
-                                discount = discVal + " QR discount";
-                                discPrice = discVal;
-                            }
-
-                            //String discount = lineItem.get(i).getDiscValue();
-                            if (name.length() > 35) {
-                                //splitstring and print
-                                int len = name.length();
-                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name.substring(0, 34)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(name.substring(35, len - 1)) + addPriceWhiteSpace(" ") + "\n", 0, 0, 0);
-                            } else {
-                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                            }
-
-                            if (!discount.equalsIgnoreCase(""))
-                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n", 0, 0, 0);
-
-                            //if (lineItem.get(j).getNotes().trim().length() != 0)
-                            //HPRTPrinterHelper.PrintText("     " + lineItem.get(j).getNotes() + "\n", 0, 0, 0);
-
-                            List<POSLineItem> extraProductList = mDBHelper.getPOSExtraLineItems(lineItem.get(j).getKotLineId());
-                            if (extraProductList.size() != 0) {
-                                for (int k = 0; k < extraProductList.size(); k++) {
-
-                                    qty = String.valueOf(extraProductList.get(k).getPosQty());
-                                    name = extraProductList.get(k).getProductName();
-                                    arabicName = extraProductList.get(k).getProdArabicName();
-                                    price = extraProductList.get(k).getPosQty() * extraProductList.get(k).getStdPrice();
-                                    discPrice = 0;
-                                    discount = "";
-                                    disc = extraProductList.get(k).getDiscType();
-                                    discVal = extraProductList.get(k).getDiscValue();
-
-                                    if (disc == 0 && discVal != 0) {
-                                        discount = discVal + "% discount";
-                                        discPrice = (price * discVal / 100);
-                                    } else if (disc == 1 && discVal != 0) {
-                                        discount = discVal + " QR discount";
-                                        discPrice = discVal;
-                                    }
-
-                                    //String discount = lineItem.get(i).getDiscValue();
-                                    if (name.length() > 35) {
-                                        //splitstring and print
-                                        int len = name.length();
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(0, 34)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(35, len - 1)) + addPriceWhiteSpace(" ") + "\n", 0, 0, 0);
-                                    } else {
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                    }
-
-                                    if (!discount.equalsIgnoreCase(""))
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n", 0, 0, 0);
-
-                                }
-                            }
-                        }
-                    }
-                    /**FOR MR. FOOD*/
-                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                    /**FOR BRIYANI HOUSE*/
-                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
-                    if (mTotalAmount != mFinalAmount) {
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n", 0, 0, 0);
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmount - mFinalAmount)) + "\n", 0, 0, 0);
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Net Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mFinalAmount)) + "\n", 0, 0, 0);
-                    } else {
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n", 0, 0, 0);
-                    }
-
-                    /**FOR MR. FOOD*/
-                    //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                    /**FOR BRIYANI HOUSE*/
-                    HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
-                    if (mPaidCashAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidAmexAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Amex Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidAmexAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidGiftAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Gift Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidGiftAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidMasterAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Master Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidMasterAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidVisaAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("VISA Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidVisaAmt)) + "\n", 0, 0, 0);
-
-                    if (mOtherAmt != 0)
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Other") + "" + addPriceWhiteSpace(Common.valueFormatter(mOtherAmt)) + "\n", 0, 0, 0);
-
-                    if (mPaidCashAmt != 0 || mPaidAmexAmt != 0 || mPaidGiftAmt != 0 || mPaidMasterAmt != 0 || mPaidVisaAmt != 0 || mOtherAmt != 0) {
-                        /**FOR MR. FOOD*/
-                        //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                        /**FOR BRIYANI HOUSE*/
-                        HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                    }
-
-                    if (mReturnAmount != 0) {
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Paid Amount") + "" + addPriceWhiteSpace(Common.valueFormatter(mAmountEntered)) + "\n", 0, 0, 0);
-                        HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Change") + "" + addPriceWhiteSpace(Common.valueFormatter(mReturnAmount)) + "\n", 0, 0, 0);
-                        /**FOR MR. FOOD*/
-                        //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                        /**FOR BRIYANI HOUSE*/
-                        HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                    }
-
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Thank you for choosing " + orgDetail.getOrgName()) + "\n", 0, 0, 0);
-                    HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgWebUrl()) + "\n", 0, 0, 0);
-
-                    PAct.AfterPrintAction();
-
-                    HPRTPrinterHelper.CutPaper(HPRTPrinterHelper.HPRT_PARTIAL_CUT_FEED, 140);
-
-                    /**Open Cashdrawer implementation*/
-                    if (printFrom.equalsIgnoreCase("QUICK")) {
-                        //no need to open cash-drawer
-                    } else {
-                        try {
-                            int iRtn = HPRTPrinterHelper.OpenCashdrawer(0);
-                            if (iRtn == 0)
-                                Log.i("POSActivity", "OpenCashDrawer");
-                        } catch (Exception e) {
-                            Log.d("HPRTSDKSample", (new StringBuilder("Activity_Cashdrawer --> onClickOpen1 ")).append(e.getMessage()).toString());
-                        }
-                    }
-
-                    AppLog.e("PRINTING", mPosNumber + " COMPLETED ");
-
-                    result = "success";
-
-
-                } catch (Exception e) {
-                    result = "error";
-                    AppLog.e("PRINTING", "FIRST ERROR");
-                    Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
-                }
-
-            } catch (Exception e) {
-                AppLog.e("PRINTING", "SECOND ERROR");
-                result = "error";
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-        // Once Music File is downloaded
-        @Override
-        protected void onPostExecute(String results) {
-            mProgress.dismiss();
-
-            if (results.equalsIgnoreCase("success")) {
-                //This is where you return data back to caller
-                if (printFrom.equalsIgnoreCase("QUICK")) {
-                    onPrintTaskComplete(mPosNumber);
-                } else {
-                    //mDBHelper.deletePOSTables(mPosNumber);
-                    AppConstants.posID = 0;
-                    OrderStatusListener.getInstance().orderPosted(AppConstants.posID, true);
-                }
-            } else {
-                //This is where you return data back to caller
-                if (printFrom.equalsIgnoreCase("QUICK")) {
-                    onPrintTaskError(results, mPosNumber);
-                } else {
-                    //mDBHelper.deletePOSTables(mPosNumber);
-                    AppConstants.posID = 0;
-                    OrderStatusListener.getInstance().orderPosted(AppConstants.posID, true);
-                }
+                FragmentManager localFragmentManager = getSupportFragmentManager();
+                AlertFragment.newInstance(mContext, "Info", "Invalid MSR data").show(localFragmentManager, "MSR");
             }
         }
     }
@@ -2847,6 +2307,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         double discVal;
         String result = "";
         long mPosNumber = 0;
+        List<String> receiptLines;
         private ProgressDialog mProgress;
 
         // Show Progress bar before downloading Music
@@ -2898,259 +2359,270 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
                 try {
 
-                    String ipAddress = mSharedPreferences.getString("ipaddress", "");
+                    receiptLines = new ArrayList<String>();
 
-                    if (Common.isIpAddress(ipAddress)) {
+                    /**Get the lineItems*/
+                    List<POSLineItem> lineItem = mDBHelper.getPOSLineItems(mPosNumber, 0);
 
-                        //call Wi-Fi print
-                        if (HPRTPrinter != null) {
-                            HPRTPrinterHelper.PortClose();
+                    if (lineItem.size() != 0) {
+
+                        Organization orgDetail = mDBHelper.getOrganizationDetail(mAppManager.getOrgID());
+
+                        if (orgDetail == null)
+                            AppLog.e("ORG DETAIL", "ORG NULL");
+
+
+                        List<Long> kotTableList = mDBHelper.getKOTTableList(mPosNumber);
+                        String tableName = "CounterSale";
+                        int covers = 0;
+
+                        if (kotTableList.size() == 0) {
+                            tableName = "CounterSale";
+                        } else if (kotTableList.size() == 1 && kotTableList.get(0) == 0) {
+                            tableName = "CounterSale";
                         } else {
-                            result = "error";
+                            StringBuilder sb = new StringBuilder("");
+                            for (int i = 0; i < kotTableList.size(); i++) {
+                                Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), kotTableList.get(i));
+                                if (table != null) {
+                                    sb.append(table.getTableName() + " ");
+
+                                    List<KOTHeader> kotHeaderList = mDBHelper.getKOTHeaders(kotTableList.get(i), true);
+                                    for (int j = 0; j < kotHeaderList.size(); j++) {
+                                        KOTHeader kotHeader = kotHeaderList.get(j);
+                                        covers = covers + kotHeader.getCoversCount();
+                                    }
+                                } else {
+                                    sb.append("CounterSale");
+                                }
+
+                            }
+                            tableName = sb.toString();
                         }
 
-                        HPRTPrinter = new HPRTPrinterHelper(thisCon, printerName);
-                        if (HPRTPrinterHelper.PortOpen("WiFi," + ipAddress + "," + strPort) != 0) {
-                            //Printer Not connected
-                            Log.e("POSActivity-LAN PRINTER", "PRINTER NOT CONNECTED");
-                            result = "printerError";
-                        } else {
+                        if (printFrom.equalsIgnoreCase("QUICK"))
+                            receiptLines.add(printTextString(alignUtils.alignFormat("PreBill") + "\n"));
 
-                            if (PAct != null) {
-                                AppLog.e("PRINTING", mPosNumber + " STARTED ");
-                                PAct.LanguageEncode();
-                                //pAct.BeforePrintAction();
-                            }
+                        if (orgDetail != null) {
 
-                            Organization orgDetail = mDBHelper.getOrganizationDetail(mAppManager.getOrgID());
+                            receiptLines.add(printTextString(alignUtils.alignFormat(orgDetail.getOrgName()) + "\n"));
+                            receiptLines.add(printTextString(alignUtils.alignFormat(orgDetail.getOrgAddress()) + "\n"));
+                            receiptLines.add(printTextString(alignUtils.alignFormat("Tel: " + orgDetail.getOrgPhone()) + "\n"));
+                        }
 
-                            List<Long> kotTableList = mDBHelper.getKOTTableList(mPosNumber);
-                            String tableName = "CounterSale";
-                            int covers = 0;
+                        receiptLines.add(printTextString(Common.getDate() + "                        " + Common.getTime() + "\n"));
+                        receiptLines.add(printTextString(alignUtils.alignFormat(String.valueOf(mPosNumber)) + "\n"));
+                        receiptLines.add(printTextString("Cashier: " + mCashierName + "\n"));
+                        receiptLines.add(printTextString("------------------------------------------\n"));
 
-                            if (kotTableList.size() == 0) {
-                                tableName = "CounterSale";
-                            } else if (kotTableList.size() == 1 && kotTableList.get(0) == 0) {
-                                tableName = "CounterSale";
-                            } else {
-                                StringBuilder sb = new StringBuilder("");
-                                for (int i = 0; i < kotTableList.size(); i++) {
-                                    Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), kotTableList.get(i));
-                                    if (table != null) {
-                                        sb.append(table.getTableName() + " ");
+                        if (!tableName.equalsIgnoreCase("CounterSale")) {
+                            String tableHeader = "Table# " + tableName + " | COVERS# " + covers;
+                            receiptLines.add(printTextString(alignUtils.alignFormat(tableHeader) + "\n"));
+                            receiptLines.add(printTextString("------------------------------------------\n"));
+                        }
 
-                                        List<KOTHeader> kotHeaderList = mDBHelper.getKOTHeaders(kotTableList.get(i), true);
-                                        for (int j = 0; j < kotHeaderList.size(); j++) {
-                                            KOTHeader kotHeader = kotHeaderList.get(j);
-                                            covers = covers + kotHeader.getCoversCount();
-                                        }
-                                    } else {
-                                        sb.append("CounterSale");
-                                    }
+                        receiptLines.add(printTextString(addQtyWhiteSpace("Qty") + addItemNameWhiteSpace("Item") + addPriceWhiteSpace("Price") + "\n"));
 
+                        for (int j = 0; j < lineItem.size(); j++) {
+
+                            try {
+                                qty = String.valueOf(lineItem.get(j).getPosQty());
+                                name = lineItem.get(j).getProductName();
+                                //arabicName = lineItem.get(j).getProdArabicName();
+                                price = lineItem.get(j).getPosQty() * lineItem.get(j).getStdPrice();
+                                discPrice = 0;
+                                discount = "";
+                                disc = lineItem.get(j).getDiscType();
+                                discVal = lineItem.get(j).getDiscValue();
+
+                                if (disc == 0 && discVal != 0) {
+                                    discount = discVal + "% discount";
+                                    discPrice = (price * discVal / 100);
+                                } else if (disc == 1 && discVal != 0) {
+                                    discount = discVal + " QR discount";
+                                    discPrice = discVal;
                                 }
-                                tableName = sb.toString();
-                            }
 
-                            if (printFrom.equalsIgnoreCase("QUICK"))
-                                HPRTPrinterHelper.PrintText(alignUtils.alignFormat("PreBill") + "\n", 0, 16, 0);
+                                //String discount = lineItem.get(i).getDiscValue();
+                                if (name.length() > 28) {
+                                    //splitstring and print
+                                    int len = name.length();
+                                    receiptLines.add(printTextString(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name.substring(0, 28)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n"));
+                                    receiptLines.add(printTextString(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(name.substring(29, len - 1)) + addPriceWhiteSpace(" ") + "\n"));
+                                } else {
+                                    receiptLines.add(printTextString(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n"));
+                                }
+                                if (!discount.equalsIgnoreCase(""))
+                                    receiptLines.add(printTextString(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n"));
 
-                            if (orgDetail != null) {
-                                HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgName()) + "\n", 0, 16, 0);
-                                HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgAddress()) + "\n", 0, 16, 0);
-                                HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Tel: " + orgDetail.getOrgPhone()) + "\n", 0, 16, 0);
-                            }
-                            HPRTPrinterHelper.PrintText(Common.getDate() + "                            " + Common.getTime() + "\n", 0, 0, 0);
-                            HPRTPrinterHelper.PrintText(alignUtils.alignFormat(String.valueOf(mPosNumber)) + "\n", 0, 16, 0);
-                            HPRTPrinterHelper.PrintText("Cashier: " + mCashierName + "\n", 0, 0, 0);
-                            /**FOR MR. FOOD*/
-                            //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
 
-                            /**FOR BRIYANI HOUSE*/
-                            HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
+                                List<POSLineItem> extraProductList = mDBHelper.getPOSExtraLineItems(lineItem.get(j).getKotLineId());
+                                if (extraProductList.size() != 0) {
+                                    for (int k = 0; k < extraProductList.size(); k++) {
 
-                            if (!tableName.equalsIgnoreCase("CounterSale")) {
-                                String tableHeader = "Table# " + tableName + " | COVERS# " + covers;
-                                HPRTPrinterHelper.PrintText(alignUtils.alignFormat(tableHeader) + "\n", 0, 16, 0);
-                                /**FOR MR. FOOD*/
-                                //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
+                                        qty = String.valueOf(extraProductList.get(k).getPosQty());
+                                        name = extraProductList.get(k).getProductName();
+                                        //arabicName = extraProductList.get(k).getProdArabicName();
+                                        price = extraProductList.get(k).getPosQty() * extraProductList.get(k).getStdPrice();
+                                        discPrice = 0;
+                                        discount = "";
+                                        disc = extraProductList.get(k).getDiscType();
+                                        discVal = extraProductList.get(k).getDiscValue();
 
-                                /**FOR BRIYANI HOUSE*/
-                                HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-                            }
+                                        if (disc == 0 && discVal != 0) {
+                                            discount = discVal + "% discount";
+                                            discPrice = (price * discVal / 100);
+                                        } else if (disc == 1 && discVal != 0) {
+                                            discount = discVal + " QR discount";
+                                            discPrice = discVal;
+                                        }
 
-                            HPRTPrinterHelper.PrintText(addQtyWhiteSpace("Qty") + addItemNameWhiteSpace("Item") + addPriceWhiteSpace("Price") + "\n", 0, 0, 0);
+                                        //String discount = lineItem.get(i).getDiscValue();
+                                        if (name.length() > 28) {
+                                            //splitstring and print
+                                            int len = name.length();
+                                            receiptLines.add(printTextString(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(0, 28)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n"));
+                                            receiptLines.add(printTextString(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(29, len - 1)) + addPriceWhiteSpace(" ") + "\n"));
+                                        } else {
+                                            receiptLines.add(printTextString(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n"));
+                                        }
 
-                            List<POSLineItem> lineItem = mDBHelper.getPOSLineItems(mPosNumber, 0);
-
-                            if (lineItem != null) {
-                                for (int j = 0; j < lineItem.size(); j++) {
-
-                                    qty = String.valueOf(lineItem.get(j).getPosQty());
-                                    name = lineItem.get(j).getProductName();
-                                    arabicName = lineItem.get(j).getProdArabicName();
-                                    price = lineItem.get(j).getPosQty() * lineItem.get(j).getStdPrice();
-                                    discPrice = 0;
-                                    discount = "";
-                                    disc = lineItem.get(j).getDiscType();
-                                    discVal = lineItem.get(j).getDiscValue();
-
-                                    if (disc == 0 && discVal != 0) {
-                                        discount = discVal + "% discount";
-                                        discPrice = (price * discVal / 100);
-                                    } else if (disc == 1 && discVal != 0) {
-                                        discount = discVal + " QR discount";
-                                        discPrice = discVal;
-                                    }
-
-                                    //String discount = lineItem.get(i).getDiscValue();
-                                    if (name.length() > 35) {
-                                        //splitstring and print
-                                        int len = name.length();
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name.substring(0, 34)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(name.substring(35, len - 1)) + addPriceWhiteSpace(" ") + "\n", 0, 0, 0);
-                                    } else {
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(qty) + addItemNameWhiteSpace(name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                    }
-
-                                    if (!discount.equalsIgnoreCase(""))
-                                        HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n", 0, 0, 0);
-
-                                    //if (lineItem.get(j).getNotes().trim().length() != 0)
-                                    //HPRTPrinterHelper.PrintText("     " + lineItem.get(j).getNotes() + "\n", 0, 0, 0);
-
-                                    List<POSLineItem> extraProductList = mDBHelper.getPOSExtraLineItems(lineItem.get(j).getKotLineId());
-                                    if (extraProductList.size() != 0) {
-                                        for (int k = 0; k < extraProductList.size(); k++) {
-
-                                            qty = String.valueOf(extraProductList.get(k).getPosQty());
-                                            name = extraProductList.get(k).getProductName();
-                                            arabicName = extraProductList.get(k).getProdArabicName();
-                                            price = extraProductList.get(k).getPosQty() * extraProductList.get(k).getStdPrice();
-                                            discPrice = 0;
-                                            discount = "";
-                                            disc = extraProductList.get(k).getDiscType();
-                                            discVal = extraProductList.get(k).getDiscValue();
-
-                                            if (disc == 0 && discVal != 0) {
-                                                discount = discVal + "% discount";
-                                                discPrice = (price * discVal / 100);
-                                            } else if (disc == 1 && discVal != 0) {
-                                                discount = discVal + " QR discount";
-                                                discPrice = discVal;
-                                            }
-
-                                            //String discount = lineItem.get(i).getDiscValue();
-                                            if (name.length() > 35) {
-                                                //splitstring and print
-                                                int len = name.length();
-                                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(0, 34)) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name.substring(35, len - 1)) + addPriceWhiteSpace(" ") + "\n", 0, 0, 0);
-                                            } else {
-                                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace("  " + name) + addPriceWhiteSpace(Common.valueFormatter(price)) + "\n", 0, 0, 0);
-                                            }
-
-                                            if (!discount.equalsIgnoreCase(""))
-                                                HPRTPrinterHelper.PrintText(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n", 0, 0, 0);
-
+                                        if (!discount.equalsIgnoreCase("")) {
+                                            receiptLines.add(printTextString(addQtyWhiteSpace(" ") + addItemNameWhiteSpace(discount) + addPriceWhiteSpace("-" + Common.valueFormatter(discPrice)) + "\n"));
                                         }
                                     }
                                 }
+                            } catch (Exception e) {
+                                StringWriter sw = new StringWriter();
+                                e.printStackTrace(new PrintWriter(sw));
+                                String stacktrace = sw.toString();
+
+                                AppLog.e("PRINTING LINE ITEM", stacktrace);
                             }
-                            /**FOR MR. FOOD*/
-                            //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
+                        }
 
-                            /**FOR BRIYANI HOUSE*/
-                            HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
-
+                        receiptLines.add(printTextString("------------------------------------------\n"));
+                        try {
                             if (mTotalAmount != mFinalAmount) {
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n", 0, 0, 0);
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmount - mFinalAmount)) + "\n", 0, 0, 0);
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Net Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mFinalAmount)) + "\n", 0, 0, 0);
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n"));
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmount - mFinalAmount)) + "\n"));
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Net Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mFinalAmount)) + "\n"));
                             } else {
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n", 0, 0, 0);
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n"));
                             }
 
-                            /**FOR MR. FOOD*/
-                            //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
+                            receiptLines.add(printTextString("------------------------------------------\n"));
 
-                            /**FOR BRIYANI HOUSE*/
-                            HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
+                            if (mPaidCashAmt != 0) {
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt)) + "\n"));
+                            }
+                            if (mPaidAmexAmt != 0) {
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Amex Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidAmexAmt)) + "\n"));
+                            }
 
-                            if (mPaidCashAmt != 0)
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt)) + "\n", 0, 0, 0);
+                            if (mPaidGiftAmt != 0) {
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Gift Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidGiftAmt)) + "\n"));
+                            }
 
-                            if (mPaidAmexAmt != 0)
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Amex Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidAmexAmt)) + "\n", 0, 0, 0);
+                            if (mPaidMasterAmt != 0) {
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Master Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidMasterAmt)) + "\n"));
+                            }
 
-                            if (mPaidGiftAmt != 0)
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Gift Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidGiftAmt)) + "\n", 0, 0, 0);
+                            if (mPaidVisaAmt != 0) {
+                                receiptLines.add(printTextString(addTotalWhiteSpace("VISA Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidVisaAmt)) + "\n"));
+                            }
 
-                            if (mPaidMasterAmt != 0)
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Master Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidMasterAmt)) + "\n", 0, 0, 0);
-
-                            if (mPaidVisaAmt != 0)
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("VISA Card") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidVisaAmt)) + "\n", 0, 0, 0);
-
-                            if (mOtherAmt != 0)
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Other") + "" + addPriceWhiteSpace(Common.valueFormatter(mOtherAmt)) + "\n", 0, 0, 0);
+                            if (mOtherAmt != 0) {
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Other") + "" + addPriceWhiteSpace(Common.valueFormatter(mOtherAmt)) + "\n"));
+                            }
 
                             if (mPaidCashAmt != 0 || mPaidAmexAmt != 0 || mPaidGiftAmt != 0 || mPaidMasterAmt != 0 || mPaidVisaAmt != 0 || mOtherAmt != 0) {
-                                /**FOR MR. FOOD*/
-                                //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                                /**FOR BRIYANI HOUSE*/
-                                HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
+                                receiptLines.add(printTextString("------------------------------------------\n"));
                             }
 
                             if (mReturnAmount != 0) {
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Paid Amount") + "" + addPriceWhiteSpace(Common.valueFormatter(mAmountEntered)) + "\n", 0, 0, 0);
-                                HPRTPrinterHelper.PrintText(addTotalWhiteSpace("Change") + "" + addPriceWhiteSpace(Common.valueFormatter(mReturnAmount)) + "\n", 0, 0, 0);
-                                /**FOR MR. FOOD*/
-                                //HPRTPrinterHelper.PrintText("------------------------------------------------\n", 0, 0, 0);
-
-                                /**FOR BRIYANI HOUSE*/
-                                HPRTPrinterHelper.PrintText("------------------------------------------\n", 0, 0, 0);
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Paid Amount") + "" + addPriceWhiteSpace(Common.valueFormatter(mAmountEntered)) + "\n"));
+                                receiptLines.add(printTextString(addTotalWhiteSpace("Change") + "" + addPriceWhiteSpace(Common.valueFormatter(mReturnAmount)) + "\n"));
+                                receiptLines.add(printTextString("------------------------------------------\n"));
                             }
+                        } catch (Exception e) {
+                            // GET THE STACK TRACE AS A STRING
+                            StringWriter sw = new StringWriter();
+                            e.printStackTrace(new PrintWriter(sw));
+                            String stacktrace = sw.toString();
 
-                            HPRTPrinterHelper.PrintText(alignUtils.alignFormat("Thank you for choosing " + orgDetail.getOrgName()) + "\n", 0, 0, 0);
-                            HPRTPrinterHelper.PrintText(alignUtils.alignFormat(orgDetail.getOrgWebUrl()) + "\n", 0, 0, 0);
-
-                            PAct.AfterPrintAction();
-
-                            HPRTPrinterHelper.CutPaper(HPRTPrinterHelper.HPRT_PARTIAL_CUT_FEED, 140);
-
-                            /**Open Cashdrawer implementation*/
-                            if (printFrom.equalsIgnoreCase("QUICK")) {
-                                //no need to open cash-drawer
-                            } else {
-                                try {
-                                    int iRtn = HPRTPrinterHelper.OpenCashdrawer(0);
-                                    if (iRtn == 0)
-                                        Log.i("POSActivity", "OpenCashDrawer");
-                                } catch (Exception e) {
-                                    Log.d("HPRTSDKSample", (new StringBuilder("Activity_Cashdrawer --> onClickOpen1 ")).append(e.getMessage()).toString());
-                                }
-                            }
-
-                            AppLog.e("PRINTING", mPosNumber + " COMPLETED ");
-
-                            result = "success";
-
+                            AppLog.e("PRINTING PAYMENT", stacktrace);
                         }
 
-                    }else{
-                        result = "printerError";
+                        receiptLines.add(printTextString(alignUtils.alignFormat("Thank you for choosing " + orgDetail.getOrgName()) + "\n"));
+                        receiptLines.add(printTextString(alignUtils.alignFormat(orgDetail.getOrgWebUrl()) + "\n"));
                     }
 
+                    if (receiptLines.size() != 0) {
+
+                        String ipAddress = mAppManager.getPrinterIP();
+                        String mode = mAppManager.getPrinterMode();
+
+                        if (mode.equalsIgnoreCase("WiFi") && Common.isIpAddress(ipAddress)) {
+
+                            if (HPRTPrinter != null) {
+                                HPRTPrinter.PortClose();
+                            }
+
+                            HPRTPrinter = new HPRTPrinterHelper(thisCon, printerName);
+
+                            if (HPRTPrinter.PortOpen("WiFi," + ipAddress + "," + strPort) != 0)
+                                result = "printerError";
+                            else {
+                                result = "success";
+                            }
+
+                        } else {
+                            result = "printerError";
+                        }
+
+                        PAct.LanguageEncode();
+                        PAct.BeforePrintAction();
+
+                        for (int i = 0; i < receiptLines.size(); i++) {
+                            System.out.println(receiptLines.get(i));
+                            HPRTPrinterHelper.PrintText(receiptLines.get(i));
+                        }
+
+                        HPRTPrinterHelper.CutPaper(HPRTPrinter.HPRT_PARTIAL_CUT_FEED, 140);
+
+                        if (printFrom.equalsIgnoreCase("QUICK")) {
+                            //no need to open cash-drawer
+                        } else {
+                            try {
+                                int iRtn = HPRTPrinterHelper.OpenCashdrawer(0);
+                                if (iRtn == 0)
+                                    Log.i("POSActivity", "OpenCashDrawer");
+                            } catch (Exception e) {
+                                StringWriter sw = new StringWriter();
+                                e.printStackTrace(new PrintWriter(sw));
+                                String stacktrace = sw.toString();
+                                AppLog.e("CASHDRAWER", stacktrace);
+                                Log.d("HPRTSDKSample", (new StringBuilder("Activity_Cashdrawer --> onClickOpen1 ")).append(e.getMessage()).toString());
+                            }
+                        }
+
+                        PAct.AfterPrintAction();
+                    }
+                    result = "success";
                 } catch (Exception e) {
                     result = "error";
-                    AppLog.e("PRINTING", "FIRST ERROR");
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+                    String stacktrace = sw.toString();
+                    AppLog.e("PRINTING", "FIRST ERROR - >" + stacktrace);
                     Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> PrintSampleReceipt ")).append(e.getMessage()).toString());
                 }
-
             } catch (Exception e) {
-                AppLog.e("PRINTING", "SECOND ERROR");
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String stacktrace = sw.toString();
+                AppLog.e("PRINTING", "SECOND ERROR -> " + stacktrace);
                 result = "error";
                 e.printStackTrace();
             }
@@ -3161,10 +2633,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         @Override
         protected void onPostExecute(String results) {
             mProgress.dismiss();
-
-            //AppConstants.posID = 0;
-            //OrderStatusListener.getInstance().orderPosted(AppConstants.posID, true);
-
             if (results.equalsIgnoreCase("success")) {
                 //This is where you return data back to caller
                 if (printFrom.equalsIgnoreCase("QUICK")) {
@@ -3174,7 +2642,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     AppConstants.posID = 0;
                     OrderStatusListener.getInstance().orderPosted(AppConstants.posID, true);
                 }
-            } else if (results.equalsIgnoreCase("error")){
+            } else if (results.equalsIgnoreCase("error")) {
                 //This is where you return data back to caller
                 if (printFrom.equalsIgnoreCase("QUICK")) {
                     onPrintTaskError(results, mPosNumber);
@@ -3183,8 +2651,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     AppConstants.posID = 0;
                     OrderStatusListener.getInstance().orderPosted(AppConstants.posID, true);
                 }
-            }else if (results.equalsIgnoreCase("printerError")){
-                Toast.makeText(mContext,"Printer not connected...", Toast.LENGTH_LONG).show();
+            } else if (results.equalsIgnoreCase("printerError")) {
+                Toast.makeText(mContext, "Printer not connected...", Toast.LENGTH_LONG).show();
 
                 if (printFrom.equalsIgnoreCase("QUICK")) {
                     onPrintTaskError(results, mPosNumber);

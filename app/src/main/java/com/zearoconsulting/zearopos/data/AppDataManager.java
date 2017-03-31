@@ -13,7 +13,7 @@ public class AppDataManager  {
 
     //local Variables
     private Context mContext;
-    private SharedPreferences mUserSessionData,mCashCustomerData, mCommonData, mCustomerData, mPOSNumberData, mServerData;
+    private SharedPreferences mUserSessionData,mCashCustomerData, mCommonData, mCustomerData, mPOSNumberData, mServerData, mPrinterData;
 
     //User variables
     private long mUserID, mUserBPID, mClientID, mOrgID, mRoleID, mWarehouseID;
@@ -41,6 +41,8 @@ public class AppDataManager  {
     private String mServerAddress;
     private int mServerPort;
 
+    private String mPrinterMode, mPrinterIP;
+
     public AppDataManager(Context context){
 
         mContext = context;
@@ -50,6 +52,7 @@ public class AppDataManager  {
         mCustomerData = mContext.getSharedPreferences("CustomerInfo", Context.MODE_PRIVATE);
         mPOSNumberData = mContext.getSharedPreferences("POSNumberInfo", Context.MODE_PRIVATE);
         mServerData = mContext.getSharedPreferences("ServerInfo", Context.MODE_PRIVATE);
+        mPrinterData = mContext.getSharedPreferences("PrinterInfo", Context.MODE_PRIVATE);
 
         mUserID = mUserSessionData.getLong("userID", 0);
         mUserBPID = mUserSessionData.getLong("userBPID", 0);
@@ -90,6 +93,9 @@ public class AppDataManager  {
 
         mServerAddress = mServerData.getString("server_name", "");
         mServerPort = mServerData.getInt("server_port", 0);
+
+        mPrinterMode = mPrinterData.getString("printer_mode", "");
+        mPrinterIP = mPrinterData.getString("printer_ip", "");
     }
 
     public void saveUserData(long userID,long userBPID,long clientID,long orgID,long roleID, long warehouseID,String username,String password, boolean isSalesRep){
@@ -464,6 +470,29 @@ public class AppDataManager  {
     public int getServerPort(){
         mServerPort = mServerData.getInt("server_port", 0);
         return mServerPort;
+    }
+
+    public void savePrinterData(String printerMode,String printerIp){
+
+        // write userSession detail to UserInfo.xml file
+        try {
+            SharedPreferences.Editor ed = mPrinterData.edit();
+            ed.putString("printer_mode", printerMode);
+            ed.putString("printer_ip", printerIp);
+            ed.commit();
+        } catch (NullPointerException npEx) {
+            Log.e("PrinterData", "Save PrinterData NullPointer Exception");
+        }
+    }
+
+    public String getPrinterMode(){
+        mPrinterMode = mPrinterData.getString("printer_mode","");
+        return mPrinterMode;
+    }
+
+    public String getPrinterIP(){
+        mPrinterMode = mPrinterData.getString("printer_ip","");
+        return mPrinterMode;
     }
 
 }

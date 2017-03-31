@@ -2782,6 +2782,42 @@ public class POSDataSource {
         return kotHeaderList;
     }
 
+    public List<KOTHeader> getKOTNumbersFromKOTHeader(long tableId, long posId) {
+
+        List<KOTHeader> kotHeaderList = new ArrayList<KOTHeader>();
+        KOTHeader kotHeader = null;
+
+        try {
+            Cursor cursor = db.rawQuery("select * from kotHeader where kotTableId = '" + tableId + "' and invoiceNumber = '" + posId + "'", null);
+
+            while (cursor.moveToNext()) {
+                kotHeader = new KOTHeader();
+
+                kotHeader.setTablesId(cursor.getLong(1));
+                kotHeader.setKotNumber(cursor.getLong(2));
+                kotHeader.setInvoiceNumber(cursor.getLong(3));
+                kotHeader.setTerminalId(cursor.getLong(4));
+                kotHeader.setTotalAmount(cursor.getDouble(5));
+                kotHeader.setOrderBy(cursor.getString(6));
+                kotHeader.setKotType(cursor.getString(7));
+                kotHeader.setOrderType(cursor.getString(8));
+                kotHeader.setIsKOT(cursor.getString(9));
+                kotHeader.setPrinted(cursor.getString(10));
+                kotHeader.setPosted(cursor.getString(11));
+                kotHeader.setSelected(cursor.getString(12));
+                kotHeader.setCoversCount(cursor.getInt(13));
+
+                kotHeaderList.add(kotHeader);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return kotHeaderList;
+    }
+
     public List<KOTHeader> getKOTHeadersNotPrinted() {
         List<KOTHeader> kotHeaderList = new ArrayList<KOTHeader>();
         KOTHeader kotHeader = null;
@@ -2937,6 +2973,7 @@ public class POSDataSource {
         return kotLineItemList;
     }
 
+
     public List<KOTLineItems> getKOTLineItems(long tableId, long posId) {
 
         List<KOTLineItems> kotLineItemList = new ArrayList<KOTLineItems>();
@@ -2998,6 +3035,55 @@ public class POSDataSource {
 
         try {
             Cursor cursor = db.rawQuery("select * from kotLineItems where isPrinted='N' and kotNumber ='" + kotNumber + "' and isExtraProduct='N' ", null);
+
+            while (cursor.moveToNext()) {
+                kotLineItems = new KOTLineItems();
+                Product product = new Product();
+
+                kotLineItems.setTableId(cursor.getLong(1));
+                kotLineItems.setKotLineId(cursor.getLong(2));
+                kotLineItems.setKotNumber(cursor.getLong(3));
+                kotLineItems.setInvoiceNumber(cursor.getLong(4));
+
+                product.setCategoryId(cursor.getLong(5));
+                product.setProdId(cursor.getLong(6));
+                product.setProdName(cursor.getString(7));
+                product.setProdArabicName(cursor.getString(8));
+                product.setProdValue(cursor.getString(9));
+                product.setUomId(cursor.getLong(10));
+                product.setUomValue(cursor.getString(11));
+                product.setSalePrice(cursor.getDouble(12));
+                product.setCostPrice(cursor.getDouble(13));
+                product.setTerminalId(cursor.getLong(14));
+
+                kotLineItems.setProduct(product);
+                kotLineItems.setQty(cursor.getInt(15));
+                kotLineItems.setTotalPrice(cursor.getDouble(16));
+                kotLineItems.setNotes(cursor.getString(17));
+                kotLineItems.setPrinted(cursor.getString(18));
+                kotLineItems.setStatus(cursor.getString(19));
+                kotLineItems.setRefRowId(cursor.getLong(20));
+                kotLineItems.setIsExtraProduct(cursor.getString(21));
+
+                kotLineItemList.add(kotLineItems);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return kotLineItemList;
+    }
+
+    public List<KOTLineItems> getKOTLineItemFromKOTNumber(long kotNumber) {
+
+        List<KOTLineItems> kotLineItemList = new ArrayList<KOTLineItems>();
+
+        KOTLineItems kotLineItems = null;
+
+        try {
+            Cursor cursor = db.rawQuery("select * from kotLineItems where kotNumber ='" + kotNumber + "' ", null);
 
             while (cursor.moveToNext()) {
                 kotLineItems = new KOTLineItems();
@@ -3301,6 +3387,19 @@ public class POSDataSource {
             db.execSQL("delete from kotHeader where kotTableId = '" + tableId + "'");
             db.execSQL("delete from kotLineItems where kotTableId = '" + tableId + "'");
 
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void deleteKOTHeaders(long kotNumber) {
+
+        db.beginTransaction();
+        try {
+            db.execSQL("delete from kotHeader where kotNumber = '" + kotNumber + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

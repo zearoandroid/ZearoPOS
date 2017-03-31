@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#cfcfcf">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10.0dip"
+                android:text="Printetr Settings"
+                android:textColor="@color/white"
+                android:textSize="20.0dip"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:background="@color/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/dialogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select the printer option"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="5dp"
+                android:id="@+id/radGroupMode" >
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radUSB"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:text="USB" />
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:id="@+id/radWiFi"
+                    android:text="WiFi" />
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:id="@+id/radBluetooth"
+                    android:text="Bluetooth" />
+
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/edtIPAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter valid ip address"
+                android:visibility="invisible"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layBottomSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20.0dip"
+            android:layout_marginTop="20.0dip"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btnSupmit"
+                fontPath="fonts/fontawesome-webfont.ttf"
+                android:layout_width="150.0dip"
+                android:layout_height="65.0dip"
+                fancy:fb_borderColor="@color/dark_sky_blue"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="#ffffffff"
+                fancy:fb_ghost="true"
+                fancy:fb_iconPosition="left"
+                fancy:fb_radius="2.0dip"
+                fancy:fb_text="Submit"
+                fancy:fb_textColor="@color/black"
+                fancy:fb_textSize="20sp" />
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btnCancel"
+                fontPath="fonts/fontawesome-webfont.ttf"
+                android:layout_width="150.0dip"
+                android:layout_height="65.0dip"
+                android:layout_marginLeft="15.0dip"
+                fancy:fb_borderColor="@color/dark_sky_blue"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="#ffffffff"
+                fancy:fb_ghost="true"
+                fancy:fb_iconPosition="left"
+                fancy:fb_radius="2.0dip"
+                fancy:fb_text="Cancel"
+                fancy:fb_textColor="@color/black"
+                fancy:fb_textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

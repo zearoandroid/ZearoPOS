@@ -16,6 +16,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,8 +90,15 @@ public class DenominationFragment extends AbstractDialogFragment {
     private TextView mTxtEndTime;
     private TextView mTxtWorkedHours;
 
+    private RadioGroup mRadGroupMode;
+    private RadioButton mRadDenomination;
+    private RadioButton mRadOnlyTotal;
+
     private long mStartTime, mCurrentTime, mDiffTime;
     SimpleDateFormat mDFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
+    double totalAmount=0;
+
+    LinearLayout mLayDenomination, mLayOnlyTotal;
 
     final Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -102,8 +112,8 @@ public class DenominationFragment extends AbstractDialogFragment {
                 case AppConstants.CLOSE_SESSION_RESPONSE:
                     mProDlg.dismiss();
                     mAppManager.setLoggedIn(false);
-                    dismiss();
-                    getActivity().finish();
+                    ((POSActivity) getActivity()).closeActivity();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.SESSION_EXPIRED:
                     mProDlg.dismiss();
@@ -113,7 +123,6 @@ public class DenominationFragment extends AbstractDialogFragment {
                     mProDlg.dismiss();
                     //show the server error dialog
                     Toast.makeText(getActivity(), "Server data error", Toast.LENGTH_SHORT).show();
-                    dismiss();
                     break;
                 default:
                     break;
@@ -200,6 +209,13 @@ public class DenominationFragment extends AbstractDialogFragment {
         this.mEdtDR25 = ((EditText) paramView.findViewById(R.id.edtDR25));
         this.mEdtDR50 = ((EditText) paramView.findViewById(R.id.edtDR50));
 
+        mRadGroupMode = ((RadioGroup) paramView.findViewById(R.id.radGroupMode));
+        mRadDenomination = ((RadioButton) paramView.findViewById(R.id.radDenomination));
+        mRadOnlyTotal = ((RadioButton) paramView.findViewById(R.id.radOnlyTotal));
+
+        this.mLayDenomination = ((LinearLayout) paramView.findViewById(R.id.layDenomination));
+        this.mLayOnlyTotal = ((LinearLayout) paramView.findViewById(R.id.layTotalSection));
+
         this.mEdtQR1.addTextChangedListener(new CustomWatcher(mEdtQR1));
         this.mEdtQR5.addTextChangedListener(new CustomWatcher(mEdtQR5));
         this.mEdtQR10.addTextChangedListener(new CustomWatcher(mEdtQR10));
@@ -231,6 +247,33 @@ public class DenominationFragment extends AbstractDialogFragment {
 
         //set the total working hours
         this.mTxtWorkedHours.setText(String.valueOf(diffDays)+" Days, "+String.valueOf(diffHours)+" Hours");
+
+        int selectedId = mRadGroupMode.getCheckedRadioButtonId();
+
+        // find which radioButton is checked by id
+        if(selectedId == mRadDenomination.getId()) {
+            mLayDenomination.setVisibility(View.VISIBLE);
+            mLayOnlyTotal.setVisibility(View.GONE);
+        } else if(selectedId == mRadOnlyTotal.getId()) {
+            mLayDenomination.setVisibility(View.GONE);
+            mLayOnlyTotal.setVisibility(View.VISIBLE);
+        }
+
+        mRadGroupMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // find which radio button is selected
+                if(checkedId == R.id.radDenomination) {
+                    mLayDenomination.setVisibility(View.VISIBLE);
+                    mLayOnlyTotal.setVisibility(View.GONE);
+                } else if(checkedId == R.id.radOnlyTotal) {
+                    mLayDenomination.setVisibility(View.GONE);
+                    mLayOnlyTotal.setVisibility(View.VISIBLE);
+                }
+            }
+
+        });
 
         // Add an OnTouchListener to the root view.
         this.mBtnCancel.setOnTouchListener(new View.OnTouchListener() {
@@ -405,14 +448,23 @@ public class DenominationFragment extends AbstractDialogFragment {
 
     private void updateTotal(){
         try{
-            double total=0;
-            if (mEdtTotal.getText().toString().trim().length() != 0) {
-                total = drTotalValue;
-            } else {
-                total = qr1Value+qr5Value+qr10Value+qr50Value+qr100Value+qr500Value+dr25Value+dr50Value;
+
+            int selectedId = mRadGroupMode.getCheckedRadioButtonId();
+
+            // find which radioButton is checked by id
+            if(selectedId == mRadDenomination.getId()) {
+                totalAmount = qr1Value+qr5Value+qr10Value+qr50Value+qr100Value+qr500Value+dr25Value+dr50Value;
+                mTxtTotal.setText(String.valueOf(totalAmount));
+            } else if(selectedId == mRadOnlyTotal.getId()) {
+                totalAmount = drTotalValue;
             }
 
-            mTxtTotal.setText(String.valueOf(total));
+            /*if (mEdtTotal.getText().toString().trim().length() != 0 && !mEdtTotal.getText().toString().trim().equalsIgnoreCase("0")) {
+                totalAmount = drTotalValue;
+            } else {
+                totalAmount = qr1Value+qr5Value+qr10Value+qr50Value+qr100Value+qr500Value+dr25Value+dr50Value;
+            }*/
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -474,7 +526,7 @@ public class DenominationFragment extends AbstractDialogFragment {
             joTotal.put("type", "total");
             joTotal.put("name", 0);
             joTotal.put("count", 0);
-            joTotal.put("total", drTotalValue);
+            joTotal.put("total", totalAmount);
 
             jsonArray.put(joQR500);
             jsonArray.put(joQR100);
