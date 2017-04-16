@@ -174,6 +174,8 @@ public class InvoiceBill {
                     Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), kotTableList.get(i));
                     sb.append(table.getTableName() + " ");
 
+                    covers = 0;
+
                     List<KOTHeader> kotHeaderList = mDBHelper.getKOTHeaders(kotTableList.get(i), true);
                     for (int j = 0; j < kotHeaderList.size(); j++) {
                         KOTHeader kotHeader = kotHeaderList.get(j);

@@ -198,6 +198,12 @@ public class AppConstants {
     /** response no product data received key */
     public static final int NO_PRODUCT_DATA_RECEIVED = 60;
 
+    public static final int CALL_DELETE_KOT_ITEM = 61;
+
+    public static final int DELETE_KOT_RESPONSE_SUCCESS = 62;
+
+    public static final int DELETE_KOT_RESPONSE_ERROR = 63;
+
     /** notify response failure key */
     public static final String NETWORK_FAILURE = "Not connected to Internet";
 

@@ -106,7 +106,7 @@ public class PrinterSettingsFragment extends AbstractDialogFragment {
         else if(mPrinterMode.equalsIgnoreCase("WiFi"))
             ((RadioButton)mRadGroupMode.getChildAt(1)).setChecked(true);
         else if(mPrinterMode.equalsIgnoreCase("Bluetooth"))
-            ((RadioButton)mRadGroupMode.getChildAt(1)).setChecked(true);
+            ((RadioButton)mRadGroupMode.getChildAt(2)).setChecked(true);
 
         int selectedId = mRadGroupMode.getCheckedRadioButtonId();
 

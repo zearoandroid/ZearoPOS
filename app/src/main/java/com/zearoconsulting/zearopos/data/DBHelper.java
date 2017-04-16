@@ -149,6 +149,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_IS_DEFAULT = "isDefault";
     private static final String KEY_IS_UPDATED = "isUpdated";
     private static final String KEY_IS_POSTED = "isPosted";
+    private static final String KEY_CREADTED_DATE = "createdDate";
     private static final String KEY_IS_SERVER_POSTED = "isServerPosted";
     private static final String KEY_IS_KOT = "isKOT";
     private static final String KEY_KOT_TYPE = "kotType";
@@ -247,7 +248,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRICELIST_ID + " NUMERIC, " + KEY_CUSTOMER_VALUE + " NUMERIC, "
             + KEY_EMAIL + " TEXT, " + KEY_NUMBER + " NUMERIC, " + KEY_TOTAL_DISCOUNT_TYPE + " INTEGER, "
             + KEY_TOTAL_DISCOUNT_VALUE + " INTEGER, " + KEY_IS_CASH_CUSTOMER + " INTEGER, " + KEY_IS_TOTAL_DISCOUNTED + " TEXT, "
-            + KEY_IS_POSTED + " TEXT, " + KEY_IS_PRINTED + " TEXT, " + KEY_KOT_TYPE + " TEXT," + KEY_IS_KOT + " TEXT," +KEY_IS_SERVER_POSTED+ " TEXT);";
+            + KEY_IS_POSTED + " TEXT, " + KEY_IS_PRINTED + " TEXT, " + KEY_KOT_TYPE + " TEXT," + KEY_IS_KOT + " TEXT," +KEY_IS_SERVER_POSTED+ " TEXT, "
+            + KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
 
     //create query for TABLE_POS_LINES
     private static final String POS_LINE_ITEM_CREATE_QUERY = "CREATE TABLE "
@@ -257,13 +259,14 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRODUCT_UOM_VALUE + " TEXT, "+ KEY_PRODUCT_QTY + " INTEGER, " + KEY_PRODUCT_STD_PRICE + " NUMERIC, " + KEY_PRODUCT_COST_PRICE + " INTEGER, "
             + KEY_PRODUCT_DISCOUNT_TYPE + " INTEGER, " + KEY_PRODUCT_DISCOUNT_VALUE + " INTEGER, " + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, "
             + KEY_IS_LINE_DISCOUNTED + " TEXT, " + KEY_IS_UPDATED + " TEXT, " + KEY_IS_POSTED + " TEXT, " + KEY_IS_KOT_GENERATED + " TEXT, " + KEY_IS_SELECTED + " TEXT, "
-            + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT);";
+            + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT, "
+            + KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
 
     //create query for TABLE_POS_PAYMENT_DETAIL
     private static final String POS_PAYMENT_CREATE_QUERY = "CREATE TABLE "
             + TABLE_POS_PAYMENT_DETAIL + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_POS_ID + " NUMERIC, " + KEY_PAYMENT_CASH + " NUMERIC, " + KEY_PAYMENT_AMEX
             + " NUMERIC, " + KEY_PAYMENT_GIFT + " NUMERIC, " + KEY_PAYMENT_MASTER + " NUMERIC, " + KEY_PAYMENT_VISA + " NUMERIC, " + KEY_PAYMENT_OTHER + " NUMERIC, "
-            + KEY_PAYMENT_RETURN + " NUMERIC);";
+            + KEY_PAYMENT_RETURN + " NUMERIC, "+ KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
 
     //create query for KOT_TABLES
     private static final String KOT_TABLES_CREATE_QUERY = "CREATE TABLE "
@@ -279,7 +282,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + TABLE_KOT_HEADER + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_NUMBER + " NUMERIC, "
             + KEY_INVOICE_NUMBER + " NUMERIC, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_KOT_TOTAL_AMOUNT + " NUMERIC, " + KEY_KOT_ORDER_BY + " TEXT,"
             + KEY_KOT_TYPE + " TEXT," + KEY_ORDER_TYPE + " TEXT," + KEY_IS_KOT + " TEXT, " + KEY_IS_PRINTED + " TEXT, " + KEY_IS_POSTED + " TEXT, "
-            + KEY_IS_SELECTED + " TEXT, " + KEY_KOT_COVERS_COUNT + " INTEGER);";
+            + KEY_IS_SELECTED + " TEXT, " + KEY_KOT_COVERS_COUNT + " INTEGER, "+ KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
 
     //create query for TABLE_KOT_LINES
     private static final String KOT_LINE_ITEM_CREATE_QUERY = "CREATE TABLE "
@@ -287,7 +290,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + " NUMERIC, " + KEY_KOT_LINE_ID + " NUMERIC, " + KEY_KOT_NUMBER + " NUMERIC, " + KEY_INVOICE_NUMBER + " NUMERIC, " + KEY_CATEGORY_ID + " NUMERIC, " + KEY_PRODUCT_ID + " NUMERIC, " + KEY_PRODUCT_NAME + " TEXT, "
             + KEY_PRODUCT_ARABIC_NAME + " TEXT, " + KEY_PRODUCT_VALE + " TEXT, " + KEY_PRODUCT_UOM_ID + " NUMERIC, " + KEY_PRODUCT_UOM_VALUE + " TEXT, "
             + KEY_PRODUCT_STD_PRICE + " NUMERIC, " + KEY_PRODUCT_COST_PRICE + " INTEGER, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_PRODUCT_QTY + " INTEGER, "
-            + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, " + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_IS_PRINTED + " TEXT," + KEY_IS_POSTED + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT);";
+            + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, " + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_IS_PRINTED + " TEXT," + KEY_IS_POSTED + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT, "
+            + KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
 
     private static DBHelper sInstance;
 

@@ -246,6 +246,9 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
     private void gotoPOS() {
         progressWheel.stopSpinning();
         dismissAllowingStateLoss();
+
+        mDBHelper.deleteOldData();
+
         mIntent = new Intent(context, POSActivity.class);
         startActivity(mIntent);
         getActivity().finish();

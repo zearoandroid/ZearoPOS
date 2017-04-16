@@ -30,7 +30,7 @@ android {
 
         applicationId globalConfiguration.getAt("androidApplicationId")
         versionCode 1
-        versionName "1.1.10"
+        versionName "1.1.16"
     }
 
     compileOptions {
@@ -63,6 +63,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion '25.0.0'
 }
 
 dependencies {

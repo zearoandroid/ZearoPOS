@@ -30,6 +30,15 @@ public class NetworkUtil {
         return TYPE_NOT_CONNECTED;
     }
 
+    public static boolean isConnected() {
+        ConnectivityManager
+                cm = (ConnectivityManager) AndroidApplication.getAppContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null
+                && activeNetwork.isConnectedOrConnecting();
+    }
+
     public static String getConnectivityStatusString() {
         int conn = NetworkUtil.getConnectivityStatus(AndroidApplication.getAppContext());
         String status = null;
@@ -41,5 +50,18 @@ public class NetworkUtil {
             status = "Not connected to Internet";
         }
         return status;
+    }
+
+    public static Boolean isOnline() {
+        try {
+            Process p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.com");
+            int returnVal = p1.waitFor();
+            boolean reachable = (returnVal==0);
+            return reachable;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
     }
 }

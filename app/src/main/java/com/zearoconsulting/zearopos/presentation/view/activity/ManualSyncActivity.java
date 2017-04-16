@@ -27,6 +27,7 @@ import com.zearoconsulting.zearopos.presentation.presenter.ILoginListeners;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.presentation.view.fragment.LoadingDialogFragment;
 import com.zearoconsulting.zearopos.utils.AppConstants;
+import com.zearoconsulting.zearopos.utils.FileUtils;
 import com.zearoconsulting.zearopos.utils.NetworkUtil;
 
 import org.json.JSONObject;
@@ -64,7 +65,9 @@ public class ManualSyncActivity extends BaseActivity implements ConnectivityRece
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                mDBHelper.deletePOSRelatedTables();
+                FileUtils.deleteImages();
+
+                mDBHelper.deleteAllTables();
                 showLoading();
             }
         });
@@ -72,7 +75,7 @@ public class ManualSyncActivity extends BaseActivity implements ConnectivityRece
 
     private void showLoading() {
         FragmentManager localFragmentManager = getSupportFragmentManager();
-        LoadingDialogFragment.newInstance(ManualSyncActivity.this, mAppManager.getUserName(), mAppManager.getUserPassword(), "SYNC").show(localFragmentManager, "loading");
+        LoadingDialogFragment.newInstance(ManualSyncActivity.this, mAppManager.getUserName(), mAppManager.getUserPassword(), "LOGIN").show(localFragmentManager, "loading");
     }
 
     @Override

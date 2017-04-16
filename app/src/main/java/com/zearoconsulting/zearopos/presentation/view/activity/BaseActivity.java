@@ -1,8 +1,10 @@
 package com.zearoconsulting.zearopos.presentation.view.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -81,5 +83,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onResume();
         AndroidApplication.activityResumed();
     }
+
 }
 

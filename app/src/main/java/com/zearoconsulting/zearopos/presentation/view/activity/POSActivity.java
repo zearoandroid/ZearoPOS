@@ -45,6 +45,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -63,6 +64,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.zearoconsulting.zearopos.AndroidApplication;
 import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
+import com.zearoconsulting.zearopos.domain.receivers.ConnectivityReceiver;
 import com.zearoconsulting.zearopos.domain.services.TableStatusService;
 import com.zearoconsulting.zearopos.presentation.exception.AppLog;
 import com.zearoconsulting.zearopos.presentation.model.BPartner;
@@ -119,7 +121,7 @@ import HPRTAndroidSDK.IPort;
 import HPRTAndroidSDK.PublicFunction;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class POSActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, IPOSListeners, ITokenListeners, MultiEditorFragment.OnMultiEditListener, SearchView.OnQueryTextListener, IPrintingListeners, OrderStatusListener.OnOrderStateListener {
+public class POSActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ConnectivityReceiver.ConnectivityReceiverListener,IPOSListeners, ITokenListeners, MultiEditorFragment.OnMultiEditListener, SearchView.OnQueryTextListener, IPrintingListeners, OrderStatusListener.OnOrderStateListener {
 
     /**
      * Static variables
@@ -383,6 +385,18 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     };
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                boolean result = bundle.getBoolean(TableStatusService.RESULT);
+                showSnack(result);
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -575,9 +589,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 this.mTablesView.setVisibility(View.VISIBLE);
                 Intent i = new Intent(this, TableStatusService.class);
                 //i.putExtra("handler", new Messenger(this.handler));
-                //this.startService(i);
+                this.startService(i);
 
-                //AppConstants.isTableService = true;
+                AppConstants.isTableService = true;
             }
 
             //check the app for isTableService and update the views
@@ -718,7 +732,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             thread.start();
         } else {
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(POSActivity.this).show();
+            showErrorDialog("Please Check Your Internet Connection!");
         }
     }
 
@@ -728,6 +742,12 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         //register receiver
         registerReceivers();
+
+        registerReceiver(receiver, new IntentFilter(
+                TableStatusService.NOTIFICATION));
+
+        // register connection status listener
+        AndroidApplication.getInstance().setConnectivityListener(this);
 
         //register the token listener to parser
         mParser.setTokeListener(POSActivity.this);
@@ -802,6 +822,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             }
         }
 
+        hideSoftKeyboard();
     }
 
     /**
@@ -1129,52 +1150,59 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private void generateInvoice(long tableId) {
 
         try {
-            long invoicNumber = 0;
 
+            long invoicNumber = 0;
             //get the table id and kot numbers of table
             kotHeaderList = mDBHelper.getKOTHeaders(tableId, false);
-
+            List<KOTLineItems> kotLineItemList = mDBHelper.getKOTLineItems(tableId);
             Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), tableId);
-            if (kotHeaderList.size() == 0 && table.getOrderAvailable().equalsIgnoreCase("Y")) {
+
+            if(table.getOrderAvailable().equalsIgnoreCase("N")){
+                return;
+            }else if ((kotHeaderList.size() == 0 || kotLineItemList.size() == 0)&& table.getOrderAvailable().equalsIgnoreCase("Y")) {
                 //call the getTable Data
                 getTableKOTData(tableId);
-
+            } else if (kotHeaderList.size() == 0) {
                 return;
-            } else if (kotHeaderList.size() == 0)
-                return;
+            }else{
+                if (kotLineItemList.size() == 0){
+                   return;
+                }else{
+                    //get the invoice number from KOTHeader table
+                    List<Long> invNumList = mDBHelper.getKOTInvoiceNumbers(tableId);
 
-            //get the invoice number from KOTHeader table
-            List<Long> invNumList = mDBHelper.getKOTInvoiceNumbers(tableId);
+                    if (invNumList.size() > 1) {
+                        //show popup dialog and select the invoice number
+                        ShowInvoiceListFragment.newInstance(POSActivity.this, tableId).show(fragmentManager, "INVOICE");
+                        return;
+                    } else if (invNumList.size() == 0) {
+                        invoicNumber = 0;
+                    } else {
+                        invoicNumber = invNumList.get(0);
+                    }
 
-            if (invNumList.size() > 1) {
-                //show popup dialog and select the invoice number
-                ShowInvoiceListFragment.newInstance(POSActivity.this, tableId).show(fragmentManager, "INVOICE");
-                return;
-            } else if (invNumList.size() == 0) {
-                invoicNumber = 0;
-            } else {
-                invoicNumber = invNumList.get(0);
-            }
-
-            if (invoicNumber == 0) {
-                if (mAppManager.getStartNumber().equals(mAppManager.getEndNumber())) {
-                    Log.i("POSACTIVITY", "GET POS NUMBERS");
-                    getPOSNumber();
-                    return;
-                } else if (!mAppManager.getStartNumber().equals(mAppManager.getEndNumber())) {
-                    long posNumber = mAppManager.getStartNumber();
-                    AppConstants.posID = posNumber;
-                    posNumber = posNumber + 1;
-                    mAppManager.setStartNumber(posNumber);
-                    mOrderFrag.updatePOSNumber();
-                    updateKOTtoInvoice(AppConstants.posID, tableId);
+                    if (invoicNumber == 0) {
+                        if (mAppManager.getStartNumber().equals(mAppManager.getEndNumber())) {
+                            Log.i("POSACTIVITY", "GET POS NUMBERS");
+                            getPOSNumber();
+                            return;
+                        } else if (!mAppManager.getStartNumber().equals(mAppManager.getEndNumber())) {
+                            long posNumber = mAppManager.getStartNumber();
+                            AppConstants.posID = posNumber;
+                            posNumber = posNumber + 1;
+                            mAppManager.setStartNumber(posNumber);
+                            mOrderFrag.updatePOSNumber();
+                            updateKOTtoInvoice(AppConstants.posID, tableId);
+                        }
+                    } else {
+                        AppConstants.posID = invoicNumber;
+                        mOrderFrag.updatePOSNumber();
+                        //mDBHelper.deletePOSTables(AppConstants.posID);
+                        updateKOTtoInvoice(AppConstants.posID, tableId);
+                    }
                 }
-            } else {
-                AppConstants.posID = invoicNumber;
-                mOrderFrag.updatePOSNumber();
-                //mDBHelper.deletePOSTables(AppConstants.posID);
-                updateKOTtoInvoice(AppConstants.posID, tableId);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1256,7 +1284,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             }
         } else {
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(mContext).show();
+            showErrorDialog("Please Check Your Internet Connection!");
         }
     }
 
@@ -1678,9 +1706,15 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 updatePrintStatus("QUICK", orderNum);
             } else {
                 AppLog.e("PRE-PRINTING", orderNum + " CALLING ");
-                USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
-                WiFiPrintInvoice prePrintTask = new WiFiPrintInvoice();
-                prePrintTask.execute(params1);
+                connectPrinter();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
+                        WiFiPrintInvoice prePrintTask = new WiFiPrintInvoice();
+                        prePrintTask.execute(params1);
+                    }
+                }, 3000);
             }
         } else if (ConnectType.equalsIgnoreCase("WiFi")) {
             USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
@@ -1712,6 +1746,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         //unregister receiver
         unregisterReceivers();
+
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -1843,11 +1879,11 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
                 if (status != 0) {
                     if (mBatteryPercent < 20) {
-                        showBatteryDialog();
+                        showErrorDialog("Battery is going to down!");
                     }
                 } else {
                     if (mBatteryPercent < 20) {
-                        showBatteryDialog();
+                        showErrorDialog("Battery is going to down!");
                     }
                 }
 
@@ -1869,32 +1905,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     }
 
-    //Show the Warning dialog for if battery level going to <20 percent
-    private void showBatteryDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                mContext);
 
-        // set title
-        alertDialogBuilder.setTitle("Warning");
-
-        // set dialog message
-        alertDialogBuilder
-                .setMessage("Battery is going to down!")
-                .setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // if this button is clicked, close
-                        // current activity
-                        dialog.cancel();
-                    }
-                });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
-        alertDialog.show();
-    }
 
     /**
      * POST the tableChange update to server. It will affect to all SmartMenu devices
@@ -1925,7 +1936,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             }
         } else {
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(POSActivity.this).show();
+            showErrorDialog("Please Check Your Internet Connection!");
         }
     }
 
@@ -1986,6 +1997,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
      */
     @Override
     public void orderPostedSuccess(long posNumber) {
+
+        updateTableUI();
+
         mOrderFrag = (OrderListFragment) getSupportFragmentManager().findFragmentByTag(ORDER_LIST_TAG);
         if (mOrderFrag != null && mOrderFrag.isVisible()) {
             //DO STUFF
@@ -2021,6 +2035,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
 
         //AppConstants.isKOTParsing = false;
+        hideSoftKeyboard();
     }
 
     @Override
@@ -2054,7 +2069,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             }
         } else {
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(POSActivity.this).show();
+            showErrorDialog("Please Check Your Internet Connection!");
         }
     }
 
@@ -2075,9 +2090,15 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 updatePrintStatus("COMPLETE", posNumber);
             } else {
                 AppLog.e("PRINTING", posNumber + " CALLING ");
-                USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
-                WiFiPrintInvoice printTask = new WiFiPrintInvoice();
-                printTask.execute(params1);
+                connectPrinter();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
+                        WiFiPrintInvoice printTask = new WiFiPrintInvoice();
+                        printTask.execute(params1);
+                    }
+                }, 3000);
             }
         } else if (ConnectType.equalsIgnoreCase("WiFi")) {
             USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
@@ -2098,13 +2119,17 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
     public void showCreateSession() {
         if (sessionDialog != null) {
-            if (sessionDialog.getDialog().isShowing()) {
-                //dialog is not showing
-                Bundle bundle = new Bundle();
-                bundle.putString("sessionType", "CREATE");
-                bundle.putString("sessionDesc", "Expired");
-                sessionDialog.setArguments(bundle);
-                sessionDialog.show(fragmentManager, "SESSION");
+            try {
+                if (sessionDialog.getDialog().isShowing()) {
+                    //dialog is not showing
+                    Bundle bundle = new Bundle();
+                    bundle.putString("sessionType", "CREATE");
+                    bundle.putString("sessionDesc", "Expired");
+                    sessionDialog.setArguments(bundle);
+                    sessionDialog.show(fragmentManager, "SESSION");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     }
@@ -2177,6 +2202,22 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private String printTextString(String printText) {
         String s = printText;
         return s;
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        if (isConnected) {
+            message = "Good! Connected to Internet";
+            Toast.makeText(mContext,message, Toast.LENGTH_LONG).show();
+        } else {
+            message = "Sorry! Not connected to internet";
+            showErrorDialog("Please Check Your Internet Connection!");
+        }
     }
 
     private class WiFiPrinteConnectionTask extends AsyncTask<Void, Void, String> {
@@ -2574,40 +2615,53 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                             if (HPRTPrinter.PortOpen("WiFi," + ipAddress + "," + strPort) != 0)
                                 result = "printerError";
                             else {
+
+                                PAct.LanguageEncode();
+                                PAct.BeforePrintAction();
+
+                                for (int i = 0; i < receiptLines.size(); i++) {
+                                    System.out.println(receiptLines.get(i));
+                                    HPRTPrinterHelper.PrintText(receiptLines.get(i));
+                                }
+
+                                HPRTPrinterHelper.CutPaper(HPRTPrinter.HPRT_PARTIAL_CUT_FEED, 140);
+
+                                PAct.AfterPrintAction();
+
                                 result = "success";
                             }
 
+                        } else if (mode.equalsIgnoreCase("USB")){
+                            PAct.LanguageEncode();
+                            PAct.BeforePrintAction();
+
+                            for (int i = 0; i < receiptLines.size(); i++) {
+                                System.out.println(receiptLines.get(i));
+                                HPRTPrinterHelper.PrintText(receiptLines.get(i));
+                            }
+
+                            HPRTPrinterHelper.CutPaper(HPRTPrinter.HPRT_PARTIAL_CUT_FEED, 140);
+
+                            if (printFrom.equalsIgnoreCase("QUICK")) {
+                                //no need to open cash-drawer
+                            } else {
+                                try {
+                                    int iRtn = HPRTPrinterHelper.OpenCashdrawer(0);
+                                    if (iRtn == 0)
+                                        Log.i("POSActivity", "OpenCashDrawer");
+                                } catch (Exception e) {
+                                    StringWriter sw = new StringWriter();
+                                    e.printStackTrace(new PrintWriter(sw));
+                                    String stacktrace = sw.toString();
+                                    AppLog.e("CASHDRAWER", stacktrace);
+                                    Log.d("HPRTSDKSample", (new StringBuilder("Activity_Cashdrawer --> onClickOpen1 ")).append(e.getMessage()).toString());
+                                }
+                            }
+
+                            PAct.AfterPrintAction();
                         } else {
                             result = "printerError";
                         }
-
-                        PAct.LanguageEncode();
-                        PAct.BeforePrintAction();
-
-                        for (int i = 0; i < receiptLines.size(); i++) {
-                            System.out.println(receiptLines.get(i));
-                            HPRTPrinterHelper.PrintText(receiptLines.get(i));
-                        }
-
-                        HPRTPrinterHelper.CutPaper(HPRTPrinter.HPRT_PARTIAL_CUT_FEED, 140);
-
-                        if (printFrom.equalsIgnoreCase("QUICK")) {
-                            //no need to open cash-drawer
-                        } else {
-                            try {
-                                int iRtn = HPRTPrinterHelper.OpenCashdrawer(0);
-                                if (iRtn == 0)
-                                    Log.i("POSActivity", "OpenCashDrawer");
-                            } catch (Exception e) {
-                                StringWriter sw = new StringWriter();
-                                e.printStackTrace(new PrintWriter(sw));
-                                String stacktrace = sw.toString();
-                                AppLog.e("CASHDRAWER", stacktrace);
-                                Log.d("HPRTSDKSample", (new StringBuilder("Activity_Cashdrawer --> onClickOpen1 ")).append(e.getMessage()).toString());
-                            }
-                        }
-
-                        PAct.AfterPrintAction();
                     }
                     result = "success";
                 } catch (Exception e) {
@@ -2665,4 +2719,46 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     }
 
+    /**
+     * Hides the soft keyboard
+     */
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    public void showErrorDialog(String message) {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing()){
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(POSActivity.this);
+
+                    // set title
+                    alertDialogBuilder.setTitle("Warning");
+
+                    // set dialog message
+                    alertDialogBuilder
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // if this button is clicked, close
+                                    // current activity
+                                    dialog.cancel();
+                                }
+                            });
+
+                    // create alert dialog
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    // show it
+                    alertDialog.show();
+                }
+            }
+        });
+    }
 }

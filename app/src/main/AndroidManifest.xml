@@ -83,9 +83,9 @@
             android:name="io.fabric.ApiKey"
             android:value="746f1850e1ede270011df2818c4010cab3a3140e" />
 
-        <!--<service
+        <service
             android:name=".domain.services.TableStatusService"
-            android:exported="false"></service>-->
+            android:exported="false"></service>
     </application>
 
 </manifest>

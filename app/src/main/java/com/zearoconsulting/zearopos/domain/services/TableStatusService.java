@@ -70,6 +70,8 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
 
     private Handler updateHandler = new Handler();
     List<KOTHeader> kotPrintList;
+    public static final String RESULT = "";
+    public static final String NOTIFICATION = "com.zearoconsulting.zearopos.domain.services.receiver";
 
     public TableStatusService() {
         super(TAG);
@@ -107,6 +109,7 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                     try {
                         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
 
+                            AppLog.e("Internet Connection", "Good! Connected to Internet");
 
                             //if (!AppConstants.isKOTParsing) {
 
@@ -123,12 +126,21 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
 
                                 updateHandler.postDelayed(runnable, 5000);*/
                             //}
+                        }else{
+                            AppLog.e("Internet Connection", "Sorry! Not connected to internet");
+
+                            AppConstants.isKOTParsing = false;
+
+                            Intent intent = new Intent(NOTIFICATION);
+                            intent.putExtra(RESULT, false);
+                            sendBroadcast(intent);
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-            }, 100, 8000);
+            }, 100, 5000);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -186,12 +198,12 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
 
     @Override
     public void onParsingSuccess() {
-        //if (AppConstants.isKOTParsing) {
+        if (AppConstants.isKOTParsing) {
             Runnable myThread = new PrintThread();
             new Thread(myThread).start();
-        //}else if(!AppConstants.isKOTParsing){
-        //    OrderStatusListener.getInstance().kotPrinted();
-        //}
+        }else if(!AppConstants.isKOTParsing){
+            OrderStatusListener.getInstance().kotPrinted();
+        }
     }
 
     public class PrintThread implements Runnable {
@@ -203,8 +215,10 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                 //kotHeaderList = mDBHelper.getKOTHeadersNotPrinted();
                 kotPrintList = mDBHelper.getKOTHeadersNotPrinted();
                 long invoiceNumber = 0;
-                //for loop for kot
 
+                OrderStatusListener.getInstance().kotPrinted();
+
+                //for loop for kot
                 for (int i = 0; i < kotPrintList.size(); i++) {
 
                     String tableName = "Counter sale";

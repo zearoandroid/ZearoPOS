@@ -33,6 +33,7 @@ import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.zearopos.domain.receivers.ConnectivityReceiver;
 import com.zearoconsulting.zearopos.presentation.model.Category;
+import com.zearoconsulting.zearopos.presentation.model.POSLineItem;
 import com.zearoconsulting.zearopos.presentation.model.Warehouse;
 import com.zearoconsulting.zearopos.presentation.presenter.ILoginListeners;
 import com.zearoconsulting.zearopos.presentation.view.adapter.OrgSpinner;
@@ -294,6 +295,9 @@ public class MainActivity extends BaseActivity implements  ConnectivityReceiver.
 
     private void showLoading()
     {
+        //List<POSLineItem> lineItems = mDBHelper.getPOSLineItems();
+        //System.out.println("Total Count: "+lineItems.size());
+
         //check server address is already available or not
         if(mAppManager.getServerAddress().equals("")){
             Toast.makeText(MainActivity.this,"Please config server details...",Toast.LENGTH_SHORT).show();

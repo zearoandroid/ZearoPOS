@@ -22,7 +22,9 @@ import com.zearoconsulting.zearopos.presentation.model.Tables;
 import com.zearoconsulting.zearopos.presentation.model.Terminals;
 import com.zearoconsulting.zearopos.presentation.model.Warehouse;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2531,6 +2533,18 @@ public class POSDataSource {
         }
     }
 
+    public void deletePOSLineItem(long invoiceNumber, long kotLineId) {
+        db.beginTransaction();
+        try {
+            db.execSQL("delete from posLineItems where posId = '" + invoiceNumber + "' and kotLineId = '" + kotLineId + "'");
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     public void releasePOSOrder(long posId) {
 
         try {
@@ -2902,6 +2916,23 @@ public class POSDataSource {
         return tableId;
     }
 
+    public long getKOTTable(long kotNumber) {
+        long tableId = 0;
+        try {
+            Cursor cursor = db.rawQuery("select kotTableId from kotHeader where kotNumber = '" + kotNumber + "' ", null);
+
+            while (cursor.moveToNext()) {
+                tableId = cursor.getLong(0);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return tableId;
+    }
+
     public boolean isKOTAvailable(long posId) {
         boolean isKOTAvail = false;
         try {
@@ -2916,6 +2947,23 @@ public class POSDataSource {
         }
 
         return isKOTAvail;
+    }
+
+    public long getKOTNumber(long kotLineId){
+        long kotNumber = 0;
+        try {
+            Cursor cursor = db.rawQuery("select kotNumber from kotLineItems where kotLineId = '" + kotLineId + "' ", null);
+
+            while (cursor.moveToNext()) {
+                kotNumber = cursor.getLong(0);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return kotNumber;
     }
 
     /**
@@ -3395,6 +3443,22 @@ public class POSDataSource {
         }
     }
 
+    public void deleteKOTLineItem(long kotNumber, long kotLineId) {
+
+        db.beginTransaction();
+        try {
+            //db.execSQL("update kotTables set isOrderAvailable='N' where kotTableId = '" + tableId + "'");
+            //db.execSQL("delete from kotHeader where kotTableId = '" + tableId + "'");
+            db.execSQL("delete from kotLineItems where kotNumber = '" + kotNumber + "' and kotLineId = '" + kotLineId + "'");
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     public void deleteKOTHeaders(long kotNumber) {
 
         db.beginTransaction();
@@ -3566,4 +3630,84 @@ public class POSDataSource {
             db.endTransaction();
         }
     }
+
+    public void deleteOldData(){
+        db.beginTransaction();
+        try {
+            db.execSQL("delete from posOrderHeader where createdDate <= date('now','-2 day')");
+            db.execSQL("delete from posLineItems where createdDate <= date('now','-2 day')");
+            db.execSQL("delete from posPaymentDetail where createdDate <= date('now','-2 day')");
+
+            db.execSQL("delete from kotHeader where createdDate <= date('now','-2 day')");
+            db.execSQL("delete from kotLineItems where createdDate <= date('now','-2 day')");
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public List<POSLineItem> getPOSLineItems() {
+
+        List<POSLineItem> posLineItemList = new ArrayList<POSLineItem>();
+        POSLineItem posLineItems = null;
+        Cursor cursor;
+
+        try {
+
+            Calendar cal5 = Calendar.getInstance();
+            cal5.add(Calendar.DATE, -5);
+
+            Calendar cal1 = Calendar.getInstance();
+            cal1.add(Calendar.DATE, -1);
+
+            Timestamp fiveDaysAgo = new Timestamp(cal5.getTimeInMillis());
+            Timestamp oneDaysAgo = new Timestamp(cal1.getTimeInMillis());
+
+            //BETWEEN '"+fiveDaysAgo+"' AND '"+oneDaysAgo+"'
+
+            cursor = db.rawQuery("select * from posLineItems where createdDate <= date('now','-2 day')", null);
+
+            while (cursor.moveToNext()) {
+                posLineItems = new POSLineItem();
+                posLineItems.setRowId(cursor.getLong(0));
+                posLineItems.setPosId(cursor.getLong(1));
+                posLineItems.setKotLineId(cursor.getLong(2));
+                posLineItems.setTerminalId(cursor.getLong(3));
+                posLineItems.setCategoryId(cursor.getLong(4));
+                posLineItems.setProductId(cursor.getLong(5));
+                posLineItems.setProductName(cursor.getString(6));
+                posLineItems.setProdArabicName(cursor.getString(7));
+                posLineItems.setProductValue(cursor.getString(8));
+                posLineItems.setPosUOMId(cursor.getLong(9));
+                posLineItems.setPosUOMValue(cursor.getString(10));
+                posLineItems.setPosQty(cursor.getInt(11));
+                posLineItems.setStdPrice(cursor.getDouble(12));
+                posLineItems.setCostPrice(cursor.getDouble(13));
+                posLineItems.setDiscType(cursor.getInt(14));
+                posLineItems.setDiscValue(cursor.getDouble(15));
+                posLineItems.setTotalPrice(cursor.getDouble(16));
+                posLineItems.setIsLineDiscounted(cursor.getString(17));
+                posLineItems.setIsUpdated(cursor.getString(18));
+                posLineItems.setIsPosted(cursor.getString(19));
+                posLineItems.setIsKOTGenerated(cursor.getString(20));
+                posLineItems.setSelected(cursor.getString(21));
+                posLineItems.setNotes(cursor.getString(22));
+                posLineItems.setRefRowId(cursor.getLong(23));
+                posLineItems.setIsExtraProduct(cursor.getString(24));
+                posLineItems.setCreatedTime(cursor.getString(25));
+
+                posLineItemList.add(posLineItems);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return posLineItemList;
+    }
+
 }

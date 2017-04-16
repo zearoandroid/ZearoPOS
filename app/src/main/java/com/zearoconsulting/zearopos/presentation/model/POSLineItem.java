@@ -255,6 +255,16 @@ public class POSLineItem implements Serializable {
         this.isExtraProduct = isExtraProduct;
     }
 
+    private String createdTime;
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
+    }
+
     /*@Override
     public int describeContents() {
         return 0;

@@ -619,6 +619,8 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             mBtnComplete.setClickable(true);
             //show network failure dialog or toast
             NetworkErrorDialog.buildDialog(PaymentActivity.this).show();
+
+            //showNetworkErrorDialog();
         }
                /* }else{
                     mBtnComplete.setClickable(true);

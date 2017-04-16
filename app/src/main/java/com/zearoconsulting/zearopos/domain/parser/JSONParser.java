@@ -173,6 +173,9 @@ public class JSONParser {
                 case AppConstants.GET_TABLE_KOT_DETAILS:
                     mJsonObj.put("operation", "getTableKot");
                     break;
+                case AppConstants.CALL_DELETE_KOT_ITEM:
+                    mJsonObj.put("operation", "deleteKotItem");
+                    break;
                 default:
                     break;
             }
@@ -1199,10 +1202,10 @@ public class JSONParser {
      */
     public void parseKOTData(String jsonStr, Handler mHandler) {
 
-        //if (!AppConstants.isKOTParsing) {
+        if (!AppConstants.isKOTParsing) {
             Runnable myThread = new ParseKOTDataThread(jsonStr, mHandler);
             new Thread(myThread).start();
-        //}
+        }
     }
 
     public class ParseKOTDataThread implements Runnable {
@@ -1234,6 +1237,11 @@ public class JSONParser {
                     AppConstants.isKOTParsing = true;
 
                     if(json.has("tables")){
+
+                        AppLog.e("PARSER", "Table parsing started");
+
+                        AppLog.e("SERVER DATA", json.toString());
+
                         jsonTableArray = json.getJSONArray("tables");
 
                         //Loop for getting tables
@@ -1280,7 +1288,20 @@ public class JSONParser {
                                 if(tableId==0){
                                     kotHeader.setInvoiceNumber(invoiceNumber);
                                 }else{
-                                    kotHeader.setInvoiceNumber(0);
+                                    List<Long> invNumList = mDBHelper.getKOTInvoiceNumbers(tableId);
+                                    int size = invNumList.size();
+                                    if(size == 1) {
+                                        invoiceNumber = invNumList.get(0);
+                                        Log.i("TABLE INVOICE", String.valueOf(invoiceNumber));
+                                    }else if(size>1) {
+                                        invoiceNumber = invNumList.get(0);
+                                        if (invoiceNumber != AppConstants.posID)
+                                            invoiceNumber = invNumList.get(1);
+                                    }else if(size == 0) {
+                                        invoiceNumber = 0;
+                                    }
+
+                                    kotHeader.setInvoiceNumber(invoiceNumber);
                                 }
 
                                 kotHeader.setTerminalId(terminalID);
@@ -1335,13 +1356,16 @@ public class JSONParser {
 
                                         if(tableId!=0){
                                             List<Long> invNumList = mDBHelper.getKOTInvoiceNumbers(tableId);
-
                                             int size = invNumList.size();
-
-                                            if(size>0)
-                                                invoiceNumber = invNumList.get(size-1);
+                                            if(size == 1) {
+                                                invoiceNumber = invNumList.get(0);
+                                                Log.i("PRODUCT INVOICE", String.valueOf(invoiceNumber));
+                                            }else if(size>1) {
+                                                invoiceNumber = invNumList.get(0);
+                                                if (invoiceNumber != AppConstants.posID)
+                                                    invoiceNumber = invNumList.get(1);
+                                            }
                                         }
-
 
                                         KOTLineItems kotLineItems = new KOTLineItems();
                                         kotLineItems.setTableId(tableId);
@@ -1359,9 +1383,12 @@ public class JSONParser {
                                             parseRelatedProducts(tableId, terminalID, kotNumber, invoiceNumber, kotLineId, productObj.getJSONArray("relatedProductsArray"));
 
                                         if(AndroidApplication.isActivityVisible() && mTokenListener!=null && AppConstants.posID!=0){
+                                            Log.i("POS VISIBLE STATE", String.valueOf(tableId)+"-----"+String.valueOf(invoiceNumber));
                                             //update the cart if invoiceNumber==AppConstants.posId
                                             if(invoiceNumber==AppConstants.posID)
                                                 mTokenListener.OnTokenReceivedListener(tableId,invoiceNumber);
+                                        }else if(!AndroidApplication.isActivityVisible()){
+                                            Log.i("POS PAUSED STATE", String.valueOf(tableId)+"-----"+String.valueOf(invoiceNumber));
                                         }
                                     }
                                 }
@@ -1369,6 +1396,11 @@ public class JSONParser {
 
                         }
                     }else if(json.has("draftedTables")){
+
+                        AppLog.e("PARSER", "Drafter Table parsing started");
+
+                        AppLog.e("PARSER", json.toString());
+
                         mDBHelper.updateAllTableStatus();
                         JSONArray jsonDraftedTableArray = json.getJSONArray("draftedTables");
                         for (int i = 0; i < jsonDraftedTableArray.length(); i++) {
@@ -1384,6 +1416,7 @@ public class JSONParser {
                     b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                     b.putString("OUTPUT", "");
                 } else if (json.getInt("responseCode") == 101) {
+                    AppLog.e("PARSER", "Table data not available");
                     AppConstants.isKOTParsing = false;
                     mDBHelper.updateAllTableStatus();
                 }else if (json.getInt("responseCode") == 700) {
@@ -1397,6 +1430,9 @@ public class JSONParser {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
                 b.putString("OUTPUT", "");
             } finally {
+
+                AppLog.e("PARSER", "Parsing Completed");
+
                 b.putInt("Type", AppConstants.KOT_HEADER_AND_lINES_RECEIVED);
                 b.putString("OUTPUT", "");
 
@@ -1835,6 +1871,58 @@ public class JSONParser {
 
                 b.putInt("Type", AppConstants.CREDIT_LIMIT_RECEIVED);
                 b.putString("OUTPUT", String.valueOf(json.getLong("businessPartnerId")));
+            } else if (json.getInt("responseCode") == 301) {
+                b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 700) {
+                b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else {
+                b.putInt("Type", AppConstants.SERVER_ERROR);
+                b.putString("OUTPUT", "");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            b.putInt("Type", AppConstants.SERVER_ERROR);
+            b.putString("OUTPUT", "");
+        }
+
+        msg.setData(b);
+        mHandler.sendMessage(msg);
+    }
+
+    public void parseDeleteKOTItem(String jsonStr, Handler mHandler) {
+        Log.i("RESPONSE", jsonStr);
+        Message msg = new Message();
+        JSONObject json;
+        try {
+            json = new JSONObject(jsonStr);
+            if (json.getInt("responseCode") == 200) {
+
+                mDBHelper.deletePOSLineItem(json.getLong("invoiceNumber"),json.getLong("KotLineID"));
+
+                long kotNumber = json.getLong("KOTNumber");
+
+                if(mDBHelper.getKOTLineItemFromKOTNumber(kotNumber).size()>1){
+                    mDBHelper.deleteKOTLineItem(kotNumber,json.getLong("KotLineID"));
+                }else{
+                    long tableId = mDBHelper.getKOTTable(kotNumber);
+                    List<KOTHeader> kotHeaderList = mDBHelper.getKOTNumbersFromKOTHeader(tableId);
+                    if(kotHeaderList.size() == 1){
+                        mDBHelper.deleteKOTDetails(tableId);
+                    }else{
+                        mDBHelper.deleteKOTLineItem(kotNumber,json.getLong("KotLineID"));
+                        mDBHelper.deleteKOTHeaders(kotNumber);
+                    }
+                }
+
+                b.putInt("Type", AppConstants.DELETE_KOT_RESPONSE_SUCCESS);
+                b.putString("OUTPUT", String.valueOf(json.getLong("invoiceNumber")));
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");

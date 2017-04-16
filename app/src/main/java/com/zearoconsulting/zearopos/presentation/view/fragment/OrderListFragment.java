@@ -20,6 +20,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.zearoconsulting.zearopos.AndroidApplication;
 import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.zearopos.presentation.model.BPartner;
@@ -87,7 +89,7 @@ import java.util.TimerTask;
  * {@link IPOSListeners} interface
  * to handle interaction events.
  */
-public class OrderListFragment extends AbstractFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener, AdapterView.OnItemClickListener {
+public class OrderListFragment extends AbstractFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
 
     ImageView mUserImgView;
@@ -252,6 +254,17 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
                     //INFORM USER POSTING FAILURE
                     mProDlg.dismiss();
                     break;
+                case AppConstants.CALL_DELETE_KOT_ITEM:
+                    mParser.parseDeleteKOTItem(jsonStr, mHandler);
+                    break;
+                case AppConstants.DELETE_KOT_RESPONSE_SUCCESS:
+                    mProDlg.dismiss();
+                    updateRow(AppConstants.posID, 0);
+                    break;
+                case AppConstants.DELETE_KOT_RESPONSE_ERROR:
+                    //INFORM USER POSTING FAILURE
+                    mProDlg.dismiss();
+                    break;
                 case AppConstants.SESSION_EXPIRED:
                     mProDlg.dismiss();
                     ((POSActivity) getActivity()).showCreateSession();
@@ -362,6 +375,8 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
         updateMode(AppConstants.posID);
 
         mOrderListView.setOnItemClickListener(this);
+
+        mOrderListView.setOnItemLongClickListener(this);
 
         mEditQtyLayout.setVisibility(View.GONE);
         mItemEditorLayout.setVisibility(View.GONE);
@@ -1643,5 +1658,78 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
     public void setCreditLimitDefault(){
         this.mBPId = 0;
         this.mCreditLimit = 0;
+    }
+
+    // method to delete list item if it long pressed
+    public void onDeleteKOTItem(POSLineItem mLineItem) {
+
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                    getActivity());
+            alertDialog.setTitle("Confirm Delete");
+            alertDialog.setIcon(android.R.drawable.ic_delete);
+            alertDialog.setCancelable(false);
+            alertDialog.setPositiveButton("Yes",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteKOTItem(mLineItem);
+                        }
+                    });
+
+            alertDialog.setNegativeButton("No",
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog
+                    .setMessage("Are you sure, you want to delete this item?");
+            alertDialog.show();
+
+
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+        POSLineItem mLineItem = (POSLineItem) parent.getItemAtPosition(position);
+        if (mLineItem.getIsKOTGenerated().equalsIgnoreCase("Y") && !AppConstants.isOrderPrinted){
+            onDeleteKOTItem(mLineItem);
+        }
+
+        return true;
+    }
+
+    private void deleteKOTItem(POSLineItem mLineItem){
+        if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
+            try {
+                mProDlg.setMessage("Delete the kot item...");
+                mProDlg.show();
+
+                long kotNumber =  mDBHelper.getKOTNumber(mLineItem.getKotLineId());
+
+                JSONObject mJsonObj = mParser.getParams(AppConstants.CALL_DELETE_KOT_ITEM);
+                JSONObject mDeleteObj = new JSONObject();
+                mDeleteObj.put("invoiceNumber", AppConstants.posID);
+                mDeleteObj.put("KOTNumber", kotNumber);
+                mDeleteObj.put("KotLineID", mLineItem.getKotLineId());
+
+                mJsonObj.put("deleteKOTItem", mDeleteObj);
+                Log.i("DELETE KOT ITEM", mJsonObj.toString());
+                NetworkDataRequestThread thread = new NetworkDataRequestThread(AppConstants.URL, "", mHandler, mJsonObj.toString(), AppConstants.CALL_DELETE_KOT_ITEM);
+                thread.start();
+
+                mProDlg.dismiss();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            //show network failure dialog or toast
+            NetworkErrorDialog.buildDialog(getActivity()).show();
+        }
     }
 }
