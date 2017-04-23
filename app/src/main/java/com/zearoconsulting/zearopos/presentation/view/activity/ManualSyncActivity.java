@@ -24,6 +24,7 @@ import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.zearopos.domain.receivers.ConnectivityReceiver;
 import com.zearoconsulting.zearopos.presentation.model.Category;
 import com.zearoconsulting.zearopos.presentation.presenter.ILoginListeners;
+import com.zearoconsulting.zearopos.presentation.view.dialogs.AlertView;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.presentation.view.fragment.LoadingDialogFragment;
 import com.zearoconsulting.zearopos.utils.AppConstants;
@@ -65,10 +66,14 @@ public class ManualSyncActivity extends BaseActivity implements ConnectivityRece
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                FileUtils.deleteImages();
+                boolean status = FileUtils.deleteImages();
 
-                mDBHelper.deleteAllTables();
-                showLoading();
+                if(status){
+                    mDBHelper.deleteAllTables();
+                    showLoading();
+                }else{
+                    AlertView.showAlert("Images are not deleted. Please delete all images from storage!", ManualSyncActivity.this);
+                }
             }
         });
     }

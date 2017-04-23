@@ -68,12 +68,17 @@ public class FileUtils {
         return null;
     }
 
-    public static void deleteImages(){
-        deleteDir(dir);
+    public static boolean deleteImages(){
+        boolean status = deleteDir(dir);
+
+        return status;
     }
 
     public static boolean deleteDir(File dir) {
         try {
+            if(dir == null)
+                return true;
+
             if (dir != null && dir.isDirectory()) {
                 String[] children = dir.list();
                 for (int i = 0; i < children.length; i++) {

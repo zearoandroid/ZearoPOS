@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.rebound.Spring;
 import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.data.AppDataManager;
@@ -77,6 +78,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
 
         Glide.with(mContext)
                 .load(mProductList.get(pos).getProdImage())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .into( holder.imageView);
 
         //AnimationUtil.aimateProduct(holder);

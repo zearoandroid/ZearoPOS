@@ -10,21 +10,21 @@
         app:showAsAction="always|collapseActionView" />
 
     <item
+        android:id="@+id/action_network_status"
+        android:icon="@drawable/ic_print"
+        android:title="@string/connectPrinterTitle"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_card_reader"
         android:icon="@drawable/ic_credit_card"
         android:title="@string/connectPrinterTitle"
         app:showAsAction="always" />
 
-   <!-- <item
-        android:id="@+id/action_print"
-        android:icon="@drawable/ic_print"
-        android:title="@string/connectPrinterTitle"
-        app:showAsAction="always" />-->
-
-    <!--<item android:id="@+id/action_menuRefresh"
+    <item android:id="@+id/action_Refresh"
         android:icon="@drawable/ic_autorenew"
         android:title="@string/menuitem_refresh"
-        app:showAsAction="always" />-->
+        app:showAsAction="always" />
 
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"

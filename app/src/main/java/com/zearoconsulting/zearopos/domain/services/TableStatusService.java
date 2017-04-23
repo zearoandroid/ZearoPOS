@@ -216,7 +216,7 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                 kotPrintList = mDBHelper.getKOTHeadersNotPrinted();
                 long invoiceNumber = 0;
 
-                OrderStatusListener.getInstance().kotPrinted();
+                //OrderStatusListener.getInstance().kotPrinted();
 
                 //for loop for kot
                 for (int i = 0; i < kotPrintList.size(); i++) {

@@ -1,6 +1,7 @@
 package com.zearoconsulting.zearopos.presentation.view.activity;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -155,6 +156,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private ImageView mDrawerView;
     private TextView mTxtLogUser;
     private Menu optionsMenu;
+    MenuItem mMenuNetwork;
+
     private ProductListFragment mProductFragment;
     private OrderListFragment mOrderFrag;
     /**
@@ -320,6 +323,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private Context thisCon = AndroidApplication.getAppContext();
     private ClipboardManager myClipboard;
     private ClipData myClip;
+
+    Intent mServiceIntent;
+
     /**
      * @BroadcastReceiver is used for notify the bluetooth status to application
      */
@@ -587,9 +593,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             if (!mAppManager.getIsRetail()) {
                 mLayPOSType.setVisibility(View.VISIBLE);
                 this.mTablesView.setVisibility(View.VISIBLE);
-                Intent i = new Intent(this, TableStatusService.class);
+                mServiceIntent = new Intent(this, TableStatusService.class);
                 //i.putExtra("handler", new Messenger(this.handler));
-                this.startService(i);
+                this.startService(mServiceIntent);
 
                 AppConstants.isTableService = true;
             }
@@ -667,6 +673,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(POSActivity.this);
 
+        mMenuNetwork = menu.findItem(R.id.action_card_reader);
+
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
@@ -702,6 +710,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             case R.id.action_card_reader:
                 readMSRData();
                 return true;
+            case R.id.action_Refresh:
+                restartTableService();
+                return true;
             case R.id.action_settings:
                 displayPrinterSettings();
                 return true;
@@ -710,6 +721,15 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     }
 
+    private void restartTableService(){
+
+        if(AppConstants.isKOTParsing)
+            AppConstants.isKOTParsing = false;
+
+        stopService(mServiceIntent);
+
+        startService(mServiceIntent);
+    }
 
     private void displayPrinterSettings() {
         try {
@@ -950,6 +970,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         if (isKOTAvail) {
             changeTableServiceBtnImage();
+            long tableId = mDBHelper.getKOTTableId(AppConstants.posID);
+            generateInvoice(tableId);
         } else {
             changeCounterSaleBtnImage();
         }
@@ -1706,15 +1728,10 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 updatePrintStatus("QUICK", orderNum);
             } else {
                 AppLog.e("PRE-PRINTING", orderNum + " CALLING ");
-                connectPrinter();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
-                        WiFiPrintInvoice prePrintTask = new WiFiPrintInvoice();
-                        prePrintTask.execute(params1);
-                    }
-                }, 3000);
+                //connectPrinter();
+                USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
+                WiFiPrintInvoice prePrintTask = new WiFiPrintInvoice();
+                prePrintTask.execute(params1);
             }
         } else if (ConnectType.equalsIgnoreCase("WiFi")) {
             USBPrintTaskParams params1 = new USBPrintTaskParams("QUICK", orderNum, totalAmt, finalAmt, paidAmt, returnAmt, 0, 0, 0, 0, 0, 0, 0);
@@ -2090,15 +2107,10 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 updatePrintStatus("COMPLETE", posNumber);
             } else {
                 AppLog.e("PRINTING", posNumber + " CALLING ");
-                connectPrinter();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
-                        WiFiPrintInvoice printTask = new WiFiPrintInvoice();
-                        printTask.execute(params1);
-                    }
-                }, 3000);
+                //connectPrinter();
+                USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
+                WiFiPrintInvoice printTask = new WiFiPrintInvoice();
+                printTask.execute(params1);
             }
         } else if (ConnectType.equalsIgnoreCase("WiFi")) {
             USBPrintTaskParams params1 = new USBPrintTaskParams("COMPLETE", posNumber, totalAmt, finalAmt, paidAmt, returnAmt, paidCash, paidAmex, paidGift, paidMaster, paidVisa, paidOther, amtEntered);
