@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#cfcfcf"
+    android:minHeight="250dp"
+    android:minWidth="600dp">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10.0dip"
+                android:text="Update available!"
+                android:textColor="@color/white"
+                android:textSize="20.0dip"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:background="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10.0dip"
+            android:layout_marginTop="10dp"
+            android:text="Do you want to install?"
+            android:textColor="@color/black"
+            android:textSize="20.0dip"
+            android:textStyle="normal" />
+
+        <LinearLayout
+            android:id="@+id/layBottomSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10.0dip"
+            android:layout_marginTop="40.0dip"
+            android:visibility="visible"
+            android:orientation="horizontal">
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btnYes"
+                fontPath="fonts/fontawesome-webfont.ttf"
+                android:layout_width="150.0dip"
+                android:layout_height="65.0dip"
+                fancy:fb_borderColor="@color/dark_sky_blue"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="#ffffffff"
+                fancy:fb_ghost="true"
+                fancy:fb_iconPosition="left"
+                fancy:fb_radius="2.0dip"
+                fancy:fb_text="Install"
+                fancy:fb_textColor="@color/black"
+                fancy:fb_textSize="20sp" />
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btnNo"
+                fontPath="fonts/fontawesome-webfont.ttf"
+                android:layout_width="150.0dip"
+                android:layout_height="65.0dip"
+                android:layout_marginLeft="15.0dip"
+                fancy:fb_borderColor="@color/dark_sky_blue"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="#ffffffff"
+                fancy:fb_ghost="true"
+                fancy:fb_iconPosition="left"
+                fancy:fb_radius="2.0dip"
+                fancy:fb_text="Later"
+                fancy:fb_textColor="@color/black"
+                fancy:fb_textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
