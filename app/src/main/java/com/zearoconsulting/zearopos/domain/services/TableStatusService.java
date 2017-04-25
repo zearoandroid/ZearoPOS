@@ -110,22 +110,14 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
                         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
 
                             AppLog.e("Internet Connection", "Good! Connected to Internet");
+                            String results = getResponse();
 
-                            //if (!AppConstants.isKOTParsing) {
-
-                                String results = getResponse();
-
+                            if(results.equalsIgnoreCase("")){
+                                AppLog.e("Internet Connection", "Sorry! Not reachable to server");
+                                AppConstants.isKOTParsing = false;
+                            }else {
                                 mParser.parseKOTData(results, null);
-
-                                /*Runnable runnable = new Runnable() {
-                                    public void run() {
-                                        Runnable myThread = new PrintThread();
-                                        new Thread(myThread).start();
-                                    }
-                                };
-
-                                updateHandler.postDelayed(runnable, 5000);*/
-                            //}
+                            }
                         }else{
                             AppLog.e("Internet Connection", "Sorry! Not connected to internet");
 
@@ -154,6 +146,9 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
         JSONObject errJson = new JSONObject();
 
         try {
+
+            //String url1 = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+9090+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
+
             URL url = new URL(AppConstants.URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -187,7 +182,6 @@ public class TableStatusService extends IntentService implements ParsingStatusLi
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            retSrc = errJson.toString();
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

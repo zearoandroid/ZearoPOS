@@ -273,6 +273,10 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
                     //INFORM USER NO DATA
                     Toast.makeText(getActivity(), "NETWORK ERROR...", Toast.LENGTH_SHORT).show();
                     break;
+                case AppConstants.UPDATE_APP:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showAppInstallDialog();
+                    break;
                 default:
                     break;
             }
@@ -1406,35 +1410,50 @@ public class OrderListFragment extends AbstractFragment implements View.OnClickL
 
 
     public void updateEmptyRow() {
-        try {
-            mOrderListView.setAdapter(null);
-            mTxtTempQty.setText("0 items");
-            mTxtTotalQty.setText("0 items");
-            mTxtTotalPrice.setText(AppConstants.currencyCode + ". 0.00");
-            mTxtTempTotalPrice.setText(AppConstants.currencyCode + ". 0.00");
-            if (lineItem != null) {
-                lineItem.clear();
-            }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mOrderListView.setAdapter(null);
+                    mTxtTempQty.setText("0 items");
+                    mTxtTotalQty.setText("0 items");
+                    mTxtTotalPrice.setText(AppConstants.currencyCode + ". 0.00");
+                    mTxtTempTotalPrice.setText(AppConstants.currencyCode + ". 0.00");
+                    if (lineItem != null) {
+                        lineItem.clear();
+                    }
 
-            totalValue = 0;
-            mTotalBill = 0;
-            mTxtOrderName.setText("");
-            updateRow(AppConstants.posID, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    totalValue = 0;
+                    mTotalBill = 0;
+                    mTxtOrderName.setText("");
+                    updateRow(AppConstants.posID, 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void updateCustomerName(String name) {
-        //mTxtBPName.setText(name);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //mTxtBPName.setText(name);
+            }
+        });
     }
 
     public void updatePOSNumber() {
 
-        if (AppConstants.posID != 0)
-            mTxtPOSNumber.setText("# " + AppConstants.posID);
-        else
-            mTxtPOSNumber.setText("#000000");
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (AppConstants.posID != 0)
+                    mTxtPOSNumber.setText("# " + AppConstants.posID);
+                else
+                    mTxtPOSNumber.setText("#000000");
+            }
+        });
     }
 
     @Override

@@ -64,6 +64,7 @@ import com.sewoo.request.android.AndroidMSR;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.zearoconsulting.zearopos.AndroidApplication;
 import com.zearoconsulting.zearopos.R;
+import com.zearoconsulting.zearopos.domain.net.AsyncConnectTask;
 import com.zearoconsulting.zearopos.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.zearopos.domain.receivers.ConnectivityReceiver;
 import com.zearoconsulting.zearopos.domain.services.TableStatusService;
@@ -78,12 +79,14 @@ import com.zearoconsulting.zearopos.presentation.model.POSOrders;
 import com.zearoconsulting.zearopos.presentation.model.POSPayment;
 import com.zearoconsulting.zearopos.presentation.model.Product;
 import com.zearoconsulting.zearopos.presentation.model.Tables;
+import com.zearoconsulting.zearopos.presentation.presenter.INetworkListeners;
 import com.zearoconsulting.zearopos.presentation.presenter.IPOSListeners;
 import com.zearoconsulting.zearopos.presentation.presenter.IPrintingListeners;
 import com.zearoconsulting.zearopos.presentation.presenter.ITokenListeners;
 import com.zearoconsulting.zearopos.presentation.presenter.OrderStatusListener;
 import com.zearoconsulting.zearopos.presentation.presenter.TableSelectListener;
 import com.zearoconsulting.zearopos.presentation.print.InvoiceBill;
+import com.zearoconsulting.zearopos.presentation.print.KOTPrintTask;
 import com.zearoconsulting.zearopos.presentation.print.PublicAction;
 import com.zearoconsulting.zearopos.presentation.view.adapter.TableAdapter;
 import com.zearoconsulting.zearopos.presentation.view.adapter.TableTouchHelper;
@@ -91,6 +94,7 @@ import com.zearoconsulting.zearopos.presentation.view.dialogs.AlertView;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.presentation.view.fragment.AboutUs;
 import com.zearoconsulting.zearopos.presentation.view.fragment.AlertFragment;
+import com.zearoconsulting.zearopos.presentation.view.fragment.AppUpdateFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.CategoryListFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.LogoutConfirmationFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.ManualSyncConfirmation;
@@ -173,6 +177,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private TableAdapter mTableAdapter;
     private List<Tables> mKOTTableList;
     private List<KOTHeader> kotHeaderList;
+
     final Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             int type = msg.getData().getInt("Type");
@@ -195,9 +200,13 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     }
                     break;
                 case AppConstants.GET_KOT_HEADER_AND_lINES:
-                    //if (!AppConstants.isKOTParsing) {
                     mParser.parseKOTData(jsonStr, mHandler);
-                    //}
+                    break;
+                case AppConstants.KOT_HEADER_AND_lINES_RECEIVED:
+                    printKOTData();
+                    break;
+                case AppConstants.DRAFTED_TABLES_RECEIVED:
+                    updateTableUI();
                     break;
                 case AppConstants.POST_KOT_FLAGS:
                     mParser.parseKOTStatus(jsonStr, mHandler);
@@ -244,6 +253,10 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 case AppConstants.NETWORK_ERROR:
                     //INFORM USER NO DATA
                     Toast.makeText(POSActivity.this, "NETWORK ERROR...", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.UPDATE_APP:
+                    mProDlg.dismiss();
+                    showAppInstallDialog();
                     break;
                 default:
                     break;
@@ -310,6 +323,10 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
      */
     private Handler mPOSNumberHandler = new Handler();
     private Runnable mPOSNumberRunnable;
+
+    private Handler mNetworkCheckHandler = new Handler();
+    private Runnable mNetworkCheckRunnable;
+
     private ArrayAdapter arrPrinterList;
     private String ConnectType = "USB";
     private StringAlignUtils alignUtils = new StringAlignUtils(42, StringAlignUtils.Alignment.CENTER);
@@ -324,7 +341,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     private ClipboardManager myClipboard;
     private ClipData myClip;
 
-    Intent mServiceIntent;
+    private  Intent mServiceIntent = null;
 
     /**
      * @BroadcastReceiver is used for notify the bluetooth status to application
@@ -525,15 +542,13 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 }
             };
 
-            //Thread for checking table status in every 5 seconds
-            /*mTableUpdateRunnable = new Runnable() {
+            mNetworkCheckRunnable = new Runnable() {
+                @Override
                 public void run() {
-                    //getTableStatus(); // some action(s)
-                    updateTableUI();
-                    mTableUpdateHandler.postDelayed(this, 5 * 1000);
+                    checkNetworkStatus();
+                    mNetworkCheckHandler.postDelayed(this, 60 * 1000);
                 }
             };
-            */
 
             if (savedInstanceState == null) {
                 if (findViewById(R.id.displayOrderList) != null) {
@@ -593,9 +608,17 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             if (!mAppManager.getIsRetail()) {
                 mLayPOSType.setVisibility(View.VISIBLE);
                 this.mTablesView.setVisibility(View.VISIBLE);
-                mServiceIntent = new Intent(this, TableStatusService.class);
-                //i.putExtra("handler", new Messenger(this.handler));
-                this.startService(mServiceIntent);
+
+                //Thread for checking table status in every 5 seconds
+                mTableUpdateRunnable = new Runnable() {
+                    public void run() {
+                        getTableDataService(); // some action(s)
+                        mTableUpdateHandler.postDelayed(this, 5 * 1000);
+                    }
+                };
+
+                //mServiceIntent = new Intent(this, TableStatusService.class);
+                //this.startService(mServiceIntent);
 
                 AppConstants.isTableService = true;
             }
@@ -617,9 +640,14 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                         mOrderFrag.updatePOSNumber();
                         mOrderFrag.updateEmptyRow();
 
-                        mTablesView.setVisibility(View.GONE);
-                        AppConstants.isTableService = false;
+                        runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+                                              mTablesView.setVisibility(View.GONE);
+                                              AppConstants.isTableService = false;
 
+                                          }
+                                      });
 
                         resetProductAdapter();
 
@@ -673,7 +701,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(POSActivity.this);
 
-        mMenuNetwork = menu.findItem(R.id.action_card_reader);
+        mMenuNetwork = menu.findItem(R.id.action_network_status);
 
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
@@ -726,9 +754,11 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         if(AppConstants.isKOTParsing)
             AppConstants.isKOTParsing = false;
 
-        stopService(mServiceIntent);
+        if(mServiceIntent!=null){
+            stopService(mServiceIntent);
 
-        startService(mServiceIntent);
+            startService(mServiceIntent);
+        }
     }
 
     private void displayPrinterSettings() {
@@ -758,6 +788,15 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
     @Override
     protected void onResume() {
+
+        try {
+            mPOSNumberHandler.postDelayed(mPOSNumberRunnable, 5000);
+            mTableUpdateHandler.postDelayed(mTableUpdateRunnable, 5000);
+            mNetworkCheckHandler.postDelayed(mNetworkCheckRunnable, 60 * 1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         super.onResume();
 
         //register receiver
@@ -780,13 +819,6 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         //Get the authorized id's for giving permission to order delete, cancel and edit
         mAuthrizeIds = mDBHelper.getAuthorizeId(mAppManager.getOrgID());
-
-        try {
-            mPOSNumberHandler.postDelayed(mPOSNumberRunnable, 5000);
-            mTableUpdateHandler.postDelayed(mTableUpdateRunnable, 5000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         if (String.valueOf(mAppManager.getSessionId()).equalsIgnoreCase("0")) {
             //show create session
@@ -852,19 +884,47 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
      */
     private void checkPOSNumber() {
         Log.i("POSACTIVITY", "GET POS NUMBERS CHECKING");
+
+        long lastTransTime = mDBHelper.lastTransactionTime();
+
+        long currentTime = System.currentTimeMillis();
+
+        long diff = currentTime - lastTransTime;
+
         if (mAppManager.getStartNumber().equals(mAppManager.getEndNumber())) {
             Log.i("POSACTIVITY", "GET POS NUMBERS");
             getPOSNumber();
         }
     }
 
+    private void checkNetworkStatus(){
+        AsyncConnectTask task = new AsyncConnectTask(POSActivity.this, new INetworkListeners() {
+            @Override
+            public void onNetworkStatus(boolean result) {
+                showSnack(result);
+                /*if (result == true) {
+                    Toast.makeText(POSActivity.this, "Connection Succesful",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(POSActivity.this, "Connection Failed", Toast.LENGTH_LONG).show();
+                }*/
+            }
+        });
+
+        task.execute();
+    }
+
     /**
      * Reset the products if order cancelled or completed
      */
     public void resetProductAdapter() {
-        if (mProductFragment != null && mProductFragment.isVisible()) {
-            mProductFragment.clearAllProduct();
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProductFragment != null && mProductFragment.isVisible()) {
+                    mProductFragment.clearAllProduct();
+                }
+            }
+        });
     }
 
     /**
@@ -1310,6 +1370,36 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         }
     }
 
+    private void getTableDataService(){
+        if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
+            JSONObject mJsonObj = mParser.getParams(AppConstants.GET_KOT_HEADER_AND_lINES);
+            NetworkDataRequestThread thread = new NetworkDataRequestThread(AppConstants.URL, "", mHandler, mJsonObj.toString(), AppConstants.GET_KOT_HEADER_AND_lINES);
+            thread.start();
+        } else {
+            //show network failure dialog or toast
+            showSnack(false);
+        }
+    }
+
+    private void postKOTPrintedData(){
+        if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
+            try {
+
+                List<KOTHeader> kotPrintList = mDBHelper.getKOTHeadersNotPrinted();
+                JSONObject mJsonObj = mParser.getParams(AppConstants.POST_KOT_FLAGS);
+                JSONArray mKOTObj = mParser.getPOSTPrintedKOT(kotPrintList);
+                mJsonObj.put("KOTNumbers", mKOTObj);
+                NetworkDataRequestThread thread = new NetworkDataRequestThread(AppConstants.URL, "", mHandler, mJsonObj.toString(), AppConstants.POST_KOT_FLAGS);
+                thread.start();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        } else {
+            //show network failure dialog or toast
+            showSnack(false);
+        }
+    }
+
     /**
      * This method is used for selected Invoice from @ShowInvoiceListFragment
      *
@@ -1608,6 +1698,11 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
         if (menuItem.getItemId() == R.id.navigation_item_5) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
+            showAppInstallDialog();
+        }
+
+        if (menuItem.getItemId() == R.id.navigation_item_6) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
             //logout();
             LogoutConfirmationFragment logoutConfirmationFragment = new LogoutConfirmationFragment();
             logoutConfirmationFragment.show(fragmentManager, "LogoutConfirmationFragment");
@@ -1754,11 +1849,31 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             });
 
         }
-        //AppConstants.isKOTParsing = false;
+    }
+
+    private void printKOTData(){
+
+        List<KOTHeader> kotPrintList = mDBHelper.getKOTHeadersNotPrinted();
+        if(kotPrintList.size()!=0){
+            KOTPrintTask task = new KOTPrintTask(POSActivity.this);
+            task.execute();
+        }else{
+            AppConstants.isKOTParsing = false;
+            updateTableUI();
+        }
+
     }
 
     @Override
     protected void onPause() {
+        try {
+            mTableUpdateHandler.removeCallbacks(mTableUpdateRunnable);
+            mPOSNumberHandler.removeCallbacks(mPOSNumberRunnable);
+            mNetworkCheckHandler.removeCallbacks(mNetworkCheckRunnable);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+
         super.onPause();
 
         //unregister receiver
@@ -1773,8 +1888,8 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         try {
 
             mTableUpdateHandler.removeCallbacks(mTableUpdateRunnable);
-
             mPOSNumberHandler.removeCallbacks(mPOSNumberRunnable);
+            mNetworkCheckHandler.removeCallbacks(mNetworkCheckRunnable);
 
             if (bluetoothPort != null) {
                 bluetoothPort.disconnect();
@@ -2070,6 +2185,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
     @Override
     public void onPrintingSuccess() {
         updateTableUI();
+        postKOTPrintedData();
     }
 
     public void checkCreditLimit(long bPartnerId) {
@@ -2225,10 +2341,12 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         String message;
         if (isConnected) {
             message = "Good! Connected to Internet";
-            Toast.makeText(mContext,message, Toast.LENGTH_LONG).show();
+            //Toast.makeText(mContext,message, Toast.LENGTH_LONG).show();
+            mMenuNetwork.setIcon(getResources().getDrawable(R.drawable.ic_green));
         } else {
             message = "Sorry! Not connected to internet";
-            showErrorDialog("Please Check Your Internet Connection!");
+            //showErrorDialog("Please Check Your Internet Connection!");
+            mMenuNetwork.setIcon(getResources().getDrawable(R.drawable.ic_red));
         }
     }
 
@@ -2772,5 +2890,16 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                 }
             }
         });
+    }
+
+    public void showAppInstallDialog(){
+        try {
+            //show denomination screen
+            FragmentManager localFragmentManager = POSActivity.this.getSupportFragmentManager();
+            AppUpdateFragment appUpdateFragment = new AppUpdateFragment();
+            appUpdateFragment.show(localFragmentManager, "AppUpdateFragment");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

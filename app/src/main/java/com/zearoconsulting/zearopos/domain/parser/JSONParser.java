@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.zearoconsulting.zearopos.AndroidApplication;
+import com.zearoconsulting.zearopos.BuildConfig;
 import com.zearoconsulting.zearopos.R;
 import com.zearoconsulting.zearopos.data.AppDataManager;
 import com.zearoconsulting.zearopos.data.DBHelper;
@@ -91,7 +92,8 @@ public class JSONParser {
             mJsonObj.put("warehouseId", mAppManager.getWarehouseID());
             mJsonObj.put("businessPartnerId", mAppManager.getUserBPID());
             mJsonObj.put("sessionId", mAppManager.getSessionId());
-            mJsonObj.put("version", 1.0);
+            mJsonObj.put("remindMe", mAppManager.getRemindMeStatus());
+            mJsonObj.put("version", BuildConfig.VERSION_NAME);
             mJsonObj.put("appName", "POS");
 
             switch (methodType) {
@@ -552,6 +554,12 @@ public class JSONParser {
                 mAppManager.setSessionId(0);
                 b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
                 b.putString("OUTPUT", "");
@@ -594,6 +602,12 @@ public class JSONParser {
                 mAppManager.setSessionStatus(false);
                 mAppManager.setSessionId(0);
                 b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.LOGIN_FAILURE);
@@ -654,6 +668,12 @@ public class JSONParser {
                 mAppManager.setSessionId(0);
                 b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
                 b.putString("OUTPUT", "");
@@ -691,6 +711,12 @@ public class JSONParser {
                 mAppManager.setSessionStatus(false);
                 mAppManager.setSessionId(0);
                 b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
@@ -750,24 +776,29 @@ public class JSONParser {
                 mAppManager.setSessionId(0);
                 b.putInt("Type", AppConstants.SESSION_EXPIRED);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             }
         } catch (Exception e) {
             e.printStackTrace();
             b.putInt("Type", AppConstants.SERVER_ERROR);
             b.putString("OUTPUT", "");
         } finally {
-
             if(tableList!=null) {
                 if (length == tableList.size()) {
                     b.putInt("Type", AppConstants.TABLES_RECEIVED);
                     b.putString("OUTPUT", "");
-
-                    msg.setData(b);
-                    mHandler.sendMessage(msg);
                 }
             }else{
                 AppLog.e("PARSE TABLE","NO TABLE DATA RECEIVED");
             }
+
+            msg.setData(b);
+            mHandler.sendMessage(msg);
         }
     }
 
@@ -824,6 +855,12 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
+            }else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -834,13 +871,13 @@ public class JSONParser {
                 if (length == terminalsList.size()) {
                     b.putInt("Type", AppConstants.TERMINALS_RECEIVED);
                     b.putString("OUTPUT", "");
-
-                    msg.setData(b);
-                    mHandler.sendMessage(msg);
                 }
             } else {
                 AppLog.e("PARSE TERMINAL", "NO TERMINAL DATA RECEIVED");
             }
+
+            msg.setData(b);
+            mHandler.sendMessage(msg);
         }
 
     }
@@ -880,6 +917,12 @@ public class JSONParser {
                     b.putString("OUTPUT", "");
                 }  else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
+                    b.putString("OUTPUT", "");
+                } else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
                     b.putString("OUTPUT", "");
                 } else {
                     b.putInt("Type", AppConstants.POS_ORDER_RELEASED_FAILURE);
@@ -973,6 +1016,12 @@ public class JSONParser {
             }else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
+            }else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1055,6 +1104,12 @@ public class JSONParser {
                 }else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
                     b.putString("OUTPUT", "");
+                }else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
+                    b.putString("OUTPUT", "");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1065,10 +1120,10 @@ public class JSONParser {
                 if (length == categoryList.size()) {
                     b.putInt("Type", AppConstants.CATEGORY_RECEIVED);
                     b.putString("OUTPUT", "");
-
-                    msg.setData(b);
-                    mHandler.sendMessage(msg);
                 }
+
+                msg.setData(b);
+                mHandler.sendMessage(msg);
             }
         }
     }
@@ -1177,6 +1232,12 @@ public class JSONParser {
                 }else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
                     b.putString("OUTPUT", "");
+                }else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
+                    b.putString("OUTPUT", "");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1186,10 +1247,10 @@ public class JSONParser {
                 if (length == productList.size()) {
                     b.putInt("Type", AppConstants.PRODUCTS_RECEIVED);
                     b.putString("OUTPUT", "");
-
-                    msg.setData(b);
-                    mHandler.sendMessage(msg);
                 }
+
+                msg.setData(b);
+                mHandler.sendMessage(msg);
             }
         }
     }
@@ -1395,6 +1456,7 @@ public class JSONParser {
                             }
 
                         }
+
                     }else if(json.has("draftedTables")){
 
                         AppLog.e("PARSER", "Drafter Table parsing started");
@@ -1409,6 +1471,9 @@ public class JSONParser {
                         }
 
                         AppConstants.isKOTParsing = false;
+
+                        //b.putInt("Type", AppConstants.DRAFTED_TABLES_RECEIVED);
+                        //b.putString("OUTPUT", "");
                     }
 
                 } else if (json.getInt("responseCode") == 301) {
@@ -1419,6 +1484,8 @@ public class JSONParser {
                     AppLog.e("PARSER", "Table data not available");
                     AppConstants.isKOTParsing = false;
                     mDBHelper.updateAllTableStatus();
+                    b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
+                    b.putString("OUTPUT", "");
                 }else if (json.getInt("responseCode") == 700) {
                     AppConstants.isKOTParsing = false;
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
@@ -1432,16 +1499,14 @@ public class JSONParser {
             } finally {
 
                 AppLog.e("PARSER", "Parsing Completed");
-
                 b.putInt("Type", AppConstants.KOT_HEADER_AND_lINES_RECEIVED);
                 b.putString("OUTPUT", "");
-
                 msg.setData(b);
 
                 if(mHandler!=null)
                 mHandler.sendMessage(msg);
 
-                ParsingStatusListener.getInstance().parsingStatus();
+                //ParsingStatusListener.getInstance().parsingStatus();
             }
         }
     }
@@ -1517,6 +1582,12 @@ public class JSONParser {
                 } else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
                     b.putString("OUTPUT", "");
+                } else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
+                    b.putString("OUTPUT", "");
                 } else {
                     b.putInt("Type", AppConstants.NO_DATA_RECEIVED);
                     b.putString("OUTPUT", "");
@@ -1563,6 +1634,12 @@ public class JSONParser {
                     b.putString("OUTPUT", "");
                 } else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
+                    b.putString("OUTPUT", "");
+                } else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
                     b.putString("OUTPUT", "");
                 } else {
                     b.putInt("Type", AppConstants.TABLE_CHANGE_FAILURE);
@@ -1640,6 +1717,12 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
                 b.putString("OUTPUT", "");
@@ -1686,6 +1769,12 @@ public class JSONParser {
                     b.putString("OUTPUT", "");
                 }  else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
+                    b.putString("OUTPUT", "");
+                } else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
                     b.putString("OUTPUT", "");
                 } else {
                     b.putInt("Type", AppConstants.POS_ORDER_CANCEL_FAILURE);
@@ -1736,7 +1825,13 @@ public class JSONParser {
                 } else if (json.getInt("responseCode") == 700) {
                     b.putInt("Type", AppConstants.NETWORK_ERROR);
                     b.putString("OUTPUT", "");
-                }  else {
+                }  else if (json.getInt("responseCode") == 1000) {
+                    if(json.has("appDownloadPath"))
+                        mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                    b.putInt("Type", AppConstants.UPDATE_APP);
+                    b.putString("OUTPUT", "");
+                } else {
                     b.putInt("Type", AppConstants.POS_ORDER_DRAFT_FAILURE);
                     b.putString("OUTPUT", "");
                 }
@@ -1772,6 +1867,12 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
@@ -1809,6 +1910,12 @@ public class JSONParser {
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
                 b.putString("OUTPUT", "");
@@ -1844,6 +1951,12 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
@@ -1881,6 +1994,12 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
@@ -1933,6 +2052,12 @@ public class JSONParser {
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 700) {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
                 b.putString("OUTPUT", "");
             } else {
                 b.putInt("Type", AppConstants.SERVER_ERROR);
@@ -2102,9 +2227,5 @@ public class JSONParser {
             msg.setData(b);
             mHandler.sendMessage(msg);
         }
-    }
-
-    public boolean getParsingState(){
-        return mParsingState;
     }
 }

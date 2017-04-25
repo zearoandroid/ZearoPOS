@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,14 +59,15 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                     mParser.parseLoginJson(jsonStr, mHandler);
                     break;
                 case AppConstants.ORGANIZATION_DATA_RECEIVED:
-                    if (!mAppManager.getIsRetail())
+                    authenticate();
+                    /*if (!mAppManager.getIsRetail())
                         authenticate();
                     else {
                         progressWheel.stopSpinning();
                         if (mListener != null)
                             mListener.onOrganizeDataReceived();
                         dismissAllowingStateLoss();
-                    }
+                    }*/
                     break;
                 case AppConstants.LOGIN_SUCCESS:
                     getDefaultCustomerData();
@@ -159,6 +161,10 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                 case AppConstants.NETWORK_ERROR:
                     //INFORM USER NO DATA
                     Toast.makeText(getActivity(), "NETWORK ERROR...", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.UPDATE_APP:
+                    progressWheel.stopSpinning();
+                    showAppInstallDialog();
                     break;
                 default:
                     break;
@@ -394,5 +400,18 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
             //show network failure dialog or toast
             NetworkErrorDialog.buildDialog(context).show();
         }
+    }
+
+    public void showAppInstallDialog(){
+        try {
+            //show denomination screen
+            FragmentManager localFragmentManager = getActivity().getSupportFragmentManager();
+            AppUpdateFragment appUpdateFragment = new AppUpdateFragment();
+            appUpdateFragment.show(localFragmentManager, "AppUpdateFragment");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        dismissAllowingStateLoss();
     }
 }

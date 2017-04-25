@@ -80,6 +80,10 @@ public class OrderCancelFragment extends AbstractDialogFragment {
                     //INFORM USER NO DATA
                     Toast.makeText(getActivity(), "Network problem...", Toast.LENGTH_SHORT).show();
                     break;
+                case AppConstants.UPDATE_APP:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showAppInstallDialog();
+                    break;
                 default:
                     break;
             }

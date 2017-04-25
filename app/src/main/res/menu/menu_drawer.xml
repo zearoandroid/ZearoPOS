@@ -16,5 +16,9 @@
 
     <item
         android:id="@+id/navigation_item_5"
+        android:title="Update Available" />
+
+    <item
+        android:id="@+id/navigation_item_6"
         android:title="Logout" />
 </menu>

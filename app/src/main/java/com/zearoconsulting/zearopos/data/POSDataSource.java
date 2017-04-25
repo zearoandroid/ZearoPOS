@@ -2570,6 +2570,26 @@ public class POSDataSource {
         }
     }
 
+    public long lastTransactionTime(){
+
+        long transTime = 0;
+        try {
+            Cursor mCount = db.rawQuery("select (strftime('%s', createdDate) * 1000) from posLineItems ORDER BY _id DESC LIMIT 1", null);
+
+            //transTime = mCount.getLong(mCount.getColumnIndexOrThrow("createdDate"));
+
+            while (mCount.moveToNext()) {
+                transTime = mCount.getLong(0);
+            }
+            mCount.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return transTime;
+    }
+
     //******************** KOT RELATED STUFF'S METHODS (ADD, GET, UPDATE, DELETE TO KOTHEADER AND KOTLINEITEMS) ***********************************//
 
     public boolean addKOTHeader(KOTHeader kotHeader) {

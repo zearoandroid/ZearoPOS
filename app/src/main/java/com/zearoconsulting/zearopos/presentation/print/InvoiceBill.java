@@ -269,10 +269,10 @@ public class InvoiceBill {
                         if(name.length()>35){
                             //splitstring and print
                             int len = name.length();
-                            posPtr.printNormal(addQtyWhiteSpace(" ")+addItemNameWhiteSpace("--"+name.substring(0, 34))+addPriceWhiteSpace(Common.valueFormatter(price))+"\n");
-                            posPtr.printNormal(addQtyWhiteSpace(" ")+addItemNameWhiteSpace("  "+name.substring(35, len-1))+addPriceWhiteSpace(" ")+"\n");
+                            posPtr.printNormal(addQtyWhiteSpace(" ")+addItemNameWhiteSpace("---"+name.substring(0, 34))+addPriceWhiteSpace(Common.valueFormatter(price))+"\n");
+                            posPtr.printNormal(addQtyWhiteSpace(" ")+addItemNameWhiteSpace("   "+name.substring(35, len-1))+addPriceWhiteSpace(" ")+"\n");
                         }else{
-                            posPtr.printNormal(addQtyWhiteSpace(qty)+addItemNameWhiteSpace("--"+name)+addPriceWhiteSpace(Common.valueFormatter(price))+"\n");
+                            posPtr.printNormal(addQtyWhiteSpace(qty)+addItemNameWhiteSpace("---"+name)+addPriceWhiteSpace(Common.valueFormatter(price))+"\n");
                         }
 
                         if(!discount.equalsIgnoreCase(""))
@@ -299,8 +299,13 @@ public class InvoiceBill {
 
             posPtr.printNormal("------------------------------------------------\n");
 
-            if(mPaidCashAmt!=0)
-                posPtr.printText(addTotalWhiteSpace("Cash")+""+addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt))+"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+            if(mPaidCashAmt!=0){
+                if(mReturnAmt!=0) {
+                    posPtr.printText(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt-(mReturnAmt))) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                }else{
+                    posPtr.printText(addTotalWhiteSpace("Cash")+""+addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt))+"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                }
+            }
 
             if(mPaidAmexAmt!=0)
                 posPtr.printText(addTotalWhiteSpace("Amex Card")+""+addPriceWhiteSpace(Common.valueFormatter(mPaidAmexAmt))+"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
@@ -321,6 +326,7 @@ public class InvoiceBill {
                 posPtr.printNormal("------------------------------------------------\n");
 
             if(mReturnAmt!=0) {
+                posPtr.printText(addTotalWhiteSpace("Paid") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt-(mReturnAmt))) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
                 posPtr.printText(addTotalWhiteSpace("Change") + "" + addPriceWhiteSpace(Common.valueFormatter(mReturnAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
                 posPtr.printNormal("------------------------------------------------\n");
             }

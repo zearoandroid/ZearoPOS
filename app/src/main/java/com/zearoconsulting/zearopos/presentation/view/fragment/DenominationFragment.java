@@ -124,6 +124,10 @@ public class DenominationFragment extends AbstractDialogFragment {
                     //show the server error dialog
                     Toast.makeText(getActivity(), "Server data error", Toast.LENGTH_SHORT).show();
                     break;
+                case AppConstants.UPDATE_APP:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showAppInstallDialog();
+                    break;
                 default:
                     break;
             }

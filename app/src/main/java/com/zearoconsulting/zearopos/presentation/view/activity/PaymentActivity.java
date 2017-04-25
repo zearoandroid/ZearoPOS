@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -55,6 +56,7 @@ import com.zearoconsulting.zearopos.presentation.view.component.CustomKeyboard;
 import com.zearoconsulting.zearopos.presentation.view.component.ReboundListener;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.AlertView;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
+import com.zearoconsulting.zearopos.presentation.view.fragment.AppUpdateFragment;
 import com.zearoconsulting.zearopos.utils.AppConstants;
 import com.zearoconsulting.zearopos.utils.Common;
 import com.zearoconsulting.zearopos.utils.NetworkUtil;
@@ -162,6 +164,10 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                     //show the server error dialog
                     TSnackbar.make(findViewById(R.id.layPayment), "Server data error", TSnackbar.LENGTH_LONG)
                             .show();
+                    break;
+                case AppConstants.UPDATE_APP:
+                    mProDlg.dismiss();
+                    showAppInstallDialog();
                     break;
                 default:
                     break;
@@ -954,4 +960,14 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
         return true;
     }*/
 
+    public void showAppInstallDialog(){
+        try {
+            //show denomination screen
+            FragmentManager localFragmentManager = PaymentActivity.this.getSupportFragmentManager();
+            AppUpdateFragment appUpdateFragment = new AppUpdateFragment();
+            appUpdateFragment.show(localFragmentManager, "AppUpdateFragment");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

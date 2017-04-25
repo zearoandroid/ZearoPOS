@@ -17,7 +17,7 @@ public class AppDataManager  {
 
     //User variables
     private long mUserID, mUserBPID, mClientID, mOrgID, mRoleID, mWarehouseID;
-    private String mUserName, mUserPassword, mRoleName;
+    private String mUserName, mUserPassword, mRoleName, mAppDownloadPath, mRemindMe;
     private boolean isLoggedIn, isSalesRep;
 
     //Cash customer variables
@@ -93,6 +93,8 @@ public class AppDataManager  {
 
         mServerAddress = mServerData.getString("server_name", "");
         mServerPort = mServerData.getInt("server_port", 0);
+        mAppDownloadPath = mServerData.getString("app_path", "");
+        mRemindMe = mServerData.getString("remindMe", "N");
 
         mPrinterMode = mPrinterData.getString("printer_mode", "");
         mPrinterIP = mPrinterData.getString("printer_ip", "");
@@ -126,8 +128,6 @@ public class AppDataManager  {
      * @param serverPort
      */
     public void saveServerData(String serverAddr,int serverPort){
-
-        // write userSession detail to UserInfo.xml file
         try {
             SharedPreferences.Editor ed = mServerData.edit();
             ed.putString("server_name", serverAddr);
@@ -135,6 +135,26 @@ public class AppDataManager  {
             ed.commit();
         } catch (NullPointerException npEx) {
             Log.e("ServerData", "Save Serverdata NullPointer Exception");
+        }
+    }
+
+    public void saveAppPath(String appDownloadPath){
+        try {
+            SharedPreferences.Editor ed = mServerData.edit();
+            ed.putString("app_path", appDownloadPath);
+            ed.commit();
+        } catch (NullPointerException npEx) {
+            Log.e("app_path", "Save app_path NullPointer Exception");
+        }
+    }
+
+    public void setRemindMe(String remindMe){
+        try {
+            SharedPreferences.Editor ed = mServerData.edit();
+            ed.putString("remindMe", remindMe);
+            ed.commit();
+        } catch (NullPointerException npEx) {
+            Log.e("remindMe", "Save remindMe NullPointer Exception");
         }
     }
 
@@ -470,6 +490,16 @@ public class AppDataManager  {
     public int getServerPort(){
         mServerPort = mServerData.getInt("server_port", 0);
         return mServerPort;
+    }
+
+    public String getAppDownloadPath(){
+        mAppDownloadPath = mServerData.getString("app_path","");
+        return mAppDownloadPath;
+    }
+
+    public String getRemindMeStatus(){
+        mRemindMe = mServerData.getString("remindMe","N");
+        return mRemindMe;
     }
 
     public void savePrinterData(String printerMode,String printerIp){

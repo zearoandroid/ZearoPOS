@@ -78,6 +78,10 @@ public class SessionFragment extends AbstractDialogFragment {
                     //INFORM USER NO DATA
                     Toast.makeText(getActivity(), "NETWORK ERROR...", Toast.LENGTH_SHORT).show();
                     break;
+                case AppConstants.UPDATE_APP:
+                    mProDlg.dismiss();
+                    ((POSActivity) getActivity()).showAppInstallDialog();
+                    break;
                 default:
                     break;
             }

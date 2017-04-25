@@ -115,8 +115,8 @@ public class MainActivity extends BaseActivity implements  ConnectivityReceiver.
 
         if(mDefaultIdList.size()!=0 && mAppManager.getIsRetail()){
             mWarehouseList = mDBHelper.getWarehouse(mDefaultIdList.get(0));
-            if(mWarehouseList.size()!=0)
-                updateWarehouseSpinners();
+            //if(mWarehouseList.size()!=0)
+                //updateWarehouseSpinners();
         }
 
         mSpnWareHouse.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

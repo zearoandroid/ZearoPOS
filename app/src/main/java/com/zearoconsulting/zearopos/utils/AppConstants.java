@@ -204,6 +204,10 @@ public class AppConstants {
 
     public static final int DELETE_KOT_RESPONSE_ERROR = 63;
 
+    public static final int DRAFTED_TABLES_RECEIVED = 64;
+
+    public static final int UPDATE_APP = 100;
+
     /** notify response failure key */
     public static final String NETWORK_FAILURE = "Not connected to Internet";
 
