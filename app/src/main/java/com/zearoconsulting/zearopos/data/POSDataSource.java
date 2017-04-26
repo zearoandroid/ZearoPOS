@@ -1087,6 +1087,33 @@ public class POSDataSource {
 
     }
 
+    public List<Terminals> getTerminalListData(long clientId, long orgId) {
+
+        List<Terminals> terminalsList = new ArrayList<Terminals>();
+        Terminals terminals = null;
+
+        try {
+            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP, kotIsPrinter from kotTerminals where clientId = '" + clientId + "' and orgId = '" + orgId + "' and kotIsPrinter = 'Y' ", null);
+
+            while (cursor.moveToNext()) {
+                terminals = new Terminals();
+                terminals.setTerminalId(cursor.getLong(0));
+                terminals.setTerminalName(cursor.getString(1));
+                terminals.setTerminalIP(cursor.getString(2));
+                terminals.setIsPrinter(cursor.getString(3));
+                terminals.setTerminalStatus("Y");
+
+                terminalsList.add(terminals);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return terminalsList;
+    }
+
     /**
      * @param categoryId
      * @return

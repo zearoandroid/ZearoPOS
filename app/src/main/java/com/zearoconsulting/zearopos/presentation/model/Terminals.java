@@ -14,6 +14,7 @@ public class Terminals implements Serializable {
     private String isPrinter;
     private long clientId;
     private long orgId;
+    private String terminalStatus;
 
     public String getTerminalIP() {
         return terminalIP;
@@ -61,6 +62,14 @@ public class Terminals implements Serializable {
 
     public void setOrgId(long orgId) {
         this.orgId = orgId;
+    }
+
+    public String getTerminalStatus() {
+        return terminalStatus;
+    }
+
+    public void setTerminalStatus(String terminalStatus) {
+        this.terminalStatus = terminalStatus;
     }
 
 }

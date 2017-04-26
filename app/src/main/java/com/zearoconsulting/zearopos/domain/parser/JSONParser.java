@@ -178,6 +178,9 @@ public class JSONParser {
                 case AppConstants.CALL_DELETE_KOT_ITEM:
                     mJsonObj.put("operation", "deleteKotItem");
                     break;
+                case AppConstants.CHECK_UPDATE_AVAILABLE:
+                    mJsonObj.put("operation","checkAppUpdate");
+                    break;
                 default:
                     break;
             }
@@ -1556,6 +1559,7 @@ public class JSONParser {
             }
         }catch (Exception e){
             e.printStackTrace();
+            AppConstants.isKOTParsing = false;
         }
     }
 
@@ -1984,6 +1988,46 @@ public class JSONParser {
 
                 b.putInt("Type", AppConstants.CREDIT_LIMIT_RECEIVED);
                 b.putString("OUTPUT", String.valueOf(json.getLong("businessPartnerId")));
+            } else if (json.getInt("responseCode") == 301) {
+                b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 401) {
+                mAppManager.setSessionStatus(false);
+                mAppManager.setSessionId(0);
+                b.putInt("Type", AppConstants.SESSION_EXPIRED);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 700) {
+                b.putInt("Type", AppConstants.NETWORK_ERROR);
+                b.putString("OUTPUT", "");
+            } else if (json.getInt("responseCode") == 1000) {
+                if(json.has("appDownloadPath"))
+                    mAppManager.saveAppPath(json.getString("appDownloadPath"));
+
+                b.putInt("Type", AppConstants.UPDATE_APP);
+                b.putString("OUTPUT", "");
+            } else {
+                b.putInt("Type", AppConstants.SERVER_ERROR);
+                b.putString("OUTPUT", "");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            b.putInt("Type", AppConstants.SERVER_ERROR);
+            b.putString("OUTPUT", "");
+        }
+
+        msg.setData(b);
+        mHandler.sendMessage(msg);
+    }
+
+    public void parseAppUpdateAvailable(String jsonStr, Handler mHandler) {
+        Log.i("RESPONSE", jsonStr);
+        Message msg = new Message();
+        JSONObject json;
+        try {
+            json = new JSONObject(jsonStr);
+            if (json.getInt("responseCode") == 200) {
+                b.putInt("Type", AppConstants.NO_UPDATE_AVAILABLE);
+                b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
