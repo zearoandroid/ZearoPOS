@@ -33,7 +33,7 @@ import java.util.Map;
 public class DBHelper extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // Database Name
     private static final String DATABASE_NAME = "smartPOSDB";
@@ -85,6 +85,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // kot line item detail table
     private static final String TABLE_KOT_LINES = "kotLineItems";
+
+    // productNotes table
+    private static final String TABLE_PRODUCT_NOTES = "productNotes";
 
     //COLUMNS
     private static final String KEY_ID = "_id";
@@ -170,6 +173,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_PAYMENT_VISA = "paymentVisa";
     private static final String KEY_PAYMENT_OTHER = "paymentOther";
     private static final String KEY_PAYMENT_RETURN = "paymentReturn";
+    private static final String KEY_PAYMENT_COMPLEMENT ="paymentComplement";
 
     private static final String KEY_START_NUMBER = "startNumber";
     private static final String KEY_END_NUMBER = "endNumber";
@@ -192,6 +196,9 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_KOT_REF_LINE_ID = "kotRefLineId";
     private static final String KEY_KOT_EXTRA_PRODUCT = "isExtraProduct";
     private static final String KEY_KOT_COVERS_COUNT = "kotCoversCount";
+
+    private static final String KEY_PRODUCT_NOTES_ID = "notesId";
+    private static final String KEY_PRODUCT_NOTES_NAME = "notesName";
 
     //create query for TABLE_ORGANIZATION
     private static final String ORGANIZATION_CREATE_QUERY = "CREATE TABLE "
@@ -266,7 +273,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String POS_PAYMENT_CREATE_QUERY = "CREATE TABLE "
             + TABLE_POS_PAYMENT_DETAIL + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_POS_ID + " NUMERIC, " + KEY_PAYMENT_CASH + " NUMERIC, " + KEY_PAYMENT_AMEX
             + " NUMERIC, " + KEY_PAYMENT_GIFT + " NUMERIC, " + KEY_PAYMENT_MASTER + " NUMERIC, " + KEY_PAYMENT_VISA + " NUMERIC, " + KEY_PAYMENT_OTHER + " NUMERIC, "
-            + KEY_PAYMENT_RETURN + " NUMERIC, "+ KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
+            + KEY_PAYMENT_RETURN + " NUMERIC, " + KEY_PAYMENT_COMPLEMENT + " INTEGER, " + KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
 
     //create query for KOT_TABLES
     private static final String KOT_TABLES_CREATE_QUERY = "CREATE TABLE "
@@ -292,6 +299,10 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRODUCT_STD_PRICE + " NUMERIC, " + KEY_PRODUCT_COST_PRICE + " INTEGER, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_PRODUCT_QTY + " INTEGER, "
             + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, " + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_IS_PRINTED + " TEXT," + KEY_IS_POSTED + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT, "
             + KEY_CREADTED_DATE + " TIMESTAMP NOT NULL DEFAULT current_timestamp);";
+
+    private static final String PRODUCT_NOTES_CREATE_QUERY = "CREATE TABLE "
+            + TABLE_PRODUCT_NOTES + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_PRODUCT_ID + " NUMERIC, "
+            + KEY_PRODUCT_NOTES_ID + " NUMERIC, " + KEY_PRODUCT_NOTES_NAME + " TEXT);";
 
     private static DBHelper sInstance;
 
@@ -323,6 +334,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(POS_ORDER_HEADER_CREATE_QUERY);
         db.execSQL(POS_LINE_ITEM_CREATE_QUERY);
         db.execSQL(POS_PAYMENT_CREATE_QUERY);
+        db.execSQL(PRODUCT_NOTES_CREATE_QUERY);
 
         db.execSQL(KOT_TABLES_CREATE_QUERY);
         db.execSQL(KOT_TERMINALS_CREATE_QUERY);
@@ -333,10 +345,9 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < newVersion){
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BPARTNERS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_POS_ORDER_HEADER);
-            db.execSQL(POS_ORDER_HEADER_CREATE_QUERY);
-            db.execSQL(BPARTNER_CREATE_QUERY);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_POS_PAYMENT_DETAIL);
+            db.execSQL(POS_PAYMENT_CREATE_QUERY);
+            db.execSQL(PRODUCT_NOTES_CREATE_QUERY);
         }
     }
 }

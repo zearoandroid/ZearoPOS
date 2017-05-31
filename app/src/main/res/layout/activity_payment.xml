@@ -13,232 +13,251 @@
     tools:context=".presentation.view.activity.PaymentActivity"
     tools:ignore="MissingPrefix">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layPayTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
-        <TextView
-            android:id="@+id/txtPaymentTitle"
-            fontPath="fonts/GothamRounded-Bold.otf"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_gravity="center|center_vertical"
-            android:gravity="center_vertical"
-            android:paddingLeft="5dp"
-            android:text="Payment"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/imgClosePayment"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="10dp"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_delete"/>
-    </RelativeLayout>
+            android:background="@color/colorPrimary">
+
+            <TextView
+                android:id="@+id/txtPaymentTitle"
+                fontPath="fonts/GothamRounded-Bold.otf"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="center|center_vertical"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="Payment"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/imgClosePayment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:src="@android:drawable/ic_delete" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/layPaymentInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layPayTitle"
+        android:layout_margin="10dp">
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/txtCustomerNameTitle"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Customer:"
+                android:textSize="@dimen/payLabelSize" />
+
+            <TextView
+                android:id="@+id/textCustomer"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Cash Customer"
+                android:textSize="@dimen/payLabelSize" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/txtOldTotalAmountTitle"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Total Amount:"
+                android:textSize="@dimen/payLabelSize" />
+
+            <TextView
+                android:id="@+id/txtOldTotalAmount"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/payLabelSize" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/txtDiscountTitle"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Discount:"
+                android:textSize="@dimen/payLabelSize" />
+
+            <TextView
+                android:id="@+id/txtDiscountAmount"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/payLabelSize" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/txtPayAmountTitle"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Payable Amount:"
+                android:textSize="@dimen/payLabelSize" />
+
+            <TextView
+                android:id="@+id/txtTotalAmount"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textColor="@color/red"
+                android:textSize="@dimen/payLabelTotalSize" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/txtReturnTitle"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Balance Amount:"
+                android:textSize="@dimen/payLabelSize" />
+
+            <TextView
+                android:id="@+id/txtReturnAmount"
+                fontPath="fonts/GothamRounded-Book.otf"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/payLabelSize" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txtPaidByTitle"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/payTableRowHeigh"
+                android:layout_gravity="center|center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Paid by:"
+                android:textSize="@dimen/activity_login_text_size" />
+
+            <Spinner
+                android:id="@+id/spnPaymentMode"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/border_dialog" />
+        </TableRow>
+    </TableLayout>
+
+    <RadioGroup
+        android:id="@+id/rgPayment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layPaymentInfo"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <RadioButton
+            android:id="@+id/rbCashCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingRight="10dp"
+            android:checked="true"
+            android:text="Cash/Card" />
+
+        <RadioButton
+            android:id="@+id/rbComplement"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingRight="10dp"
+            android:text="Complement" />
+
+    </RadioGroup>
 
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/layPayTitle">
+        android:layout_below="@+id/rgPayment">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <RadioGroup
-                android:id="@+id/rgPayment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp"
-                android:visibility="gone"
-                android:padding="15dp">
-
-                <RadioButton
-                    android:id="@+id/rbCredit"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingRight="10dp"
-                    android:text="On Credit" />
-
-                <RadioButton
-                    android:id="@+id/rbCash"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingRight="10dp"
-                    android:text="On Cash" />
-
-            </RadioGroup>
-
             <TableLayout
                 android:id="@+id/layPaymentTypes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp">
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:id="@+id/txtCustomerNameTitle"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Customer:"
-                        android:textSize="@dimen/payLabelSize" />
-
-                    <TextView
-                        android:id="@+id/textCustomer"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Cash Customer"
-                        android:textSize="@dimen/payLabelSize" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:id="@+id/txtOldTotalAmountTitle"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Total Amount:"
-                        android:textSize="@dimen/payLabelSize" />
-
-                    <TextView
-                        android:id="@+id/txtOldTotalAmount"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:textSize="@dimen/payLabelSize" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:id="@+id/txtDiscountTitle"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Discount:"
-                        android:textSize="@dimen/payLabelSize" />
-
-                    <TextView
-                        android:id="@+id/txtDiscountAmount"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:textSize="@dimen/payLabelSize" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:id="@+id/txtPayAmountTitle"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Payable Amount:"
-                        android:textSize="@dimen/payLabelSize" />
-
-                    <TextView
-                        android:id="@+id/txtTotalAmount"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:textColor="@color/red"
-                        android:textSize="@dimen/payLabelTotalSize" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:id="@+id/txtReturnTitle"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Balance Amount:"
-                        android:textSize="@dimen/payLabelSize" />
-
-                    <TextView
-                        android:id="@+id/txtReturnAmount"
-                        fontPath="fonts/GothamRounded-Book.otf"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:textSize="@dimen/payLabelSize" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/txtPaidByTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/payTableRowHeigh"
-                        android:layout_gravity="center|center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Paid by:"
-                        android:textSize="@dimen/activity_login_text_size" />
-
-                    <Spinner
-                        android:id="@+id/spnPaymentMode"
-                        android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/border_dialog" />
-                </TableRow>
 
                 <TableRow
                     android:layout_width="fill_parent"
@@ -479,6 +498,7 @@
             </TableLayout>
 
             <LinearLayout
+                android:id="@+id/layPaymentReason"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

@@ -95,6 +95,7 @@ import com.zearoconsulting.zearopos.presentation.view.adapter.TableTouchHelper;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.AlertView;
 import com.zearoconsulting.zearopos.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.zearopos.presentation.view.fragment.AboutUs;
+import com.zearoconsulting.zearopos.presentation.view.fragment.AddNotesFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.AlertFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.AppUpdateFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.CategoryListFragment;
@@ -106,6 +107,7 @@ import com.zearoconsulting.zearopos.presentation.view.fragment.PrinterSettingsFr
 import com.zearoconsulting.zearopos.presentation.view.fragment.ProductListFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.SessionFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.ShowInvoiceListFragment;
+import com.zearoconsulting.zearopos.presentation.view.fragment.TableChangeFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.TerminalPrinterFragment;
 import com.zearoconsulting.zearopos.presentation.view.fragment.ViewTransactionFragment;
 import com.zearoconsulting.zearopos.utils.AppConstants;
@@ -285,6 +287,15 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             try {
                 selecteTableId = tableEntity.getTableId();
                 generateInvoice(selecteTableId);
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void OnTableSelectedChangeListener(Tables tableEntity) {
+            try {
+                tableToChange(tableEntity.getTableId());
             } catch (ClassCastException e) {
                 e.printStackTrace();
             }
@@ -538,9 +549,9 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
             mTableAdapter.setOnTableSelectListener(tableSelectListener);
 
             // Setup ItemTouchHelper
-            mTableTouchCallback = new TableTouchHelper(mKOTTableList, mTableAdapter);
-            mTableTouchHelper = new ItemTouchHelper(mTableTouchCallback);
-            mTableTouchHelper.attachToRecyclerView(mTablesView);
+            //mTableTouchCallback = new TableTouchHelper(mKOTTableList, mTableAdapter);
+            //mTableTouchHelper = new ItemTouchHelper(mTableTouchCallback);
+            //mTableTouchHelper.attachToRecyclerView(mTablesView);
 
             //mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.openDrawer, R.string.closeDrawer);
             //mDrawerLayout.addDrawerListener(mDrawerToggle);
@@ -1338,6 +1349,17 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         mOrderFrag.updateMode(posId);
     }
 
+    private void tableToChange(long tableId){
+
+        Tables table = mDBHelper.getTableData(mAppManager.getClientID(), mAppManager.getOrgID(), tableId);
+        if (table.getOrderAvailable().equalsIgnoreCase("N")) {
+            return;
+        } else{
+            //show tableChange fragment dialog
+            TableChangeFragment.newInstance(POSActivity.this, tableId).show(fragmentManager, "TableChange");
+        }
+    }
+
     private void getTableKOTData(long tableId) {
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
             try {
@@ -1770,6 +1792,18 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         mOrderFrag.showSnackBar("Call Supervisor to unlock the Order.");
     }
 
+    public void showAddNotes(long posId, long categoryId, POSLineItem mPoslineItem){
+        if(mPoslineItem.getIsKOTGenerated().equalsIgnoreCase("N")){
+            try {
+                AddNotesFragment.newInstance(POSActivity.this, posId,mPoslineItem.getRowId(),mPoslineItem.getProductId()).show(fragmentManager, "TableChange");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+
+        }
+    }
+
     /**
      * DISPLAY THE BLUETOOTH PRINTER
      */
@@ -2085,7 +2119,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
      * @param activeTableId
      * @param targetTableId
      */
-    private void tableChange(long activeTableId, long targetTableId) {
+    public void tableChange(long activeTableId, long targetTableId) {
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
             try {
 
@@ -2590,6 +2624,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         long mPosNumber = 0;
         List<String> receiptLines;
         private ProgressDialog mProgress;
+        private int complement = 0;
 
         // Show Progress bar before downloading Music
         @Override
@@ -2636,6 +2671,7 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
                     mPaidVisaAmt = payment.getVisa();
                     mOtherAmt = payment.getOther();
                     mReturnAmount = payment.getChange();
+                    complement = payment.getIsComplement();
                 }
 
                 try {
@@ -2784,17 +2820,24 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
 
                         receiptLines.add(printTextString("------------------------------------------\n"));
                         try {
-                            if (mTotalAmount != mFinalAmount) {
+                            if(complement == 0){
+                                if (mTotalAmount != mFinalAmount) {
+                                    receiptLines.add(printTextString(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n"));
+                                    receiptLines.add(printTextString(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmount - mFinalAmount)) + "\n"));
+                                    receiptLines.add(printTextString(addTotalWhiteSpace("Net Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mFinalAmount)) + "\n"));
+                                } else {
+                                    receiptLines.add(printTextString(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n"));
+                                }
+                            }else {
                                 receiptLines.add(printTextString(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n"));
-                                receiptLines.add(printTextString(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmount - mFinalAmount)) + "\n"));
-                                receiptLines.add(printTextString(addTotalWhiteSpace("Net Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mFinalAmount)) + "\n"));
-                            } else {
-                                receiptLines.add(printTextString(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmount)) + "\n"));
+                                receiptLines.add(printTextString("------------------------------------------\n"));
+                                receiptLines.add(printTextString("--------------COMPLEMENTARY ORDER---------------\n"));
                             }
+
 
                             receiptLines.add(printTextString("------------------------------------------\n"));
 
-                            if (mPaidCashAmt != 0) {
+                            if (mPaidCashAmt != 0 && complement == 0) {
                                 receiptLines.add(printTextString(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mPaidCashAmt)) + "\n"));
                             }
                             if (mPaidAmexAmt != 0) {

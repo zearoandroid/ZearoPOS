@@ -41,6 +41,7 @@ public class InvoiceBill {
     private List<POSLineItem> lineItem;
     private double mTotalAmt, mTotalFinalAmt, mPaidAmt, mReturnAmt;
     private int rtn;
+    private int complement;
     private String mCashierName;
     public AppDataManager mAppManager;
     public POSDataSource mDBHelper;
@@ -88,6 +89,7 @@ public class InvoiceBill {
         this.mPaidVisaAmt = payment.getVisa();
         this.mOtherAmt = payment.getOther();
         this.mReturnAmt = payment.getChange();
+        this.complement = payment.getIsComplement();
     }
 
     public void setOrgDetails(Organization orgDetails){
@@ -289,17 +291,23 @@ public class InvoiceBill {
             posPtr.printNormal("------------------------------------------------\n");
             //posPtr.printNormal(addTotalWhiteSpace("Total")+""+addPriceWhiteSpace(Common.valueFormatter(totalAmount))+"\n");
 
-            if(mTotalAmt!=mTotalFinalAmt) {
-                posPtr.printText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
-                posPtr.printText(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmt-mTotalFinalAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
-                posPtr.printText(addTotalWhiteSpace("Net Total")+""+addPriceWhiteSpace(Common.valueFormatter(mTotalFinalAmt))+"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+            if(complement == 0){
+                if(mTotalAmt!=mTotalFinalAmt) {
+                    posPtr.printText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                    posPtr.printText(addTotalWhiteSpace("Discount QR ") + "" + addPriceWhiteSpace("-" + Common.valueFormatter(mTotalAmt-mTotalFinalAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                    posPtr.printText(addTotalWhiteSpace("Net Total")+""+addPriceWhiteSpace(Common.valueFormatter(mTotalFinalAmt))+"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                }else{
+                    posPtr.printText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                }
             }else{
                 posPtr.printText(addTotalWhiteSpace("Total") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt)) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+                posPtr.printNormal("------------------------------------------------\n");
+                posPtr.printNormal("--------------COMPLEMENTARY ORDER---------------\n");
             }
 
             posPtr.printNormal("------------------------------------------------\n");
 
-            if(mPaidCashAmt!=0){
+            if(mPaidCashAmt!=0 && complement == 0){
                 if(mReturnAmt!=0) {
                     posPtr.printText(addTotalWhiteSpace("Cash") + "" + addPriceWhiteSpace(Common.valueFormatter(mTotalAmt-(mReturnAmt))) + "\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
                 }else{

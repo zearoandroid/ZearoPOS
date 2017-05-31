@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.zearoconsulting.zearopos.AndroidApplication;
 import com.zearoconsulting.zearopos.R;
@@ -52,6 +53,7 @@ public class OrderItemAdapter extends ArrayAdapter<POSLineItem> {
             viewHolder.txtPlus = (TextView) view.findViewById(R.id.txtPlus);
             viewHolder.txtMinus = (TextView) view.findViewById(R.id.txtMinus);
             viewHolder.txtDiscIndicator = (TextView) view.findViewById(R.id.txtDiscountIndicator);
+            viewHolder.btnAddNotes = (ImageView) view.findViewById(R.id.btnAddNotes);
             view.setTag(viewHolder);
         }
         else
@@ -121,6 +123,16 @@ public class OrderItemAdapter extends ArrayAdapter<POSLineItem> {
             }
         });
 
+        holder.btnAddNotes.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //show the add notes fragment
+                if(context instanceof POSActivity){
+                    ((POSActivity)context).showAddNotes(AppConstants.posID, mOrderData.get(position).getCategoryId(),mOrderData.get(position));
+                }
+            }
+        });
+
         if(view!=null)
             view.setBackgroundResource(R.drawable.orderitem_default);
 
@@ -160,6 +172,7 @@ public class OrderItemAdapter extends ArrayAdapter<POSLineItem> {
         protected TextView txtPlus;
         protected TextView txtMinus;
         protected TextView txtDiscIndicator;
+        protected ImageView btnAddNotes;
     }
 
 }

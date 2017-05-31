@@ -70,7 +70,7 @@
                 android:layout_alignParentLeft="true"
                 android:gravity="center"
                 android:padding="10.0dip"
-                android:text="24-Apr-2017"
+                android:text="08-May-2017"
                 android:textColor="@color/black"
                 android:textSize="20.0dip"
                 android:textStyle="normal" />

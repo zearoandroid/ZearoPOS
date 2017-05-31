@@ -30,7 +30,7 @@ android {
 
         applicationId globalConfiguration.getAt("androidApplicationId")
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
     }
 
     compileOptions {

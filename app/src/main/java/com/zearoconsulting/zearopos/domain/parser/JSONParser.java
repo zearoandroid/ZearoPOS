@@ -20,6 +20,7 @@ import com.zearoconsulting.zearopos.presentation.model.Category;
 import com.zearoconsulting.zearopos.presentation.model.Customer;
 import com.zearoconsulting.zearopos.presentation.model.KOTHeader;
 import com.zearoconsulting.zearopos.presentation.model.KOTLineItems;
+import com.zearoconsulting.zearopos.presentation.model.Notes;
 import com.zearoconsulting.zearopos.presentation.model.Organization;
 import com.zearoconsulting.zearopos.presentation.model.POSLineItem;
 import com.zearoconsulting.zearopos.presentation.model.Product;
@@ -1224,6 +1225,11 @@ public class JSONParser {
 
                         mDBHelper.addProduct(categoryId, product);
                         productList.add(product);
+
+                        //check notes available and store to notes table
+                        if (obj.has("productsNotesArray")) {
+                            addProductsNotes(obj.getJSONArray("productsNotesArray"), obj.getLong("productId"));
+                        }
                     }
 
                 }else if (json.getInt("responseCode") == 301) {
@@ -1255,6 +1261,28 @@ public class JSONParser {
                 msg.setData(b);
                 mHandler.sendMessage(msg);
             }
+        }
+    }
+
+    private void addProductsNotes(JSONArray jsonArray, long productId) {
+        try {
+            JSONArray jsonNotesArray = jsonArray;
+
+            for (int i = 0; i < jsonNotesArray.length(); i++) {
+
+                JSONObject obj = (JSONObject) jsonNotesArray.get(i);
+                Notes notes = new Notes();
+
+                notes.setProdcutId(productId);
+                notes.setNotesId(obj.getLong("productnotesId"));
+                notes.setNotesName(obj.getString("notesName"));
+                notes.setClientId(mAppManager.getClientID());
+                notes.setOrgId(mAppManager.getOrgID());
+
+                mDBHelper.addNotes(notes);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

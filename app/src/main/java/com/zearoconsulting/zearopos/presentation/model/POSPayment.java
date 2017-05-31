@@ -17,6 +17,7 @@ public class POSPayment implements Serializable {
     private double change;
     private long clientId;
     private long orgId;
+    private int isComplement;
 
     public long getPosId() {
         return posId;
@@ -78,6 +79,13 @@ public class POSPayment implements Serializable {
         return change;
     }
 
+    public int getIsComplement() {
+        return isComplement;
+    }
+
+    public void setIsComplement(int isComplement) {
+        this.isComplement = isComplement;
+    }
     public void setChange(double change) {
         this.change = change;
     }

@@ -23,7 +23,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="dhukan.me"
+        android:text="@string/dhukan.me"
         android:textSize="@dimen/appname_size"
         android:layout_marginTop="16dp"
         android:textColor="@color/pale_grey"

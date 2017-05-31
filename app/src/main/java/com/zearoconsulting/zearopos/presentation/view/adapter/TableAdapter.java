@@ -30,25 +30,6 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableItemHol
 
     private long table1Id = 0;
     private long table2Id = 0;
-    // Define Drag Listener:
-    final View.OnDragListener onDrag = new View.OnDragListener() {
-        @Override
-        public boolean onDrag(View v, DragEvent event) {
-            switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_ENTERED:
-
-                    break;
-                case DragEvent.ACTION_DRAG_EXITED:
-                case DragEvent.ACTION_DRAG_ENDED:
-                    listener.OnTableChangeListener(table1Id, table2Id);
-                    break;
-                case DragEvent.ACTION_DROP:
-
-                    break;
-            }
-            return true;
-        }
-    };
 
     public TableAdapter(List<Tables> kotTableList, List<KOTHeader> kotHeaders) {
         this.mKOTTableList = kotTableList;
@@ -115,11 +96,20 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableItemHol
         }
     }
 
+    public void selectedTableChangeItem(int pos) {
+        try {
+            Tables tables = mKOTTableList.get(pos);
+            listener.OnTableSelectedChangeListener(tables);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setOnTableSelectListener(TableSelectListener paramTableSelectListener) {
         this.listener = paramTableSelectListener;
     }
 
-    public class TableItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class TableItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         public final View mView;
         protected Button btnTable;
 
@@ -128,11 +118,18 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableItemHol
             mView = view;
             this.btnTable = (Button) view.findViewById(R.id.btnTable);
             this.btnTable.setOnClickListener(this);
+            this.btnTable.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             selectedItem(getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            selectedTableChangeItem(getAdapterPosition());
+            return true;
         }
     }
 

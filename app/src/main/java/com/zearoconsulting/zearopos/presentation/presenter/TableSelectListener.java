@@ -10,5 +10,6 @@ import com.zearoconsulting.zearopos.presentation.model.Tables;
 public abstract interface TableSelectListener {
 
     public abstract void OnTableSelectedListener(Tables tableEntity);
+    public abstract void OnTableSelectedChangeListener(Tables tableEntity);
     public abstract void OnTableChangeListener(long activeTableId, long moveTableId);
 }

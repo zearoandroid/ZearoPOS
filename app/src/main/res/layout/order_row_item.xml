@@ -80,6 +80,21 @@
             android:id="@+id/txtDiscountIndicator"
             android:layout_alignParentLeft="true" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:textSize="@dimen/orderListLblSize"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp"
+            fontPath="fonts/GothamRounded-Bold.otf"
+            android:gravity="center_vertical|center_horizontal"
+            android:src="@android:drawable/ic_menu_edit"
+            android:background="@color/blackGrey"
+            android:id="@+id/btnAddNotes"
+            android:layout_centerInParent="true" />
+
         <LinearLayout
             android:layout_width="132dp"
             android:layout_height="45dp"

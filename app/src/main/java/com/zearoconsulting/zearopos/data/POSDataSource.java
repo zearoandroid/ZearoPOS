@@ -12,6 +12,7 @@ import com.zearoconsulting.zearopos.presentation.model.Category;
 import com.zearoconsulting.zearopos.presentation.model.Customer;
 import com.zearoconsulting.zearopos.presentation.model.KOTHeader;
 import com.zearoconsulting.zearopos.presentation.model.KOTLineItems;
+import com.zearoconsulting.zearopos.presentation.model.Notes;
 import com.zearoconsulting.zearopos.presentation.model.Organization;
 import com.zearoconsulting.zearopos.presentation.model.POSLineItem;
 import com.zearoconsulting.zearopos.presentation.model.POSOrders;
@@ -85,6 +86,9 @@ public class POSDataSource {
 
     // kot line item detail table
     private static final String TABLE_KOT_LINES = "kotLineItems";
+
+    // productNotes table
+    private static final String TABLE_PRODUCT_NOTES = "productNotes";
 
     //COLUMNS
     private static final String KEY_ID = "_id";
@@ -169,6 +173,7 @@ public class POSDataSource {
     private static final String KEY_PAYMENT_VISA = "paymentVisa";
     private static final String KEY_PAYMENT_OTHER = "paymentOther";
     private static final String KEY_PAYMENT_RETURN = "paymentReturn";
+    private static final String KEY_PAYMENT_COMPLEMENT ="paymentComplement";
 
     private static final String KEY_START_NUMBER = "startNumber";
     private static final String KEY_END_NUMBER = "endNumber";
@@ -192,6 +197,9 @@ public class POSDataSource {
     private static final String KEY_KOT_EXTRA_PRODUCT = "isExtraProduct";
     private static final String KEY_KOT_COVERS_COUNT = "kotCoversCount";
 
+    private static final String KEY_PRODUCT_NOTES_ID = "notesId";
+    private static final String KEY_PRODUCT_NOTES_NAME = "notesName";
+
     public POSDataSource(Context context) {
         dbHelper = DBHelper.getInstance(context);
     }
@@ -201,7 +209,7 @@ public class POSDataSource {
     }
 
     public void close() {
-        dbHelper.close();
+        //dbHelper.close();
     }
 
     public SQLiteDatabase getDb(){
@@ -554,6 +562,46 @@ public class POSDataSource {
 
     }
 
+    public void addNotes(Notes notes) {
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+
+        try {
+            Cursor mCount = db.rawQuery("select notesId from productNotes where notesId='" + notes.getNotesId() + "'", null);
+            //mCount.moveToFirst();
+            long notesId = 0;
+
+            while (mCount.moveToNext()) {
+                notesId = mCount.getLong(0);
+            }
+            mCount.close();
+
+            if (notesId != 0) {
+                String strSQL = "update productNotes set notesName='" + notes.getNotesName() + "' where notesId='" + notes.getNotesId() + "' ;";
+                db.execSQL(strSQL);
+            } else {
+                ContentValues values = new ContentValues();
+                values.put(KEY_CLIENT_ID, notes.getClientId());
+                values.put(KEY_ORG_ID, notes.getOrgId());
+                values.put(KEY_PRODUCT_ID, notes.getProdcutId());
+                values.put(KEY_PRODUCT_NOTES_ID, notes.getNotesId());
+                values.put(KEY_PRODUCT_NOTES_NAME, notes.getNotesName());
+
+                // Inserting Row
+                db.insert(TABLE_PRODUCT_NOTES, null, values);
+            }
+
+            db.setTransactionSuccessful();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     public void addPOSPayments(POSPayment payment) {
 
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
@@ -570,6 +618,7 @@ public class POSDataSource {
             values.put(KEY_PAYMENT_VISA, payment.getVisa());
             values.put(KEY_PAYMENT_OTHER, payment.getOther());
             values.put(KEY_PAYMENT_RETURN, payment.getChange());
+            values.put(KEY_PAYMENT_COMPLEMENT, payment.getIsComplement());
 
             // Inserting Row
             db.insert(TABLE_POS_PAYMENT_DETAIL, null, values);
@@ -635,6 +684,7 @@ public class POSDataSource {
                 payment.setVisa(cursor.getDouble(6));
                 payment.setOther(cursor.getDouble(7));
                 payment.setChange(cursor.getDouble(8));
+                payment.setIsComplement(cursor.getInt(9));
             }
             cursor.close();
 
@@ -1017,6 +1067,28 @@ public class POSDataSource {
         return table;
     }
 
+    public List<Tables> getNonOrderTables(long clientId, long orgId){
+        List<Tables> tablesList = new ArrayList<Tables>();
+        Tables tables = null;
+
+        try {
+            Cursor cursor = db.rawQuery("select kotTableId, kotTableName from kotTables where clientId = '" + clientId + "' and orgId = '" + orgId + "' and isOrderAvailable='N' ", null);
+
+            while (cursor.moveToNext()) {
+                tables = new Tables();
+                tables.setTableId(cursor.getLong(0));
+                tables.setTableName(cursor.getString(1));
+                tablesList.add(tables);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return tablesList;
+    }
+
     /**
      * @param terminalId
      * @return
@@ -1093,7 +1165,7 @@ public class POSDataSource {
         Terminals terminals = null;
 
         try {
-            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP, kotIsPrinter from kotTerminals where clientId = '" + clientId + "' and orgId = '" + orgId + "' and kotIsPrinter = 'Y' ", null);
+            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP, kotIsPrinter from kotTerminals where clientId = '" + clientId + "' and orgId = '" + orgId + "' ", null);
 
             while (cursor.moveToNext()) {
                 terminals = new Terminals();
@@ -1686,6 +1758,52 @@ public class POSDataSource {
         return posOrdersList;
     }
 
+    public List<Notes> getNotes(long clientId, long orgId, long productId) {
+        List<Notes> notesList = new ArrayList<Notes>();
+        Notes notes = null;
+
+        try {
+            Cursor cursor = db.rawQuery("select notesId, notesName from productNotes where clientId = '" + clientId + "' and orgId = '" + orgId + "' and productId = '" + productId + "' ", null);
+
+            while (cursor.moveToNext()) {
+                notes = new Notes();
+                notes.setNotesId(cursor.getLong(0));
+                notes.setNotesName(cursor.getString(1));
+                notesList.add(notes);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return notesList;
+    }
+
+    public List<String> getNotesList(long clientId, long orgId, long productId) {
+        List<String> notesList = new ArrayList<String>();
+        Notes notes = null;
+
+        try {
+            Cursor cursor = db.rawQuery("select notesId, notesName from productNotes where clientId = '" + clientId + "' and orgId = '" + orgId + "' and productId = '" + productId + "' ", null);
+
+            notesList.add("Choose one");
+
+            while (cursor.moveToNext()) {
+                notes = new Notes();
+                notes.setNotesId(cursor.getLong(0));
+                notes.setNotesName(cursor.getString(1));
+                notesList.add(cursor.getString(1));
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+
+        return notesList;
+    }
+
     public List<POSLineItem> getAllPOSLineItems(long posId) {
 
         List<POSLineItem> posLineItemList = new ArrayList<POSLineItem>();
@@ -1995,7 +2113,7 @@ public class POSDataSource {
                 product.setSalePrice(cursor.getDouble(12));
                 product.setCostPrice(cursor.getDouble(13));
                 product.setTotalPrice(cursor.getDouble(16));
-                product.setDescription("");
+                product.setDescription(cursor.getString(22));
 
                 itemList.add(product);
             }
@@ -2417,6 +2535,17 @@ public class POSDataSource {
             String strSQL = "update posLineItems set isUpdated='Y', qty='" + qty
                     + "', isLineDiscounted='" + isLineDiscounted + "', totalPrice='" + totalPrice + "', productDiscType='" + prodDiscType + "', productDiscValue='" + prodDiscValue + "' where _id='" + rowId + "' and posId='"
                     + posId + "' and productId = '" + productId + "' ;";
+            db.execSQL(strSQL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+    }
+
+    public void updatePOSLineItemNotes(long posId, long rowId, long productId, String notes) {
+
+        try {
+            String strSQL = "update posLineItems set kotItemNotes='" + notes + "', isUpdated='Y' where _id='" + rowId + "' and posId='" + posId + "' and productId = '" + productId + "' and isKOTGenerated='N' ;";
             db.execSQL(strSQL);
         } catch (Exception e) {
             e.printStackTrace();

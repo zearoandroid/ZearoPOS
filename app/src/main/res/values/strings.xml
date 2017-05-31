@@ -22,6 +22,7 @@
     <string name="action_settings">Settings</string>
     <string name="menuitem_refresh">Table Refresh</string>
     <string name="dhukan.me">dhukan.me</string>
+    <string name="awsal">Awsal Grocery2U</string>
     <string name="hint_username">username</string>
     <string name="hint_password">password</string>
     <string name="hint_total_amount">Enter amount to discount total bill</string>

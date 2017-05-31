@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -110,7 +111,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
     private POSOrders order;
     private BPartner bPartner;
     private RadioGroup mRGPayType;
-    private RadioButton onCredit, onCash;
+    private RadioButton onCashCard, onComplement;
 
     private ImageView mImgClosePayment;
     private SharedPreferences mSharedPreferences;
@@ -141,6 +142,7 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                     //INFORM USER POSTING FAILURE
                     mProDlg.dismiss();
                     mBtnComplete.setClickable(true);
+                    //POSPayment payment = mDBHelper.getPaymentDetails(AppConstants.posID);
                     TSnackbar.make(findViewById(R.id.layPayment), "ORDER POSTING ERROR", TSnackbar.LENGTH_LONG)
                             .show();
                     //finish();
@@ -194,8 +196,8 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             ConnectType = mAppManager.getPrinterMode();
 
             mTblPayTypes = (TableLayout) findViewById(R.id.layPaymentTypes);
-            onCredit = (RadioButton) findViewById(R.id.rbCredit);
-            onCash = (RadioButton) findViewById(R.id.rbCash);
+            onCashCard = (RadioButton) findViewById(R.id.rbCashCard);
+            onComplement = (RadioButton) findViewById(R.id.rbComplement);
             mTxtPaymentTitle = (TextView) findViewById(R.id.txtPaymentTitle);
             mOldTotalAmountView = (TextView) findViewById(R.id.txtOldTotalAmount);
             mDiscountAmountView = (TextView) findViewById(R.id.txtDiscountAmount);
@@ -242,15 +244,15 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
             mProDlg.setIndeterminate(true);
             mProDlg.setCancelable(false);
 
-            mRGPayType.setVisibility(View.GONE);
+            //mRGPayType.setVisibility(View.GONE);
 
-            if (bPartner.getIsCredit().equalsIgnoreCase("Y")) {
+            /*if (bPartner.getIsCredit().equalsIgnoreCase("Y")) {
                 mRGPayType.setVisibility(View.VISIBLE);
                 mRGPayType.check(R.id.rbCredit);
                 mTblPayTypes.setVisibility(View.GONE);
             } else {
 
-            }
+            }*/
 
             // set onkeyListner
             /*mEdtPaidAmount.setOnKeyListener(this);
@@ -294,10 +296,10 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // find which radio button is selected
-                    if (checkedId == R.id.rbCredit) {
-                        mTblPayTypes.setVisibility(View.GONE);
-                    } else if (checkedId == R.id.rbCash) {
+                    if (checkedId == R.id.rbCashCard) {
                         mTblPayTypes.setVisibility(View.VISIBLE);
+                    } else if (checkedId == R.id.rbComplement) {
+                        mTblPayTypes.setVisibility(View.GONE);
                     }
                 }
 
@@ -337,7 +339,23 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                                 postPOSOrder();
                             }
                         } else {
-                            mReturnAmount = validateReturnAmount();
+                            int selectedId = mRGPayType.getCheckedRadioButtonId();
+                            // find which radioButton is checked by id
+                            if (selectedId == onCashCard.getId()) {
+                                mReturnAmount = validateReturnAmount();
+                            } else if (selectedId == onComplement.getId()) {
+                                mPaidCashAmount = mTotalAmount;
+                                mPaidCardAmount = 0;
+                                mPaidTotalAmount = (mPaidCashAmount + mPaidCardAmount);
+                                mReturnAmount = mFinalAmount - mPaidTotalAmount;
+
+                                if(mEdtReason.getText().toString().trim().length() == 0 && mEdtReason.getText().toString().equals("")){
+                                    TSnackbar.make(findViewById(R.id.layPayment), "Please enter the reason", TSnackbar.LENGTH_LONG)
+                                            .show();
+                                    return;
+                                }
+                            }
+
                             if (mReturnAmount <= 0) {
                                 mBtnComplete.setClickable(false);
                                 savePaymentDetail();
@@ -496,6 +514,14 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
         mPayment.setChange(mReturnAmount);
         mPayment.setPosId(AppConstants.posID);
 
+        int selectedId = mRGPayType.getCheckedRadioButtonId();
+        // find which radioButton is checked by id
+        if (selectedId == onCashCard.getId()) {
+            mPayment.setIsComplement(0);
+        } else if (selectedId == onComplement.getId()) {
+            mPayment.setIsComplement(1);
+        }
+
         mDBHelper.addPOSPayments(mPayment);
     }
 
@@ -525,12 +551,15 @@ public class PaymentActivity extends BaseActivity implements ConnectivityReceive
                 JSONObject mJsonObj = mParser.getParams(AppConstants.CALL_RELEASE_POS_ORDER);
                 JSONObject mHeaderObj = mParser.getHeaderObj(AppConstants.posID, mCustomer, mTotalLines, mFinalAmount, mPaidTotalAmount, mReturnAmount, mPaidCashAmount, mPaidTotalCardAmount);
                 mHeaderObj.put("isCredit", "N");
+                mHeaderObj.put("isComplement", "N");
                 int selectedId = mRGPayType.getCheckedRadioButtonId();
                 // find which radioButton is checked by id
-                if (selectedId == onCredit.getId()) {
-                    mHeaderObj.put("isCredit", "Y");
-                } else if (selectedId == onCash.getId()) {
-                    mHeaderObj.put("isCredit", "N");
+                if (selectedId == onCashCard.getId()) {
+                    mHeaderObj.put("isComplement", "N");
+                } else if (selectedId == onComplement.getId()) {
+                    mHeaderObj.put("isComplement", "Y");
+                    mHeaderObj.put("IsCash", "N");
+                    mHeaderObj.put("IsCard", "N");
                 }
 
                 mJsonObj.put("OrderHeaders", mHeaderObj);

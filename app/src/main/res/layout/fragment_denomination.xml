@@ -84,31 +84,31 @@
             android:background="@color/colorPrimary" />
 
         <RadioGroup
+            android:id="@+id/radGroupMode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_margin="5dp"
-            android:id="@+id/radGroupMode" >
+            android:orientation="horizontal">
 
             <RadioButton
+                android:id="@+id/radDenomination"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/radDenomination"
                 android:layout_weight="1"
-                android:textSize="18sp"
                 android:checked="true"
+                android:text="Denomination"
                 android:textColor="@color/black"
-                android:text="Denomination" />
+                android:textSize="18sp" />
 
             <RadioButton
+                android:id="@+id/radOnlyTotal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
-                android:textSize="18sp"
+                android:text="OnlyTotal"
                 android:textColor="@color/black"
-                android:id="@+id/radOnlyTotal"
-                android:text="OnlyTotal" />
+                android:textSize="18sp" />
 
         </RadioGroup>
 
@@ -149,343 +149,343 @@
 
                 </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/layDenomination"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
-                    android:gravity="left"
-                    android:text="@string/riyals"
-                    android:textStyle="bold" />
-
-                <TableLayout
-                    android:id="@+id/lay_riyal"
+                <LinearLayout
+                    android:id="@+id/layDenomination"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginTop="10dp"
-                    android:stretchColumns="*">
+                    android:orientation="vertical">
 
-                    <TableRow
-                        android:layout_width="fill_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="left"
+                        android:text="@string/riyals"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="@string/qr500" />
-
-                        <EditText
-                            android:id="@+id/edtQR500"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
-
-                        <TextView
-                            android:id="@+id/txtTotalQR500"
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="fill_parent"
+                    <TableLayout
+                        android:id="@+id/lay_riyal"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginTop="10dp"
+                        android:stretchColumns="*">
 
-                        <TextView
-                            android:layout_width="0dip"
+                        <TableRow
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="@string/qr100" />
+                            android:layout_margin="3dp">
 
-                        <EditText
-                            android:id="@+id/edtQR100"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="@string/qr500" />
 
-                        <TextView
-                            android:id="@+id/txtTotalQR100"
-                            android:layout_width="0dip"
+                            <EditText
+                                android:id="@+id/edtQR500"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalQR500"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
+                            android:layout_margin="3dp">
 
-                    <TableRow
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="@string/qr100" />
+
+                            <EditText
+                                android:id="@+id/edtQR100"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalQR100"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp">
+
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="@string/qr50" />
+
+                            <EditText
+                                android:id="@+id/edtQR50"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalQR50"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp">
+
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_weight="1"
+                                android:gravity="center|right"
+                                android:text="@string/qr10" />
+
+                            <EditText
+                                android:id="@+id/edtQR10"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalQR10"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp">
+
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="@string/qr5" />
+
+                            <EditText
+                                android:id="@+id/edtQR5"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalQR5"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp">
+
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="@string/qr1" />
+
+                            <EditText
+                                android:id="@+id/edtQR1"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalQR1"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <RelativeLayout
                         android:layout_width="fill_parent"
+                        android:layout_height="5dp"
+                        android:background="@color/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="left"
+                        android:text="@string/dirhams"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="0dip"
+                    <TableLayout
+                        android:id="@+id/lay_dirhams"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginTop="10dp"
+                        android:stretchColumns="*">
+
+                        <TableRow
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="@string/qr50" />
+                            android:layout_margin="3dp">
 
-                        <EditText
-                            android:id="@+id/edtQR50"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_weight="1"
+                                android:gravity="center|right"
+                                android:text="@string/dr50" />
 
-                        <TextView
-                            android:id="@+id/txtTotalQR50"
-                            android:layout_width="0dip"
+                            <EditText
+                                android:id="@+id/edtDR50"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalDR50"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
+                            android:layout_margin="3dp">
 
-                    <TableRow
+                            <TextView
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="@string/dr25" />
+
+                            <EditText
+                                android:id="@+id/edtDR25"
+                                android:layout_width="0dip"
+                                android:layout_height="50.0dip"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginLeft="20.0dip"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textCursorDrawable="@null" />
+
+                            <TextView
+                                android:id="@+id/txtTotalDR25"
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center|center_vertical"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <RelativeLayout
                         android:layout_width="fill_parent"
+                        android:layout_height="5dp"
+                        android:background="@color/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/txtTotal"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
-
-                        <TextView
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_weight="1"
-                            android:gravity="center|right"
-                            android:text="@string/qr10" />
-
-                        <EditText
-                            android:id="@+id/edtQR10"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
-
-                        <TextView
-                            android:id="@+id/txtTotalQR10"
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
-
-                        <TextView
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="@string/qr5" />
-
-                        <EditText
-                            android:id="@+id/edtQR5"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
-
-                        <TextView
-                            android:id="@+id/txtTotalQR5"
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
-
-                        <TextView
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="@string/qr1" />
-
-                        <EditText
-                            android:id="@+id/edtQR1"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
-
-                        <TextView
-                            android:id="@+id/txtTotalQR1"
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
-
-                </TableLayout>
-
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="5dp"
-                    android:background="@color/colorPrimary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
-                    android:gravity="left"
-                    android:text="@string/dirhams"
-                    android:textStyle="bold" />
-
-                <TableLayout
-                    android:id="@+id/lay_dirhams"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginTop="10dp"
-                    android:stretchColumns="*">
-
-                    <TableRow
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
-
-                        <TextView
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_weight="1"
-                            android:gravity="center|right"
-                            android:text="@string/dr50" />
-
-                        <EditText
-                            android:id="@+id/edtDR50"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
-
-                        <TextView
-                            android:id="@+id/txtTotalDR50"
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="3dp">
-
-                        <TextView
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="@string/dr25" />
-
-                        <EditText
-                            android:id="@+id/edtDR25"
-                            android:layout_width="0dip"
-                            android:layout_height="50.0dip"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginLeft="20.0dip"
-                            android:layout_weight="1"
-                            android:inputType="number"
-                            android:textCursorDrawable="@null" />
-
-                        <TextView
-                            android:id="@+id/txtTotalDR25"
-                            android:layout_width="0dip"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center|center_vertical"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0" />
-                    </TableRow>
-
-                </TableLayout>
-
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="5dp"
-                    android:background="@color/colorPrimary" />
-
-                <TextView
-                    android:id="@+id/txtTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:layout_marginRight="25dp"
-                    android:layout_marginTop="10dp"
-                    android:gravity="right"
-                    android:text="@string/total" />
+                        android:layout_gravity="right"
+                        android:layout_marginRight="25dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="right"
+                        android:text="@string/total" />
 
                 </LinearLayout>
 
