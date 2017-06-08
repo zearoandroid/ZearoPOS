@@ -35,61 +35,40 @@ import java.util.Map;
  */
 
 public class POSDataSource {
-    // Database fields
-    private SQLiteDatabase db;
-    private DBHelper dbHelper;
-
     //organization table
     private static final String TABLE_ORGANIZATION = "organization";
-
     //warehouse table
     private static final String TABLE_WAREHOUSE = "warehouse";
-
     // role table
     private static final String TABLE_ROLE = "role";
-
     // role table
     private static final String TABLE_ROLE_ACESS = "roleAccess";
-
     // category table
     private static final String TABLE_CATEGORY = "category";
-
     // product table
     private static final String TABLE_PRODUCT = "product";
-
     // BPartner table
     private static final String TABLE_BPARTNERS = "businessPartner";
-
     // BPartner table
     private static final String TABLE_SUPERVISOR = "supervisor";
-
     // pos order number table
     private static final String TABLE_POS_ORDER_NUMBER = "posOrderNumber";
-
     // pos order header table
     private static final String TABLE_POS_ORDER_HEADER = "posOrderHeader";
-
     // pos line item detail table
     private static final String TABLE_POS_LINES = "posLineItems";
-
     // pos payment detail table
     private static final String TABLE_POS_PAYMENT_DETAIL = "posPaymentDetail";
-
     // kot tables table
     private static final String TABLE_KOT_TABLE = "kotTables";
-
     // kot terminals table
     private static final String TABLE_KOT_TERMINALS = "kotTerminals";
-
     // kot header table
     private static final String TABLE_KOT_HEADER = "kotHeader";
-
     // kot line item detail table
     private static final String TABLE_KOT_LINES = "kotLineItems";
-
     // productNotes table
     private static final String TABLE_PRODUCT_NOTES = "productNotes";
-
     //COLUMNS
     private static final String KEY_ID = "_id";
     private static final String KEY_ORG_ID = "orgId";
@@ -105,19 +84,15 @@ public class POSDataSource {
     private static final String KEY_ORG_WEB_URL = "orgWebUrl";
     private static final String KEY_ORG_DESCRIPTION = "orgDescription";
     private static final String KEY_ORG_FOOTER = "orgFooter";
-
     private static final String KEY_WAREHOUSE_ID = "warehouseId";
     private static final String KEY_WAREHOUSE_NAME = "warehouseName";
-
     private static final String KEY_ROLE_ID = "roleId";
     private static final String KEY_ROLE_NAME = "roleName";
-
     private static final String KEY_CATEGORY_ID = "categoryId";
     private static final String KEY_CATEGORY_NAME = "categoryName";
     private static final String KEY_CATEGORY_VALUE = "categoryValue";
     private static final String KEY_CATEGORY_IMAGE = "categoryImage";
     private static final String KEY_SHOWN_DIGITAL_MENU = "shownDigitalMenu";
-
     private static final String KEY_POS_ID = "posId";
     private static final String KEY_BP_ID = "bpId";
     private static final String KEY_CUSTOMER_NAME = "customerName";
@@ -128,7 +103,6 @@ public class POSDataSource {
     private static final String KEY_IS_CASH_CUSTOMER = "isCashCustomer";
     private static final String KEY_IS_CREDIT = "isCredit";
     private static final String KEY_CREDIT_LIMIT = "creditLimit";
-
     private static final String KEY_PRODUCT_ID = "productId";
     private static final String KEY_PRODUCT_NAME = "productName";
     private static final String KEY_PRODUCT_ARABIC_NAME = "productArabicName";
@@ -149,7 +123,6 @@ public class POSDataSource {
     private static final String KEY_PRODUCT_PREPARATION_TIME = "preparationTime";
     private static final String KEY_PRODUCT_DESCRIPTION = "description";
     private static final String KEY_PRODUCT_TERMINAL_ID = "terminalId";
-
     private static final String KEY_IS_DEFAULT = "isDefault";
     private static final String KEY_IS_UPDATED = "isUpdated";
     private static final String KEY_IS_POSTED = "isPosted";
@@ -165,7 +138,6 @@ public class POSDataSource {
     private static final String KEY_AUTHORIZE_NAME = "authorizeName";
     private static final String KEY_AUTHORIZE_CODE = "authorizeCode";
     private static final String KEY_USER_ID = "userId";
-
     private static final String KEY_PAYMENT_CASH = "paymentCash";
     private static final String KEY_PAYMENT_AMEX = "paymentAmex";
     private static final String KEY_PAYMENT_GIFT = "paymentGift";
@@ -173,20 +145,16 @@ public class POSDataSource {
     private static final String KEY_PAYMENT_VISA = "paymentVisa";
     private static final String KEY_PAYMENT_OTHER = "paymentOther";
     private static final String KEY_PAYMENT_RETURN = "paymentReturn";
-    private static final String KEY_PAYMENT_COMPLEMENT ="paymentComplement";
-
+    private static final String KEY_PAYMENT_COMPLEMENT = "paymentComplement";
     private static final String KEY_START_NUMBER = "startNumber";
     private static final String KEY_END_NUMBER = "endNumber";
-
     private static final String KEY_KOT_TABLE_ID = "kotTableId";
     private static final String KEY_KOT_LINE_ID = "kotLineId";
     private static final String KEY_KOT_TABLE_NAME = "kotTableName";
-
     private static final String KEY_KOT_TERMINAL_ID = "kotTerminalId";
     private static final String KEY_KOT_TERMINAL_NAME = "kotTerminalName";
     private static final String KEY_KOT_TERMINAL_IP = "kotTerminalIP";
     private static final String KEY_KOT_IS_PRINTER = "kotIsPrinter";
-
     private static final String KEY_KOT_NUMBER = "kotNumber";
     private static final String KEY_INVOICE_NUMBER = "invoiceNumber";
     private static final String KEY_KOT_TOTAL_AMOUNT = "kotTotalAmount";
@@ -196,9 +164,11 @@ public class POSDataSource {
     private static final String KEY_KOT_REF_LINE_ID = "kotRefLineId";
     private static final String KEY_KOT_EXTRA_PRODUCT = "isExtraProduct";
     private static final String KEY_KOT_COVERS_COUNT = "kotCoversCount";
-
     private static final String KEY_PRODUCT_NOTES_ID = "notesId";
     private static final String KEY_PRODUCT_NOTES_NAME = "notesName";
+    // Database fields
+    private SQLiteDatabase db;
+    private DBHelper dbHelper;
 
     public POSDataSource(Context context) {
         dbHelper = DBHelper.getInstance(context);
@@ -212,8 +182,8 @@ public class POSDataSource {
         //dbHelper.close();
     }
 
-    public SQLiteDatabase getDb(){
-        return  db;
+    public SQLiteDatabase getDb() {
+        return db;
     }
 
     //******************** POS MASTER RELATED STUFF'S METHODS (ORG, ROLE, WAREHOUSE, BPARTNER, CATEGORY, PRODUCT, AUTHORIZE) ***********************************//
@@ -516,7 +486,6 @@ public class POSDataSource {
     }
 
     /**
-     *
      * @param bPartner
      */
     public void addBPartner(BPartner bPartner) {
@@ -531,7 +500,7 @@ public class POSDataSource {
 
             while (mCount.moveToNext()) {
                 bPartnerId = mCount.getLong(0);
-                String updateSQL = "update businessPartner set creditLimit='"+bPartner.getCreditLimit()+"', isCredit='" + bPartner.getIsCredit() +"' where bpId='" + bPartner.getBpId() + "';";
+                String updateSQL = "update businessPartner set creditLimit='" + bPartner.getCreditLimit() + "', isCredit='" + bPartner.getIsCredit() + "' where bpId='" + bPartner.getBpId() + "';";
                 db.execSQL(updateSQL);
             }
             mCount.close();
@@ -649,7 +618,7 @@ public class POSDataSource {
         return authIds;
     }
 
-    public long getAuthorizedUserId(long authorizeId){
+    public long getAuthorizedUserId(long authorizeId) {
 
         long userId = 0;
 
@@ -664,7 +633,7 @@ public class POSDataSource {
             e.printStackTrace();
         } finally {
         }
-        return  userId;
+        return userId;
     }
 
     public POSPayment getPaymentDetails(long posId) {
@@ -947,7 +916,7 @@ public class POSDataSource {
         BPartner bPartner = null;
 
         try {
-            Cursor cursor = db.rawQuery("select * from businessPartner where clientId = '" + clientId + "' and orgId = '" + orgId + "' and bpId = '"+bpId+"' ", null);
+            Cursor cursor = db.rawQuery("select * from businessPartner where clientId = '" + clientId + "' and orgId = '" + orgId + "' and bpId = '" + bpId + "' ", null);
 
             while (cursor.moveToNext()) {
                 bPartner = new BPartner();
@@ -1067,7 +1036,7 @@ public class POSDataSource {
         return table;
     }
 
-    public List<Tables> getNonOrderTables(long clientId, long orgId){
+    public List<Tables> getNonOrderTables(long clientId, long orgId) {
         List<Tables> tablesList = new ArrayList<Tables>();
         Tables tables = null;
 
@@ -2291,6 +2260,7 @@ public class POSDataSource {
 
     /**
      * This method is used for totalQty of bill
+     *
      * @param posId
      * @return
      */
@@ -2726,7 +2696,7 @@ public class POSDataSource {
         }
     }
 
-    public long lastTransactionTime(){
+    public long lastTransactionTime() {
 
         long transTime = 0;
         try {
@@ -3125,7 +3095,7 @@ public class POSDataSource {
         return isKOTAvail;
     }
 
-    public long getKOTNumber(long kotLineId){
+    public long getKOTNumber(long kotLineId) {
         long kotNumber = 0;
         try {
             Cursor cursor = db.rawQuery("select kotNumber from kotLineItems where kotLineId = '" + kotLineId + "' ", null);
@@ -3145,6 +3115,7 @@ public class POSDataSource {
     /**
      * This method used for get the KotLineItems for Release, Cancel an Order.
      * Merge the kotLineItems to invoice.
+     *
      * @param tableId
      * @return
      */
@@ -3504,7 +3475,7 @@ public class POSDataSource {
         }
     }
 
-    public void updateKOTSelectedStatusWithPOSId(long tableId, String isSelect,long posId) {
+    public void updateKOTSelectedStatusWithPOSId(long tableId, String isSelect, long posId) {
         String strSQL;
         try {
             strSQL = "update kotHeader set isSelected='" + isSelect + "' where kotTableId = '" + tableId + "' and invoiceNumber = '" + posId + "';";
@@ -3565,7 +3536,7 @@ public class POSDataSource {
     public void updateInvoiceToKOT(long tableId, long invoiceNumber) {
         String strSQL;
         try {
-            if(tableId!=0) {
+            if (tableId != 0) {
                 strSQL = "update kotHeader set invoiceNumber='" + invoiceNumber + "' where kotTableId = '" + tableId + "' ;";
                 db.execSQL(strSQL);
 
@@ -3578,7 +3549,7 @@ public class POSDataSource {
         }
     }
 
-    public void updateAllTableStatus(){
+    public void updateAllTableStatus() {
         try {
             String strSQL = "update kotTables set isOrderAvailable='N' ;";
             db.execSQL(strSQL);
@@ -3807,7 +3778,7 @@ public class POSDataSource {
         }
     }
 
-    public void deleteOldData(){
+    public void deleteOldData() {
         db.beginTransaction();
         try {
             db.execSQL("delete from posOrderHeader where createdDate <= date('now','-2 day')");

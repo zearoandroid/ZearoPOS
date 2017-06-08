@@ -33,7 +33,10 @@ import com.zearoconsulting.zearopos.utils.NetworkUtil;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.List;
+
+import static com.zearoconsulting.zearopos.utils.FileUtils.deleteDir;
 
 public class ManualSyncActivity extends BaseActivity implements ConnectivityReceiver.ConnectivityReceiverListener, ILoginListeners {
 
@@ -70,12 +73,21 @@ public class ManualSyncActivity extends BaseActivity implements ConnectivityRece
 
                 if(status){
                     mDBHelper.deleteAllTables();
+
+                    clearCache();
                     showLoading();
                 }else{
                     AlertView.showAlert("Images are not deleted. Please delete all images from storage!", ManualSyncActivity.this);
                 }
             }
         });
+    }
+
+    private void clearCache() {
+        try {
+            File dir = ManualSyncActivity.this.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) {}
     }
 
     private void showLoading() {

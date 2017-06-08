@@ -103,8 +103,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
             Glide.with(mContext)
                     .load(model.getCategoryImage())
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
                     .into( holder.imageView);
 
 

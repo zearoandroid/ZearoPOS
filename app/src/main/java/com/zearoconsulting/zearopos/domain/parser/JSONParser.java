@@ -1075,8 +1075,8 @@ public class JSONParser {
 
                         //load image to sdcard and store the path to db
                         if (obj.has("categoryImage")) {
-                            String imagePath = FileUtils.storeImage(obj.getString("categoryImage"),obj.getLong("categoryId"),null);
-                            category.setCategoryImage(imagePath);
+                            //String imagePath = FileUtils.storeImage(obj.getString("categoryImage"),obj.getLong("categoryId"),null);
+                            category.setCategoryImage(obj.getString("categoryImage"));
                         } else {
                             // Retrieve the image from the res folder
                             Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),
@@ -1172,17 +1172,41 @@ public class JSONParser {
                         product.setCostPrice(Double.parseDouble(obj.getString("costprice")));
                         product.setTerminalId(obj.getLong("terminalId"));
 
-                        //load image to sdcard and store the path to db
-                        if (obj.has("productImage")) {
-                            String imagePath = FileUtils.storeImage(obj.getString("productImage"),obj.getLong("productId"),null);
-                            product.setProdImage(imagePath);
-                        } else {
+                        if(obj.has("productMultiImage")){
+                            JSONArray jsonProdArray = obj.getJSONArray("productMultiImage");
+                            for (int j = 0; j < jsonProdArray.length(); j++) {
+                                JSONObject prodObj = (JSONObject) jsonProdArray.get(0);
+                                if(prodObj.has("productImage")){
+                                    product.setProdImage(prodObj.getString("productImage"));
+                                }else{
+                                    // Retrieve the image from the res folder
+                                    Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),
+                                            R.drawable.no_product);
+                                    String imagePath = FileUtils.storeImage("",obj.getLong("productId"),bitmap);
+                                    product.setProdImage(imagePath);
+                                }
+                            }
+                        }else{
                             // Retrieve the image from the res folder
                             Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),
                                     R.drawable.no_product);
                             String imagePath = FileUtils.storeImage("",obj.getLong("productId"),bitmap);
                             product.setProdImage(imagePath);
                         }
+
+                        /*//load image to sdcard and store the path to db
+                        if (obj.has("productImage")) {
+                            String imagePath = FileUtils.storeImage(obj.getString("productImage"),obj.getLong("productId"),null);
+                            product.setProdImage(imagePath);
+                        } else {
+                                // Retrieve the image from the res folder
+                                Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),
+                                        R.drawable.no_product);
+                                String imagePath = FileUtils.storeImage("",obj.getLong("productId"),bitmap);
+                                product.setProdImage(imagePath);
+                        }*/
+
+
 
                         if (obj.has("productArabicName")) {
                             product.setProdArabicName(obj.getString("productArabicName"));

@@ -78,8 +78,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
 
         Glide.with(mContext)
                 .load(mProductList.get(pos).getProdImage())
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
                 .into( holder.imageView);
 
         //AnimationUtil.aimateProduct(holder);
