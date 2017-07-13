@@ -44,6 +44,7 @@ public class AddNotesFragment extends AbstractDialogFragment implements AdapterV
     private FancyButton mBtnCancel;
     //private POSLineItem posLineItem;
     private long mPOSId=0, mRowId = 0, mProdId =0;
+    private String isKOT, notes;
     ImageView imageOfFood;
     TextView foodName;
     TextView addNote;
@@ -55,12 +56,14 @@ public class AddNotesFragment extends AbstractDialogFragment implements AdapterV
     private String selectedNotes="";
     private LinearLayout mLayChoice;
 
-    public static AddNotesFragment newInstance(Context paramContext, long posId, long rowId, long prodId) {
+    public static AddNotesFragment newInstance(Context paramContext, long posId, long rowId, long prodId,String isKOT,String notes) {
         AddNotesFragment addNotesFragment = new AddNotesFragment();
         Bundle localBundle = new Bundle();
         localBundle.putLong("posID", posId);
         localBundle.putLong("rowID", rowId);
         localBundle.putLong("prodID", prodId);
+        localBundle.putString("isKOT", isKOT);
+        localBundle.putString("notes", notes);
         addNotesFragment.setArguments(localBundle);
         context = paramContext;
         return addNotesFragment;
@@ -101,6 +104,8 @@ public class AddNotesFragment extends AbstractDialogFragment implements AdapterV
             this.mPOSId = bundle.getLong("posID", 0);
             this.mRowId = bundle.getLong("rowID", 0);
             this.mProdId = bundle.getLong("prodID", 0);
+            this.isKOT = bundle.getString("isKOT","N");
+            this.notes = bundle.getString("notes","");
         }
 
         getDialog().getWindow().setSoftInputMode(3);
@@ -161,6 +166,14 @@ public class AddNotesFragment extends AbstractDialogFragment implements AdapterV
             mSpnNotes.setAdapter(dataAdapter);
         }else{
             mLayChoice.setVisibility(View.GONE);
+        }
+
+        AddNotesFragment.this.note.setText(this.notes);
+
+        if(this.isKOT.equalsIgnoreCase("N")){
+            this.mBtnSubmit.setVisibility(View.VISIBLE);
+        }else{
+            this.mBtnSubmit.setVisibility(View.GONE);
         }
 
         // Add an OnTouchListener to the root view.

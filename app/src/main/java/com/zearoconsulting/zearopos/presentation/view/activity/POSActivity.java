@@ -1792,16 +1792,14 @@ public class POSActivity extends BaseActivity implements NavigationView.OnNaviga
         mOrderFrag.showSnackBar("Call Supervisor to unlock the Order.");
     }
 
-    public void showAddNotes(long posId, long categoryId, POSLineItem mPoslineItem){
-        if(mPoslineItem.getIsKOTGenerated().equalsIgnoreCase("N")){
-            try {
-                AddNotesFragment.newInstance(POSActivity.this, posId,mPoslineItem.getRowId(),mPoslineItem.getProductId()).show(fragmentManager, "TableChange");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }else{
-
+    public void showAddNotes(long posId, long categoryId, POSLineItem mPoslineItem) {
+        //if(mPoslineItem.getIsKOTGenerated().equalsIgnoreCase("N")){
+        try {
+            AddNotesFragment.newInstance(POSActivity.this, posId, mPoslineItem.getRowId(), mPoslineItem.getProductId(), mPoslineItem.getIsKOTGenerated(), mPoslineItem.getNotes()).show(fragmentManager, "TableChange");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        //}
     }
 
     /**
